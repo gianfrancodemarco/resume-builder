@@ -310,92 +310,84 @@ export default {
 
 <style scoped>
 .editor-card {
-  height: calc(100vh - 32px);
-  overflow-y: auto;
-  background-color: #f5f5f5;
-  padding-right: 16px;
+  height: 100%;
+  background-color: white;
+  display: flex;
+  flex-direction: column;
 }
 
 .editor-tabs {
   position: sticky;
   top: 0;
-  z-index: 1;
-  background-color: #f5f5f5;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+  z-index: 2;
+  background-color: white;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
 }
 
 .editor-window {
-  height: calc(100% - 48px);
+  flex: 1;
   overflow-y: auto;
+  padding: 16px;
 }
 
 .editor-panels {
   background: transparent;
-  margin-right: -16px;
 }
 
-.editor-panel {
-  margin-bottom: 8px;
-  border-radius: 8px !important;
+:deep(.editor-panel) {
+  background-color: white;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  border-radius: 12px !important;
+  margin-bottom: 16px;
   overflow: hidden;
-  box-shadow: none !important;
-  border: none !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  transition: all 0.2s ease-in-out;
 }
 
-.panel-title {
-  font-weight: 600;
-  color: #2c3e50;
+:deep(.editor-panel:hover) {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+:deep(.panel-title) {
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.87);
+  padding: 16px;
+}
+
+:deep(.v-expansion-panel-text__wrapper) {
+  padding: 0 16px 16px;
 }
 
 .experience-card,
 .education-card {
-  background-color: white;
+  background-color: #f8fafc;
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-}
-
-:deep(.v-expansion-panel-text) {
-  padding: 16px;
-  overflow-x: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.08);
 }
 
 :deep(.v-field) {
-  border-radius: 8px;
-  margin-bottom: 8px;
+  border-radius: 8px !important;
+}
+
+:deep(.v-field__outline) {
+  border-color: rgba(0, 0, 0, 0.12) !important;
+}
+
+:deep(.v-field--focused .v-field__outline) {
+  border-color: rgb(var(--v-theme-primary)) !important;
 }
 
 :deep(.v-btn) {
-  text-transform: none;
+  border-radius: 8px;
   font-weight: 500;
 }
 
-:deep(.v-expansion-panel-title) {
-  min-height: 48px;
-  padding: 0 16px;
+:deep(.v-btn--icon) {
+  border-radius: 8px;
 }
 
-:deep(.v-expansion-panel-title__overlay) {
-  opacity: 0;
-}
-
-:deep(.v-expansion-panel--active > .v-expansion-panel-title) {
-  background-color: rgba(var(--v-theme-primary), 0.1);
-}
-
-/* Remove all transitions */
-:deep(.v-expansion-panels),
-:deep(.v-expansion-panel),
-:deep(.v-expansion-panel-text__wrapper),
-:deep(.v-expansion-panel-title) {
-  transition: none !important;
-}
-
-:deep(.v-expansion-panel) {
-  box-shadow: none !important;
-  border: none !important;
-}
-
-:deep(.v-expansion-panel-text__wrapper) {
-  padding: 0;
+:deep(.v-switch .v-label) {
+  font-size: 0.875rem;
+  opacity: 0.7;
 }
 </style>

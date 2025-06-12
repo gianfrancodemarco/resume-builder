@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <v-app-bar color="primary" elevation="1">
+    <v-app-bar color="primary" elevation="0" class="px-4">
       <v-app-bar-title class="text-h5 font-weight-bold">Resume Builder</v-app-bar-title>
       <v-spacer></v-spacer>
       <v-btn icon="mdi-github" variant="text" href="https://github.com/gianfrancodemarco/resume-builder"
@@ -8,9 +8,9 @@
     </v-app-bar>
 
     <v-main class="app-background">
-      <v-container fluid class="pa-0">
-        <v-row no-gutters>
-          <v-col cols="12" md="4" lg="3">
+      <v-container fluid class="pa-0 fill-height">
+        <v-row no-gutters class="fill-height">
+          <v-col cols="12" md="4" lg="3" class="editor-col">
             <ResumeEditor v-model:resume-data="resumeData" v-model:style="styleData" @update:style="updateStyle" />
           </v-col>
           <v-col cols="12" md="8" lg="9" class="preview-container">
@@ -184,16 +184,40 @@ watch(showFullPreview, (newVal) => {
   }
 })
 
-const downloadPDF = () => {
-  const element = document.getElementById('resume-preview')
-  const opt = {
+const downloadPDF = async () => {
+  const srcEl = document.getElementById('resume-preview')
+  if (!srcEl) return
+
+  // Clone the preview so we can force exact A4 sizing without disrupting the UI
+  const clone = srcEl.cloneNode(true)
+  clone.style.width = '210mm'
+  clone.style.height = '297mm'
+  clone.style.margin = '0'
+  clone.style.overflow = 'hidden'
+  clone.id = 'clone-preview'
+  document.body.appendChild(clone)
+
+  const { jsPDF } = await import('jspdf')
+  const doc = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' })
+
+  await doc.html(clone, {
     margin: 0,
-    filename: 'resume.pdf',
-    image: { type: 'jpeg', quality: 0.98 },
-    html2canvas: { scale: 2 },
-    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-  }
-  html2pdf().set(opt).from(element).save()
+    html2canvas: {
+      scale: 1,          // 1:1 pixels -> mm mapping
+      useCORS: true,
+      backgroundColor: null,
+      fontFace: true
+    },
+    x: 0,
+    y: 0,
+    autoPaging: false,
+    width: 210,
+    windowWidth: 793.7   // 210 mm at 96 dpi
+  })
+
+  doc.save('resume.pdf')
+
+  document.body.removeChild(clone)
 }
 
 const downloadHTML = () => {
@@ -215,30 +239,40 @@ const updateStyle = (newStyle) => {
 
 <style>
 .app-background {
-  background-color: #f5f7fa;
+  background-color: #f8fafc;
   min-height: 100vh;
+}
+
+.editor-col {
+  background-color: white;
+  border-right: 1px solid rgba(0, 0, 0, 0.08);
+  height: 100vh;
+  overflow-y: auto;
 }
 
 .download-buttons {
   position: fixed;
-  bottom: 20px;
-  right: 20px;
+  bottom: 24px;
+  right: 24px;
   display: flex;
-  gap: 8px;
+  gap: 12px;
   z-index: 100;
 }
 
 .download-btn {
-  transition: transform 0.2s ease-in-out;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
 }
 
 .download-btn:hover {
   transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15) !important;
 }
 
 :deep(.v-app-bar) {
-  backdrop-filter: blur(10px);
-  background-color: rgba(var(--v-theme-primary), 0.95) !important;
+  backdrop-filter: blur(12px);
+  background-color: rgba(var(--v-theme-primary), 0.98) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 :deep(.v-main) {
@@ -255,11 +289,12 @@ const updateStyle = (newStyle) => {
 
 .preview-card {
   background-color: white;
-  border-radius: 12px;
+  border-radius: 16px;
   overflow: hidden;
   max-height: 90vh;
   display: flex;
   flex-direction: column;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }
 
 .preview-content {
@@ -274,35 +309,38 @@ const updateStyle = (newStyle) => {
 .preview-wrapper {
   height: 100vh;
   overflow-y: auto;
-  background-color: #f5f5f5;
-  padding: 48px;
+  background-color: transparent;
+  padding: 24px;
 }
 
 .preview-container {
   position: relative;
   height: 100vh;
   overflow: hidden;
+  background-color: #f8fafc;
 }
 
 .floating-actions {
   position: fixed;
-  top: 16px;
-  right: 16px;
+  top: 24px;
+  right: 24px;
   z-index: 2;
-  background: rgba(0, 0, 0, 0.5);
-  padding: 8px;
-  border-radius: 8px;
-  backdrop-filter: blur(4px);
+  background: rgba(0, 0, 0, 0.6);
+  padding: 8px 16px;
+  border-radius: 12px;
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .zoom-controls {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 8px;
 }
 
 :deep(.v-overlay__scrim) {
-  opacity: 0.8 !important;
+  opacity: 0.85 !important;
+  backdrop-filter: blur(4px);
 }
 
 :deep(.v-btn--disabled) {
