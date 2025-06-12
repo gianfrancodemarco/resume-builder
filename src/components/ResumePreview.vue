@@ -1,44 +1,55 @@
 <template>
-  <div id="printable-area">
-    <div class="resume-preview" :style="resumeStyle">
-      <div class="preview-container">
-        <div class="container" :class="{ 'sidebar-left': sidebarPosition === 'left' }">
-          <div class="sidebar">
-            <template v-for="(section, index) in visibleCustomSections" :key="index">
-              <h2>{{ section.title }}</h2>
-              <component :is="getSectionComponent(section.type)" :items="section.items" :type="section.type" />
-            </template>
+  <div class="preview-container">
+    <div class="container">
+      <div class="sidebar">
+        <div v-if="resumeData.personal.visible">
+          <h2>About me</h2>
+          <p class="subsubtitle" v-for="(t, i) in resumeData.personal.about" :key="i">{{ t }}</p>
+        </div>
+        <div v-if="resumeData.personal.detailsVisible">
+          <h2>Details</h2>
+          <p>{{ resumeData.personal.location }}<br />
+            <a :href="'mailto:' + resumeData.personal.email">{{ resumeData.personal.email }}</a>
+          </p>
+        </div>
+        <div v-if="resumeData.personal.linksVisible && resumeData.personal.links.length">
+          <h2>Links</h2>
+          <a v-for="(l, i) in resumeData.personal.links" :key="i" :href="l" target="_blank">{{ l }}</a>
+        </div>
+        <div v-if="resumeData.skillsVisible && resumeData.skills.length">
+          <h2>Skills</h2>
+          <p class="skills-list"><span v-for="(s, i) in resumeData.skills" :key="i">{{ s }}<br /></span></p>
+        </div>
+        <div v-if="resumeData.languagesVisible && resumeData.languages.length">
+          <h2>Languages</h2>
+          <div class="language-proficiency" v-for="(l, i) in resumeData.languages" :key="i">
+            <div class="language-proficiency-label">{{ l.name }}</div>
+            <div class="language-proficiency-bar">
+              <div class="language-proficiency-bar-fill" :style="{ width: l.proficiency + '%' }"></div>
+            </div>
           </div>
-          <div class="content">
-            <h1>{{ resumeData.personal.name || 'Your Name' }}</h1>
-            <h2 class="subtitle">{{ resumeData.personal.title }}</h2>
+        </div>
+      </div>
+      <div class="content">
+        <h1>{{ resumeData.personal.name || 'Your Name' }}</h1>
+        <h2 class="subtitle">{{ resumeData.personal.title }}</h2>
 
-            <div class="section"
-              v-if="resumeData.experiencesVisible && resumeData.experiences && resumeData.experiences.filter(e => e?.visible).length">
-              <h2>Employment History</h2>
-              <div v-for="(e, i) in resumeData.experiences" :key="i">
-                <template v-if="e?.visible">
-                  <p class="job-title">{{ e.title }} - {{ e.company }}</p>
-                  <p class="date">{{ e.period }}</p>
-                  <p class="job-desc" v-html="e.description"></p>
-                </template>
-              </div>
-            </div>
+        <div class="section" v-if="resumeData.experiencesVisible && resumeData.experiences.length">
+          <h2>Employment History</h2>
+          <div v-for="(e, i) in resumeData.experiences" :key="i">
+            <p class="job-title">{{ e.title }}</p>
+            <p class="date">{{ e.period }}</p>
+            <p class="job-desc" v-html="e.description"></p>
+          </div>
+        </div>
 
-            <div class="section"
-              v-if="resumeData.educationVisible && resumeData.education && resumeData.education.filter(e => e?.visible).length">
-              <h2>Education</h2>
-              <div v-for="(ed, i) in resumeData.education" :key="i">
-                <template v-if="ed?.visible">
-                  <p class="job-title">{{ ed.degree }} - {{ ed.school }}</p>
-                  <div>
-                    <p class="date">{{ ed.period }}</p>
-                    <p class="graduation-mark">{{ ed.mark }}</p>
-                  </div>
-                  <p class="thesis">{{ ed.thesis }}</p>
-                </template>
-              </div>
-            </div>
+        <div class="section" v-if="resumeData.educationVisible && resumeData.education.length">
+          <h2>Education</h2>
+          <div v-for="(ed, i) in resumeData.education" :key="i">
+            <p class="job-title">{{ ed.degree }}</p>
+            <p class="date">{{ ed.period }}</p>
+            <p class="graduation-mark">{{ ed.mark }}</p>
+            <p class="thesis">{{ ed.thesis }}</p>
           </div>
         </div>
       </div>
@@ -47,237 +58,115 @@
 </template>
 
 <script>
-import SkillsList from './sections/SkillsList.vue'
-import LanguageProficiency from './sections/LanguageProficiency.vue'
-import ItalicText from './sections/ItalicText.vue'
-import DefaultText from './sections/DefaultText.vue'
-
 export default {
-  components: {
-    SkillsList,
-    LanguageProficiency,
-    ItalicText,
-    DefaultText
-  },
-  props: {
-    resumeData: {
-      type: Object,
-      required: true
-    },
-    style: {
-      type: Object,
-      required: true
-    },
-    downloadId: {
-      type: String,
-      default: ''
-    },
-    sidebarPosition: {
-      type: String,
-      default: 'right',
-      validator: (value) => ['left', 'right'].includes(value)
-    }
-  },
-  computed: {
-    resumeStyle() {
-      const { colors, typography, spacing } = this.style
-      return {
-        '--primary-color': colors.primary,
-        '--text-color': colors.text,
-        '--background-color': colors.background,
-        '--sidebar-color': colors.sidebar || colors.primary,
-        '--link-color': colors.link || colors.primary,
-        '--heading-font': typography.headingFont,
-        '--body-font': typography.bodyFont,
-        '--base-size': `${typography.baseSize}px`,
-        '--heading-size': `${typography.headingSize}px`,
-        '--section-spacing': `${spacing.section}px`,
-        '--content-spacing': `${spacing.content}px`,
-        '--sidebar-width': `${spacing.sidebarWidth || 280}px`
-      }
-    },
-    visibleCustomSections() {
-      return this.resumeData.customSections.filter(s => s && s.visible !== false)
-    }
-  },
-  methods: {
-    getSectionComponent(type) {
-      const components = {
-        list: 'SkillsList',
-        languages: 'LanguageProficiency',
-        italic: 'ItalicText',
-        default: 'DefaultText'
-      }
-      return components[type] || components.default
-    }
-  }
+  props: { resumeData: Object }
 }
 </script>
 
-<style>
-#printable-area {
-  margin: auto;
-  width: 210mm;
-  padding: 0;
-  background-color: black !important;
-}
-
-.resume-preview {
-  background-color: var(--background-color);
-  color: var(--text-color);
-  font-family: var(--body-font);
-  font-size: var(--base-size);
-  line-height: 1.6;
-  padding: 0;
-  overflow: hidden;
-}
-
-.resume-preview h1,
-.resume-preview h2,
-.resume-preview h3 {
-  color: var(--primary-color);
-  font-family: var(--heading-font);
-  font-size: var(--heading-size);
-  margin-bottom: var(--content-spacing);
-}
-
-.resume-preview .section {
-  margin-bottom: var(--section-spacing);
-}
-
-.resume-preview .section-content {
-  margin-top: var(--content-spacing);
+<style scoped>
+@page {
+  size: A4;
+  margin: 0;
 }
 
 .preview-container {
-  width: 100%;
-  min-height: 100%;
   margin: 0;
-  background-color: var(--background-color);
-  color: var(--text-color);
-  font-family: var(--body-font);
+  font-family: 'Lato', sans-serif;
+  background-color: #f9f9f9;
+  color: #08294D;
+  width: 210mm;
+  min-height: 297mm;
+  margin: 0 auto;
   padding: 0;
 }
 
 .container {
   display: flex;
   flex-direction: row-reverse;
-  width: 100%;
-  margin: 0;
-  padding: 0;
+  width: 210mm;
+  min-height: 297mm;
+  margin: 0 auto;
   background: #fff;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
   overflow: hidden;
 }
 
-.container.sidebar-left {
-  flex-direction: row;
-}
-
 .sidebar {
-  width: var(--sidebar-width);
-  min-width: var(--sidebar-width);
-  max-width: var(--sidebar-width);
-  background-color: var(--sidebar-color);
+  background-color: #08294D;
   color: #eee;
   font-weight: 400;
-  min-height: 297mm;
-  padding: 28px 28px 48px;
+  width: 28%;
+  padding: 28px 28px 48px 28px;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  overflow-wrap: break-word;
-  word-wrap: break-word;
-  word-break: break-word;
 }
 
-.sidebar h1,
 .sidebar h2 {
-  font-family: var(--heading-font);
+  font-family: 'Oswald', sans-serif;
   font-size: 1em;
-  margin: 16px 0 6px;
+  margin-bottom: 6px;
   border-bottom: 2px solid #ffffff33;
   padding-bottom: 3px;
   font-weight: 700;
   letter-spacing: 0.5px;
   color: #fff;
-  word-wrap: break-word;
-}
-
-.sidebar h1:first-child,
-.sidebar h2:first-child {
-  margin-top: 0;
 }
 
 .sidebar a {
-  color: var(--link-color);
+  color: #eee !important;
   text-decoration: underline;
   display: block;
   margin-bottom: 3px;
   font-size: 0.9em;
   opacity: 1;
-  word-wrap: break-word;
 }
 
 .sidebar a:hover {
   opacity: 0.8;
 }
 
+.sidebar div:first-child {
+  margin-top: 0;
+}
+
 .sidebar div {
   margin-bottom: 6px;
   font-size: 0.9em;
-  word-wrap: break-word;
 }
 
 .sidebar p {
-  margin: 0 0 4px;
+  margin: 0 0 4px 0;
   font-size: 0.85em;
   line-height: 1.4;
   font-weight: 100;
-  word-wrap: break-word;
 }
 
 .sidebar .subsubtitle {
   font-size: 0.75em;
   font-weight: 400;
   color: #eee;
-  margin: 8px 0 0;
+  margin: 8px 0 0 0;
+  text-transform: none;
   font-style: italic;
   line-height: 1.4;
-  font-family: var(--body-font);
 }
 
 .content {
   width: 72%;
-  padding: 16px 48px 64px;
-  background: var(--background-color);
-  color: var(--text-color);
-  overflow-wrap: break-word;
-  display: flex;
-  flex-direction: column;
-  gap: var(--content-spacing);
+  padding: 16px 48px 64px 48px;
+  background: #fff;
+  color: #08294D;
 }
 
 .content h1,
 .content h2,
 .content p,
+.content .job-title,
 .content .job-desc,
 .content strong,
 .content span {
-  color: var(--text-color);
-}
-
-.content h1,
-.content h2 {
-  font-family: var(--heading-font);
-  color: var(--primary-color);
-}
-
-.content p,
-.content .job-desc,
-.content strong,
-.content span {
-  font-family: var(--body-font);
+  color: #08294D;
 }
 
 .content .date {
@@ -285,70 +174,72 @@ export default {
 }
 
 .content a {
-  color: var(--link-color);
+  color: #0b7dda;
   text-decoration: underline;
 }
 
 .content h1 {
+  font-family: 'Oswald', sans-serif;
+  font-size: 1.6em;
   margin-bottom: 0;
   font-weight: 700;
   letter-spacing: 0.5px;
 }
 
 .content .subtitle {
-  font-size: calc(var(--base-size) * 0.75);
+  font-size: 0.75em;
+  padding-left: 3px;
   color: #aaa;
-  margin-top: 4px;
 }
 
 .content h2 {
+  font-family: 'Oswald', sans-serif;
   font-weight: 600;
-  font-size: calc(var(--heading-size) * 0.56);
+  font-size: 0.9em;
   letter-spacing: 2px;
-  margin: 0;
+  margin-top: 6px;
+  margin-bottom: 0;
   text-transform: uppercase;
 }
 
-/* Sections */
 .section {
-  margin-top: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--content-spacing);
+  margin-top: 24px;
 }
 
-.section>div {
-  display: flex;
-  flex-direction: column;
-  gap: calc(var(--content-spacing) * 0.5);
+.section h2 {
+  font-family: 'Oswald', sans-serif;
+  font-size: 1em;
+  margin-bottom: 12px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
 }
 
 .job-title {
-  font-family: var(--heading-font);
+  font-family: 'Oswald', sans-serif;
   font-weight: 700;
-  margin: 0;
-  font-size: calc(var(--heading-size) * 0.5);
+  margin-top: 20px;
+  margin-bottom: 0;
+  font-size: 0.8em;
 }
 
 .date {
   text-transform: uppercase;
-  font-size: calc(var(--base-size) * 0.7);
+  font-size: 0.7em;
   font-weight: 600;
-  margin: 0;
+  margin-top: 0;
   display: inline-block;
-  color: #aaa;
 }
 
 .job-desc {
-  margin: 0;
+  margin-top: 0;
 }
 
 p,
 li {
-  font-family: var(--body-font);
-  font-size: calc(var(--base-size) * 0.75);
+  font-family: 'Lato', sans-serif;
+  font-size: 0.75em;
   line-height: 1.5;
-  margin: 0;
+  margin-bottom: 6px;
 }
 
 .language-proficiency {
@@ -361,6 +252,7 @@ li {
 }
 
 .language-proficiency-bar {
+  flex-grow: 1;
   height: 8px;
   background-color: #526A82;
   border-radius: 4px;
@@ -371,7 +263,7 @@ li {
 
 .language-proficiency-bar-fill {
   height: 100%;
-  background-color: #fff;
+  background-color: #ffffff;
   border-radius: 4px;
 }
 
@@ -389,76 +281,12 @@ li {
   display: inline-block;
 }
 
-.school {
-  font-size: calc(var(--base-size) * 0.75);
-  color: #666;
-  margin: 0 0 4px;
-  font-style: italic;
-}
-
-/* Custom sections styling to match original sections */
-.resume-preview .custom-section h2 {
-  font-family: var(--heading-font);
-  font-size: var(--heading-size);
-  margin-bottom: var(--content-spacing);
-  color: var(--primary-color);
-}
-
-.resume-preview .custom-section p {
-  font-family: var(--body-font);
-  font-size: var(--base-size);
-  line-height: 1.6;
-  margin-bottom: var(--content-spacing);
-}
-
-.resume-preview .custom-section .skills-list {
-  font-size: var(--base-size);
-  line-height: 1.6;
-}
-
-.resume-preview .custom-section .skills-list span {
-  display: block;
-  margin-bottom: 4px;
-}
-
-.resume-preview .custom-section .language-proficiency {
-  margin-bottom: var(--content-spacing);
-}
-
-.resume-preview .custom-section .language-proficiency-label {
-  font-size: var(--base-size);
-  line-height: 1.2;
-  margin-bottom: 4px;
-}
-
-.resume-preview .custom-section .language-proficiency-bar {
-  height: 8px;
-  background-color: var(--sidebar-color);
-  border-radius: 4px;
-  overflow: hidden;
-  max-width: 250px;
-  margin-bottom: 8px;
-}
-
-.resume-preview .custom-section .language-proficiency-bar-fill {
-  height: 100%;
-  background-color: #ffffff;
-  border-radius: 4px;
-}
-
-.resume-preview .custom-section .subsubtitle {
-  font-style: italic;
-  font-size: var(--base-size);
-  line-height: 1.6;
-  margin-bottom: var(--content-spacing);
-}
-
-.resume-preview .custom-section a {
-  color: var(--link-color);
-  text-decoration: none;
-}
-
-.resume-preview .custom-section a:hover {
-  text-decoration: underline;
+@media print {
+  .container {
+    width: 210mm;
+    height: 297mm;
+    padding: 20mm;
+    margin: 0;
+  }
 }
 </style>
