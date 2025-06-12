@@ -3,7 +3,7 @@
     <v-app-bar color="primary" elevation="1">
       <v-app-bar-title class="text-h5 font-weight-bold">Resume Builder</v-app-bar-title>
       <v-spacer></v-spacer>
-      <v-btn icon="mdi-github" variant="text" href="https://github.com/yourusername/resume-builder"
+      <v-btn icon="mdi-github" variant="text" href="https://github.com/gianfrancodemarco/resume-builder"
         target="_blank"></v-btn>
     </v-app-bar>
 
@@ -21,6 +21,12 @@
     </v-main>
 
     <div class="download-buttons">
+      <v-tooltip text="Preview" location="top">
+        <template v-slot:activator="{ props }">
+          <v-btn v-bind="props" icon="mdi-eye" color="primary" @click="showFullPreview = true" class="mr-2 download-btn"
+            elevation="2" />
+        </template>
+      </v-tooltip>
       <v-tooltip text="Download as PDF" location="top">
         <template v-slot:activator="{ props }">
           <v-btn v-bind="props" icon="mdi-file-pdf-box" color="primary" @click="downloadPDF" class="mr-2 download-btn"
@@ -34,14 +40,41 @@
         </template>
       </v-tooltip>
     </div>
+
+    <!-- Preview Modal -->
+    <v-dialog v-model="showFullPreview" max-width="90vw" class="preview-dialog">
+      <v-card class="preview-card">
+        <v-card-text class="preview-content pa-0">
+          <div class="floating-actions">
+            <div class="d-flex align-center">
+              <v-btn icon="mdi-close" variant="text" @click="showFullPreview = false" color="white"></v-btn>
+              <v-divider vertical class="mx-2" color="white"></v-divider>
+              <div class="zoom-controls">
+                <v-btn icon="mdi-magnify-minus" variant="text" @click="zoomOut" color="white"
+                  :disabled="zoomLevel <= 0.5"></v-btn>
+                <span class="text-white mx-2">{{ Math.round(zoomLevel * 100) }}%</span>
+                <v-btn icon="mdi-magnify-plus" variant="text" @click="zoomIn" color="white"
+                  :disabled="zoomLevel >= 2"></v-btn>
+              </div>
+            </div>
+          </div>
+          <div class="preview-wrapper" :style="{ transform: `scale(${zoomLevel})`, transformOrigin: 'center top' }">
+            <ResumePreview :resume-data="resumeData" />
+          </div>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
   </v-app>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import ResumeEditor from './components/ResumeEditor.vue'
 import ResumePreview from './components/ResumePreview.vue'
 import html2pdf from 'html2pdf.js'
+
+const showFullPreview = ref(false)
+const zoomLevel = ref(1)
 
 const resumeData = ref({
   personal: {
@@ -110,6 +143,25 @@ const resumeData = ref({
   educationVisible: true
 })
 
+const zoomIn = () => {
+  if (zoomLevel.value < 2) {
+    zoomLevel.value = Math.min(zoomLevel.value + 0.1, 2)
+  }
+}
+
+const zoomOut = () => {
+  if (zoomLevel.value > 0.5) {
+    zoomLevel.value = Math.max(zoomLevel.value - 0.1, 0.5)
+  }
+}
+
+// Reset zoom when closing modal
+watch(showFullPreview, (newVal) => {
+  if (!newVal) {
+    zoomLevel.value = 1
+  }
+})
+
 const downloadPDF = () => {
   const element = document.getElementById('resume-preview')
   const opt = {
@@ -165,5 +217,65 @@ const downloadHTML = () => {
 
 :deep(.v-main) {
   padding-top: 64px;
+}
+
+.preview-dialog {
+  :deep(.v-overlay__content) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+.preview-card {
+  background-color: white;
+  border-radius: 12px;
+  overflow: hidden;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.preview-content {
+  position: relative;
+  overflow-y: auto;
+  max-height: 90vh;
+  padding-top: 80px;
+  display: flex;
+  justify-content: center;
+}
+
+.preview-wrapper {
+  transition: transform 0.2s ease-in-out;
+  min-height: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 0 48px 48px 48px;
+  margin-top: 24px;
+}
+
+.floating-actions {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 2;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 8px;
+  border-radius: 8px;
+  backdrop-filter: blur(4px);
+}
+
+.zoom-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+:deep(.v-overlay__scrim) {
+  opacity: 0.8 !important;
+}
+
+:deep(.v-btn--disabled) {
+  opacity: 0.5 !important;
 }
 </style>
