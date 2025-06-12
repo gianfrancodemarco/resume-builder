@@ -1,206 +1,237 @@
 <template>
-  <v-card class="editor-card" elevation="2">
-    <v-expansion-panels variant="accordion" class="editor-panels">
-      <!-- Personal / Sidebar -->
-      <v-expansion-panel class="editor-panel">
-        <v-expansion-panel-title class="panel-title">
-          <v-icon icon="mdi-account" class="mr-2" />
-          About Me
-        </v-expansion-panel-title>
-        <v-expansion-panel-text>
-          <div class="d-flex justify-end mb-4">
-            <v-switch v-model="local.personal.visible" label="Show section" hide-details density="compact"
-              color="primary" />
-          </div>
-          <v-text-field v-model="local.personal.name" label="Name" :disabled="!local.personal.visible"
-            variant="outlined" density="comfortable" class="mb-2" />
-          <v-text-field v-model="local.personal.title" label="Title" :disabled="!local.personal.visible"
-            variant="outlined" density="comfortable" class="mb-2" />
-          <v-textarea v-model="local.personal.about[0]" label="Description 1" :disabled="!local.personal.visible"
-            variant="outlined" density="comfortable" class="mb-2" />
-          <v-textarea v-model="local.personal.about[1]" label="Description 2" :disabled="!local.personal.visible"
-            variant="outlined" density="comfortable" />
-        </v-expansion-panel-text>
-      </v-expansion-panel>
+  <div class="editor-card">
+    <v-tabs v-model="activeTab" color="primary" class="editor-tabs">
+      <v-tab value="info">
+        <v-icon icon="mdi-account" class="mr-2" />
+        Info
+      </v-tab>
+      <v-tab value="style">
+        <v-icon icon="mdi-palette" class="mr-2" />
+        Style
+      </v-tab>
+    </v-tabs>
 
-      <v-expansion-panel class="editor-panel">
-        <v-expansion-panel-title class="panel-title">
-          <v-icon icon="mdi-card-account-details" class="mr-2" />
-          Details
-        </v-expansion-panel-title>
-        <v-expansion-panel-text>
-          <div class="d-flex justify-end mb-4">
-            <v-switch v-model="local.personal.detailsVisible" label="Show section" hide-details density="compact"
-              color="primary" />
-          </div>
-          <v-text-field v-model="local.personal.location" label="Location" :disabled="!local.personal.detailsVisible"
-            variant="outlined" density="comfortable" class="mb-2" />
-          <v-text-field v-model="local.personal.email" label="Email" :disabled="!local.personal.detailsVisible"
-            variant="outlined" density="comfortable" />
-        </v-expansion-panel-text>
-      </v-expansion-panel>
+    <v-window v-model="activeTab" class="editor-window">
+      <v-window-item value="info">
+        <v-expansion-panels class="editor-panels" multiple>
+          <!-- Personal / Sidebar -->
+          <v-expansion-panel class="editor-panel">
+            <v-expansion-panel-title class="panel-title">
+              <v-icon icon="mdi-account" class="mr-2" />
+              About Me
+            </v-expansion-panel-title>
+            <v-expansion-panel-text>
+              <div class="d-flex justify-end mb-4">
+                <v-switch v-model="local.personal.visible" label="Show section" hide-details density="compact"
+                  color="primary" />
+              </div>
+              <v-text-field v-model="local.personal.name" label="Name" :disabled="!local.personal.visible"
+                variant="outlined" density="comfortable" class="mb-2" />
+              <v-text-field v-model="local.personal.title" label="Title" :disabled="!local.personal.visible"
+                variant="outlined" density="comfortable" class="mb-2" />
+              <v-textarea v-model="local.personal.about[0]" label="Description 1" :disabled="!local.personal.visible"
+                variant="outlined" density="comfortable" class="mb-2" />
+              <v-textarea v-model="local.personal.about[1]" label="Description 2" :disabled="!local.personal.visible"
+                variant="outlined" density="comfortable" />
+            </v-expansion-panel-text>
+          </v-expansion-panel>
 
-      <v-expansion-panel class="editor-panel">
-        <v-expansion-panel-title class="panel-title">
-          <v-icon icon="mdi-link-variant" class="mr-2" />
-          Links
-        </v-expansion-panel-title>
-        <v-expansion-panel-text>
-          <div class="d-flex justify-end mb-4">
-            <v-switch v-model="local.personal.linksVisible" label="Show section" hide-details density="compact"
-              color="primary" />
-          </div>
-          <div v-for="(link, index) in local.personal.links" :key="index" class="d-flex align-center mb-2">
-            <v-text-field v-model="local.personal.links[index]" label="Link" readonly
-              :disabled="!local.personal.linksVisible" variant="outlined" density="comfortable" />
-            <v-btn icon="mdi-delete" color="error" variant="text" @click="removeLink(index)" class="ml-2"
-              :disabled="!local.personal.linksVisible" />
-          </div>
-          <v-text-field v-model="link" label="Add link (url)" :disabled="!local.personal.linksVisible"
-            variant="outlined" density="comfortable" class="mb-2" />
-          <v-btn color="primary" @click="addLink" :disabled="!local.personal.linksVisible" prepend-icon="mdi-plus">Add
-            Link</v-btn>
-        </v-expansion-panel-text>
-      </v-expansion-panel>
+          <v-expansion-panel class="editor-panel">
+            <v-expansion-panel-title class="panel-title">
+              <v-icon icon="mdi-card-account-details" class="mr-2" />
+              Details
+            </v-expansion-panel-title>
+            <v-expansion-panel-text>
+              <div class="d-flex justify-end mb-4">
+                <v-switch v-model="local.personal.detailsVisible" label="Show section" hide-details density="compact"
+                  color="primary" />
+              </div>
+              <v-text-field v-model="local.personal.location" label="Location"
+                :disabled="!local.personal.detailsVisible" variant="outlined" density="comfortable" class="mb-2" />
+              <v-text-field v-model="local.personal.email" label="Email" :disabled="!local.personal.detailsVisible"
+                variant="outlined" density="comfortable" />
+            </v-expansion-panel-text>
+          </v-expansion-panel>
 
-      <v-expansion-panel class="editor-panel">
-        <v-expansion-panel-title class="panel-title">
-          <v-icon icon="mdi-tools" class="mr-2" />
-          Skills
-        </v-expansion-panel-title>
-        <v-expansion-panel-text>
-          <div class="d-flex justify-end mb-4">
-            <v-switch v-model="local.skillsVisible" label="Show section" hide-details density="compact"
-              color="primary" />
-          </div>
-          <div v-for="(skill, index) in local.skills" :key="index" class="d-flex align-center mb-2">
-            <v-text-field v-model="local.skills[index]" label="Skill" readonly :disabled="!local.skillsVisible"
-              variant="outlined" density="comfortable" />
-            <v-btn icon="mdi-delete" color="error" variant="text" @click="removeSkill(index)" class="ml-2"
-              :disabled="!local.skillsVisible" />
-          </div>
-          <v-text-field v-model="skill" label="Skill" :disabled="!local.skillsVisible" variant="outlined"
-            density="comfortable" class="mb-2" />
-          <v-btn color="primary" @click="addSkill" :disabled="!local.skillsVisible" prepend-icon="mdi-plus">Add
-            Skill</v-btn>
-        </v-expansion-panel-text>
-      </v-expansion-panel>
+          <v-expansion-panel class="editor-panel">
+            <v-expansion-panel-title class="panel-title">
+              <v-icon icon="mdi-link-variant" class="mr-2" />
+              Links
+            </v-expansion-panel-title>
+            <v-expansion-panel-text>
+              <div class="d-flex justify-end mb-4">
+                <v-switch v-model="local.personal.linksVisible" label="Show section" hide-details density="compact"
+                  color="primary" />
+              </div>
+              <div v-for="(link, index) in local.personal.links" :key="index" class="d-flex align-center mb-2">
+                <v-text-field v-model="local.personal.links[index]" label="Link" readonly
+                  :disabled="!local.personal.linksVisible" variant="outlined" density="comfortable" />
+                <v-btn icon="mdi-delete" color="error" variant="text" @click="removeLink(index)" class="ml-2"
+                  :disabled="!local.personal.linksVisible" />
+              </div>
+              <v-text-field v-model="link" label="Add link (url)" :disabled="!local.personal.linksVisible"
+                variant="outlined" density="comfortable" class="mb-2" />
+              <v-btn color="primary" @click="addLink" :disabled="!local.personal.linksVisible"
+                prepend-icon="mdi-plus">Add
+                Link</v-btn>
+            </v-expansion-panel-text>
+          </v-expansion-panel>
 
-      <v-expansion-panel class="editor-panel">
-        <v-expansion-panel-title class="panel-title">
-          <v-icon icon="mdi-translate" class="mr-2" />
-          Languages
-        </v-expansion-panel-title>
-        <v-expansion-panel-text>
-          <div class="d-flex justify-end mb-4">
-            <v-switch v-model="local.languagesVisible" label="Show section" hide-details density="compact"
-              color="primary" />
-          </div>
-          <div v-for="(lang, index) in local.languages" :key="index" class="d-flex align-center mb-2">
-            <v-text-field v-model="local.languages[index].name" label="Language" readonly
-              :disabled="!local.languagesVisible" variant="outlined" density="comfortable" />
-            <v-text-field v-model="local.languages[index].proficiency" label="Proficiency (%)" readonly class="mx-2"
-              :disabled="!local.languagesVisible" variant="outlined" density="comfortable" />
-            <v-btn icon="mdi-delete" color="error" variant="text" @click="removeLang(index)" class="ml-2"
-              :disabled="!local.languagesVisible" />
-          </div>
-          <v-text-field v-model="lang.name" label="Language" :disabled="!local.languagesVisible" variant="outlined"
-            density="comfortable" class="mb-2" />
-          <v-text-field v-model="lang.proficiency" label="Proficiency (%)" :disabled="!local.languagesVisible"
-            variant="outlined" density="comfortable" class="mb-2" />
-          <v-btn color="primary" @click="addLang" :disabled="!local.languagesVisible" prepend-icon="mdi-plus">Add
-            Language</v-btn>
-        </v-expansion-panel-text>
-      </v-expansion-panel>
+          <v-expansion-panel class="editor-panel">
+            <v-expansion-panel-title class="panel-title">
+              <v-icon icon="mdi-tools" class="mr-2" />
+              Skills
+            </v-expansion-panel-title>
+            <v-expansion-panel-text>
+              <div class="d-flex justify-end mb-4">
+                <v-switch v-model="local.skillsVisible" label="Show section" hide-details density="compact"
+                  color="primary" />
+              </div>
+              <div v-for="(skill, index) in local.skills" :key="index" class="d-flex align-center mb-2">
+                <v-text-field v-model="local.skills[index]" label="Skill" readonly :disabled="!local.skillsVisible"
+                  variant="outlined" density="comfortable" />
+                <v-btn icon="mdi-delete" color="error" variant="text" @click="removeSkill(index)" class="ml-2"
+                  :disabled="!local.skillsVisible" />
+              </div>
+              <v-text-field v-model="skill" label="Skill" :disabled="!local.skillsVisible" variant="outlined"
+                density="comfortable" class="mb-2" />
+              <v-btn color="primary" @click="addSkill" :disabled="!local.skillsVisible" prepend-icon="mdi-plus">Add
+                Skill</v-btn>
+            </v-expansion-panel-text>
+          </v-expansion-panel>
 
-      <v-expansion-panel class="editor-panel">
-        <v-expansion-panel-title class="panel-title">
-          <v-icon icon="mdi-briefcase" class="mr-2" />
-          Experience
-        </v-expansion-panel-title>
-        <v-expansion-panel-text>
-          <div class="d-flex justify-end mb-4">
-            <v-switch v-model="local.experiencesVisible" label="Show section" hide-details density="compact"
-              color="primary" />
-          </div>
-          <div v-for="(exp, index) in local.experiences" :key="index" class="mb-4 experience-card pa-3">
-            <div class="d-flex align-center mb-2">
-              <v-text-field v-model="local.experiences[index].title" label="Job title" readonly
-                :disabled="!local.experiencesVisible" variant="outlined" density="comfortable" />
-              <v-btn icon="mdi-delete" color="error" variant="text" @click="removeExp(index)" class="ml-2"
-                :disabled="!local.experiencesVisible" />
-            </div>
-            <v-text-field v-model="local.experiences[index].company" label="Company (+ location)" readonly
-              :disabled="!local.experiencesVisible" variant="outlined" density="comfortable" class="mb-2" />
-            <v-text-field v-model="local.experiences[index].period" label="Period" readonly
-              :disabled="!local.experiencesVisible" variant="outlined" density="comfortable" class="mb-2" />
-            <v-textarea v-model="local.experiences[index].description" label="Description" readonly
-              :disabled="!local.experiencesVisible" variant="outlined" density="comfortable" />
-          </div>
-          <v-text-field v-model="exp.title" label="Job title" :disabled="!local.experiencesVisible" variant="outlined"
-            density="comfortable" class="mb-2" />
-          <v-text-field v-model="exp.company" label="Company (+ location)" :disabled="!local.experiencesVisible"
-            variant="outlined" density="comfortable" class="mb-2" />
-          <v-text-field v-model="exp.period" label="Period" :disabled="!local.experiencesVisible" variant="outlined"
-            density="comfortable" class="mb-2" />
-          <v-textarea v-model="exp.description" label="Description" :disabled="!local.experiencesVisible"
-            variant="outlined" density="comfortable" class="mb-2" />
-          <v-btn color="primary" @click="addExp" :disabled="!local.experiencesVisible" prepend-icon="mdi-plus">Add
-            Experience</v-btn>
-        </v-expansion-panel-text>
-      </v-expansion-panel>
+          <v-expansion-panel class="editor-panel">
+            <v-expansion-panel-title class="panel-title">
+              <v-icon icon="mdi-translate" class="mr-2" />
+              Languages
+            </v-expansion-panel-title>
+            <v-expansion-panel-text>
+              <div class="d-flex justify-end mb-4">
+                <v-switch v-model="local.languagesVisible" label="Show section" hide-details density="compact"
+                  color="primary" />
+              </div>
+              <div v-for="(lang, index) in local.languages" :key="index" class="d-flex align-center mb-2">
+                <v-text-field v-model="local.languages[index].name" label="Language" readonly
+                  :disabled="!local.languagesVisible" variant="outlined" density="comfortable" />
+                <v-text-field v-model="local.languages[index].proficiency" label="Proficiency (%)" readonly class="mx-2"
+                  :disabled="!local.languagesVisible" variant="outlined" density="comfortable" />
+                <v-btn icon="mdi-delete" color="error" variant="text" @click="removeLang(index)" class="ml-2"
+                  :disabled="!local.languagesVisible" />
+              </div>
+              <v-text-field v-model="lang.name" label="Language" :disabled="!local.languagesVisible" variant="outlined"
+                density="comfortable" class="mb-2" />
+              <v-text-field v-model="lang.proficiency" label="Proficiency (%)" :disabled="!local.languagesVisible"
+                variant="outlined" density="comfortable" class="mb-2" />
+              <v-btn color="primary" @click="addLang" :disabled="!local.languagesVisible" prepend-icon="mdi-plus">Add
+                Language</v-btn>
+            </v-expansion-panel-text>
+          </v-expansion-panel>
 
-      <v-expansion-panel class="editor-panel">
-        <v-expansion-panel-title class="panel-title">
-          <v-icon icon="mdi-school" class="mr-2" />
-          Education
-        </v-expansion-panel-title>
-        <v-expansion-panel-text>
-          <div class="d-flex justify-end mb-4">
-            <v-switch v-model="local.educationVisible" label="Show section" hide-details density="compact"
-              color="primary" />
-          </div>
-          <div v-for="(edu, index) in local.education" :key="index" class="mb-4 education-card pa-3">
-            <div class="d-flex align-center mb-2">
-              <v-text-field v-model="local.education[index].degree" label="Degree" readonly
-                :disabled="!local.educationVisible" variant="outlined" density="comfortable" />
-              <v-btn icon="mdi-delete" color="error" variant="text" @click="removeEdu(index)" class="ml-2"
-                :disabled="!local.educationVisible" />
-            </div>
-            <v-text-field v-model="local.education[index].period" label="Period" readonly
-              :disabled="!local.educationVisible" variant="outlined" density="comfortable" class="mb-2" />
-            <v-text-field v-model="local.education[index].mark" label="Grade" readonly
-              :disabled="!local.educationVisible" variant="outlined" density="comfortable" class="mb-2" />
-            <v-textarea v-model="local.education[index].thesis" label="Thesis / Notes" readonly
-              :disabled="!local.educationVisible" variant="outlined" density="comfortable" />
-          </div>
-          <v-text-field v-model="edu.degree" label="Degree" :disabled="!local.educationVisible" variant="outlined"
-            density="comfortable" class="mb-2" />
-          <v-text-field v-model="edu.period" label="Period" :disabled="!local.educationVisible" variant="outlined"
-            density="comfortable" class="mb-2" />
-          <v-text-field v-model="edu.mark" label="Grade" :disabled="!local.educationVisible" variant="outlined"
-            density="comfortable" class="mb-2" />
-          <v-textarea v-model="edu.thesis" label="Thesis / Notes" :disabled="!local.educationVisible" variant="outlined"
-            density="comfortable" class="mb-2" />
-          <v-btn color="primary" @click="addEdu" :disabled="!local.educationVisible" prepend-icon="mdi-plus">Add
-            Education</v-btn>
-        </v-expansion-panel-text>
-      </v-expansion-panel>
-    </v-expansion-panels>
-  </v-card>
+          <v-expansion-panel class="editor-panel">
+            <v-expansion-panel-title class="panel-title">
+              <v-icon icon="mdi-briefcase" class="mr-2" />
+              Experience
+            </v-expansion-panel-title>
+            <v-expansion-panel-text>
+              <div class="d-flex justify-end mb-4">
+                <v-switch v-model="local.experiencesVisible" label="Show section" hide-details density="compact"
+                  color="primary" />
+              </div>
+              <div v-for="(exp, index) in local.experiences" :key="index" class="mb-4 experience-card pa-3">
+                <div class="d-flex align-center mb-2">
+                  <v-text-field v-model="local.experiences[index].title" label="Job title" readonly
+                    :disabled="!local.experiencesVisible" variant="outlined" density="comfortable" />
+                  <v-btn icon="mdi-delete" color="error" variant="text" @click="removeExp(index)" class="ml-2"
+                    :disabled="!local.experiencesVisible" />
+                </div>
+                <v-text-field v-model="local.experiences[index].company" label="Company (+ location)" readonly
+                  :disabled="!local.experiencesVisible" variant="outlined" density="comfortable" class="mb-2" />
+                <v-text-field v-model="local.experiences[index].period" label="Period" readonly
+                  :disabled="!local.experiencesVisible" variant="outlined" density="comfortable" class="mb-2" />
+                <v-textarea v-model="local.experiences[index].description" label="Description" readonly
+                  :disabled="!local.experiencesVisible" variant="outlined" density="comfortable" />
+              </div>
+              <v-text-field v-model="exp.title" label="Job title" :disabled="!local.experiencesVisible"
+                variant="outlined" density="comfortable" class="mb-2" />
+              <v-text-field v-model="exp.company" label="Company (+ location)" :disabled="!local.experiencesVisible"
+                variant="outlined" density="comfortable" class="mb-2" />
+              <v-text-field v-model="exp.period" label="Period" :disabled="!local.experiencesVisible" variant="outlined"
+                density="comfortable" class="mb-2" />
+              <v-textarea v-model="exp.description" label="Description" :disabled="!local.experiencesVisible"
+                variant="outlined" density="comfortable" class="mb-2" />
+              <v-btn color="primary" @click="addExp" :disabled="!local.experiencesVisible" prepend-icon="mdi-plus">Add
+                Experience</v-btn>
+            </v-expansion-panel-text>
+          </v-expansion-panel>
+
+          <v-expansion-panel class="editor-panel">
+            <v-expansion-panel-title class="panel-title">
+              <v-icon icon="mdi-school" class="mr-2" />
+              Education
+            </v-expansion-panel-title>
+            <v-expansion-panel-text>
+              <div class="d-flex justify-end mb-4">
+                <v-switch v-model="local.educationVisible" label="Show section" hide-details density="compact"
+                  color="primary" />
+              </div>
+              <div v-for="(edu, index) in local.education" :key="index" class="mb-4 education-card pa-3">
+                <div class="d-flex align-center mb-2">
+                  <v-text-field v-model="local.education[index].degree" label="Degree" readonly
+                    :disabled="!local.educationVisible" variant="outlined" density="comfortable" />
+                  <v-btn icon="mdi-delete" color="error" variant="text" @click="removeEdu(index)" class="ml-2"
+                    :disabled="!local.educationVisible" />
+                </div>
+                <v-text-field v-model="local.education[index].period" label="Period" readonly
+                  :disabled="!local.educationVisible" variant="outlined" density="comfortable" class="mb-2" />
+                <v-text-field v-model="local.education[index].mark" label="Grade" readonly
+                  :disabled="!local.educationVisible" variant="outlined" density="comfortable" class="mb-2" />
+                <v-textarea v-model="local.education[index].thesis" label="Thesis / Notes" readonly
+                  :disabled="!local.educationVisible" variant="outlined" density="comfortable" />
+              </div>
+              <v-text-field v-model="edu.degree" label="Degree" :disabled="!local.educationVisible" variant="outlined"
+                density="comfortable" class="mb-2" />
+              <v-text-field v-model="edu.period" label="Period" :disabled="!local.educationVisible" variant="outlined"
+                density="comfortable" class="mb-2" />
+              <v-text-field v-model="edu.mark" label="Grade" :disabled="!local.educationVisible" variant="outlined"
+                density="comfortable" class="mb-2" />
+              <v-textarea v-model="edu.thesis" label="Thesis / Notes" :disabled="!local.educationVisible"
+                variant="outlined" density="comfortable" class="mb-2" />
+              <v-btn color="primary" @click="addEdu" :disabled="!local.educationVisible" prepend-icon="mdi-plus">Add
+                Education</v-btn>
+            </v-expansion-panel-text>
+          </v-expansion-panel>
+        </v-expansion-panels>
+      </v-window-item>
+
+      <v-window-item value="style">
+        <ResumeStyle v-model:style-data="styleData" @update:style-data="updateStyle" />
+      </v-window-item>
+    </v-window>
+  </div>
 </template>
 
 <script>
+import ResumeStyle from './ResumeStyle.vue'
+
 export default {
+  components: {
+    ResumeStyle
+  },
   props: {
     resumeData: {
       type: Object,
       required: true
+    },
+    style: {
+      type: Object,
+      required: true
     }
   },
-  emits: ['update:resume-data'],
+  emits: ['update:resume-data', 'update:style'],
   data() {
     return {
+      activeTab: 'info',
+      styleData: JSON.parse(JSON.stringify(this.style)),
       local: this.resumeData,
       link: '',
       skill: '',
@@ -215,9 +246,19 @@ export default {
         this.$emit('update:resume-data', newVal)
       },
       deep: true
+    },
+    style: {
+      handler(newVal) {
+        this.styleData = JSON.parse(JSON.stringify(newVal))
+      },
+      deep: true
     }
   },
   methods: {
+    updateStyle(newStyle) {
+      this.styleData = newStyle
+      this.$emit('update:style', JSON.parse(JSON.stringify(newStyle)))
+    },
     addLink() {
       if (this.link) {
         this.local.personal.links.push(this.link)
@@ -271,18 +312,34 @@ export default {
 .editor-card {
   height: calc(100vh - 32px);
   overflow-y: auto;
-  background-color: #f8f9fa;
-  border-radius: 12px;
+  background-color: #f5f5f5;
+  padding-right: 16px;
+}
+
+.editor-tabs {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background-color: #f5f5f5;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.editor-window {
+  height: calc(100% - 48px);
+  overflow-y: auto;
 }
 
 .editor-panels {
-  background-color: transparent;
+  background: transparent;
+  margin-right: -16px;
 }
 
 .editor-panel {
   margin-bottom: 8px;
   border-radius: 8px !important;
   overflow: hidden;
+  box-shadow: none !important;
+  border: none !important;
 }
 
 .panel-title {
@@ -299,10 +356,12 @@ export default {
 
 :deep(.v-expansion-panel-text) {
   padding: 16px;
+  overflow-x: hidden;
 }
 
 :deep(.v-field) {
   border-radius: 8px;
+  margin-bottom: 8px;
 }
 
 :deep(.v-btn) {
@@ -312,6 +371,7 @@ export default {
 
 :deep(.v-expansion-panel-title) {
   min-height: 48px;
+  padding: 0 16px;
 }
 
 :deep(.v-expansion-panel-title__overlay) {
@@ -320,5 +380,22 @@ export default {
 
 :deep(.v-expansion-panel--active > .v-expansion-panel-title) {
   background-color: rgba(var(--v-theme-primary), 0.1);
+}
+
+/* Remove all transitions */
+:deep(.v-expansion-panels),
+:deep(.v-expansion-panel),
+:deep(.v-expansion-panel-text__wrapper),
+:deep(.v-expansion-panel-title) {
+  transition: none !important;
+}
+
+:deep(.v-expansion-panel) {
+  box-shadow: none !important;
+  border: none !important;
+}
+
+:deep(.v-expansion-panel-text__wrapper) {
+  padding: 0;
 }
 </style>

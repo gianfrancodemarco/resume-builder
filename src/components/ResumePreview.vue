@@ -1,55 +1,57 @@
 <template>
-  <div class="preview-container">
-    <div class="container">
-      <div class="sidebar">
-        <div v-if="resumeData.personal.visible">
-          <h2>About me</h2>
-          <p class="subsubtitle" v-for="(t, i) in resumeData.personal.about" :key="i">{{ t }}</p>
-        </div>
-        <div v-if="resumeData.personal.detailsVisible">
-          <h2>Details</h2>
-          <p>{{ resumeData.personal.location }}<br />
-            <a :href="'mailto:' + resumeData.personal.email">{{ resumeData.personal.email }}</a>
-          </p>
-        </div>
-        <div v-if="resumeData.personal.linksVisible && resumeData.personal.links.length">
-          <h2>Links</h2>
-          <a v-for="(l, i) in resumeData.personal.links" :key="i" :href="l" target="_blank">{{ l }}</a>
-        </div>
-        <div v-if="resumeData.skillsVisible && resumeData.skills.length">
-          <h2>Skills</h2>
-          <p class="skills-list"><span v-for="(s, i) in resumeData.skills" :key="i">{{ s }}<br /></span></p>
-        </div>
-        <div v-if="resumeData.languagesVisible && resumeData.languages.length">
-          <h2>Languages</h2>
-          <div class="language-proficiency" v-for="(l, i) in resumeData.languages" :key="i">
-            <div class="language-proficiency-label">{{ l.name }}</div>
-            <div class="language-proficiency-bar">
-              <div class="language-proficiency-bar-fill" :style="{ width: l.proficiency + '%' }"></div>
+  <div class="resume-preview" :style="resumeStyle" :id="downloadId || null">
+    <div class="preview-container">
+      <div class="container">
+        <div class="sidebar">
+          <div v-if="resumeData.personal.visible">
+            <h2>About me</h2>
+            <p class="subsubtitle" v-for="(t, i) in resumeData.personal.about" :key="i">{{ t }}</p>
+          </div>
+          <div v-if="resumeData.personal.detailsVisible">
+            <h2>Details</h2>
+            <p>{{ resumeData.personal.location }}<br />
+              <a :href="'mailto:' + resumeData.personal.email">{{ resumeData.personal.email }}</a>
+            </p>
+          </div>
+          <div v-if="resumeData.personal.linksVisible && resumeData.personal.links.length">
+            <h2>Links</h2>
+            <a v-for="(l, i) in resumeData.personal.links" :key="i" :href="l" target="_blank">{{ l }}</a>
+          </div>
+          <div v-if="resumeData.skillsVisible && resumeData.skills.length">
+            <h2>Skills</h2>
+            <p class="skills-list"><span v-for="(s, i) in resumeData.skills" :key="i">{{ s }}<br /></span></p>
+          </div>
+          <div v-if="resumeData.languagesVisible && resumeData.languages.length">
+            <h2>Languages</h2>
+            <div class="language-proficiency" v-for="(l, i) in resumeData.languages" :key="i">
+              <div class="language-proficiency-label">{{ l.name }}</div>
+              <div class="language-proficiency-bar">
+                <div class="language-proficiency-bar-fill" :style="{ width: l.proficiency + '%' }"></div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-      <div class="content">
-        <h1>{{ resumeData.personal.name || 'Your Name' }}</h1>
-        <h2 class="subtitle">{{ resumeData.personal.title }}</h2>
+        <div class="content">
+          <h1>{{ resumeData.personal.name || 'Your Name' }}</h1>
+          <h2 class="subtitle">{{ resumeData.personal.title }}</h2>
 
-        <div class="section" v-if="resumeData.experiencesVisible && resumeData.experiences.length">
-          <h2>Employment History</h2>
-          <div v-for="(e, i) in resumeData.experiences" :key="i">
-            <p class="job-title">{{ e.title }}</p>
-            <p class="date">{{ e.period }}</p>
-            <p class="job-desc" v-html="e.description"></p>
+          <div class="section" v-if="resumeData.experiencesVisible && resumeData.experiences.length">
+            <h2>Employment History</h2>
+            <div v-for="(e, i) in resumeData.experiences" :key="i">
+              <p class="job-title">{{ e.title }}</p>
+              <p class="date">{{ e.period }}</p>
+              <p class="job-desc" v-html="e.description"></p>
+            </div>
           </div>
-        </div>
 
-        <div class="section" v-if="resumeData.educationVisible && resumeData.education.length">
-          <h2>Education</h2>
-          <div v-for="(ed, i) in resumeData.education" :key="i">
-            <p class="job-title">{{ ed.degree }}</p>
-            <p class="date">{{ ed.period }}</p>
-            <p class="graduation-mark">{{ ed.mark }}</p>
-            <p class="thesis">{{ ed.thesis }}</p>
+          <div class="section" v-if="resumeData.educationVisible && resumeData.education.length">
+            <h2>Education</h2>
+            <div v-for="(ed, i) in resumeData.education" :key="i">
+              <p class="job-title">{{ ed.degree }}</p>
+              <p class="date">{{ ed.period }}</p>
+              <p class="graduation-mark">{{ ed.mark }}</p>
+              <p class="thesis">{{ ed.thesis }}</p>
+            </div>
           </div>
         </div>
       </div>
@@ -59,7 +61,37 @@
 
 <script>
 export default {
-  props: { resumeData: Object }
+  props: {
+    resumeData: {
+      type: Object,
+      required: true
+    },
+    styleData: {
+      type: Object,
+      required: true
+    },
+    downloadId: {
+      type: String,
+      default: ''
+    }
+  },
+  computed: {
+    resumeStyle() {
+      return {
+        '--primary-color': this.styleData.colors.primary,
+        '--text-color': this.styleData.colors.text,
+        '--background-color': this.styleData.colors.background,
+        '--sidebar-color': this.styleData.colors.sidebar || this.styleData.colors.primary,
+        '--link-color': this.styleData.colors.link || this.styleData.colors.primary,
+        '--heading-font': this.styleData.typography.headingFont,
+        '--body-font': this.styleData.typography.bodyFont,
+        '--base-size': `${this.styleData.typography.baseSize}px`,
+        '--heading-size': `${this.styleData.typography.headingSize}px`,
+        '--section-spacing': `${this.styleData.spacing.section}px`,
+        '--content-spacing': `${this.styleData.spacing.content}px`
+      }
+    }
+  }
 }
 </script>
 
@@ -69,11 +101,40 @@ export default {
   margin: 0;
 }
 
+.resume-preview {
+  background-color: var(--background-color);
+  color: var(--text-color);
+  font-family: var(--body-font);
+  font-size: var(--base-size);
+  line-height: 1.6;
+  padding: 48px;
+  max-width: 800px;
+  margin: 0 auto;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.resume-preview h1,
+.resume-preview h2,
+.resume-preview h3 {
+  color: var(--primary-color);
+  font-family: var(--heading-font);
+  font-size: var(--heading-size);
+  margin-bottom: var(--content-spacing);
+}
+
+.resume-preview section {
+  margin-bottom: var(--section-spacing);
+}
+
+.resume-preview .section-content {
+  margin-top: var(--content-spacing);
+}
+
 .preview-container {
   margin: 0;
   font-family: 'Lato', sans-serif;
-  background-color: #f9f9f9;
-  color: #08294D;
+  background-color: var(--background-color, #f9f9f9);
+  color: var(--text-color, #08294D);
   width: 210mm;
   min-height: 297mm;
   margin: 0 auto;
@@ -92,7 +153,7 @@ export default {
 }
 
 .sidebar {
-  background-color: #08294D;
+  background-color: var(--sidebar-color, #08294D);
   color: #eee;
   font-weight: 400;
   width: 28%;
@@ -103,7 +164,7 @@ export default {
 }
 
 .sidebar h2 {
-  font-family: 'Oswald', sans-serif;
+  font-family: var(--heading-font, 'Oswald', sans-serif);
   font-size: 1em;
   margin-bottom: 6px;
   border-bottom: 2px solid #ffffff33;
@@ -114,7 +175,7 @@ export default {
 }
 
 .sidebar a {
-  color: #eee !important;
+  color: var(--link-color, #eee);
   text-decoration: underline;
   display: block;
   margin-bottom: 3px;
@@ -155,8 +216,8 @@ export default {
 .content {
   width: 72%;
   padding: 16px 48px 64px 48px;
-  background: #fff;
-  color: #08294D;
+  background: var(--background-color, #fff);
+  color: var(--text-color, #08294D);
 }
 
 .content h1,
@@ -166,7 +227,8 @@ export default {
 .content .job-desc,
 .content strong,
 .content span {
-  color: #08294D;
+  color: var(--text-color, #08294D);
+  font-family: var(--body-font, 'Lato', sans-serif);
 }
 
 .content .date {
@@ -174,32 +236,34 @@ export default {
 }
 
 .content a {
-  color: #0b7dda;
+  color: var(--link-color, #0b7dda);
   text-decoration: underline;
 }
 
 .content h1 {
-  font-family: 'Oswald', sans-serif;
-  font-size: 1.6em;
+  font-family: var(--heading-font, 'Oswald', sans-serif);
+  font-size: var(--heading-size, 1.6em);
   margin-bottom: 0;
   font-weight: 700;
   letter-spacing: 0.5px;
+  color: var(--primary-color, #08294D);
 }
 
 .content .subtitle {
-  font-size: 0.75em;
+  font-size: calc(var(--base-size, 16px) * 0.75);
   padding-left: 3px;
   color: #aaa;
 }
 
 .content h2 {
-  font-family: 'Oswald', sans-serif;
+  font-family: var(--heading-font, 'Oswald', sans-serif);
   font-weight: 600;
-  font-size: 0.9em;
+  font-size: calc(var(--heading-size, 24px) * 0.56);
   letter-spacing: 2px;
   margin-top: 6px;
   margin-bottom: 0;
   text-transform: uppercase;
+  color: var(--primary-color, #08294D);
 }
 
 .section {
@@ -207,24 +271,24 @@ export default {
 }
 
 .section h2 {
-  font-family: 'Oswald', sans-serif;
-  font-size: 1em;
+  font-family: var(--heading-font, 'Oswald', sans-serif);
+  font-size: var(--heading-size, 1em);
   margin-bottom: 12px;
   font-weight: 700;
   letter-spacing: 0.5px;
 }
 
 .job-title {
-  font-family: 'Oswald', sans-serif;
+  font-family: var(--heading-font, 'Oswald', sans-serif);
   font-weight: 700;
   margin-top: 20px;
   margin-bottom: 0;
-  font-size: 0.8em;
+  font-size: calc(var(--heading-size, 24px) * 0.5);
 }
 
 .date {
   text-transform: uppercase;
-  font-size: 0.7em;
+  font-size: calc(var(--base-size, 16px) * 0.7);
   font-weight: 600;
   margin-top: 0;
   display: inline-block;
@@ -236,8 +300,8 @@ export default {
 
 p,
 li {
-  font-family: 'Lato', sans-serif;
-  font-size: 0.75em;
+  font-family: var(--body-font, 'Lato', sans-serif);
+  font-size: calc(var(--base-size, 16px) * 0.75);
   line-height: 1.5;
   margin-bottom: 6px;
 }
