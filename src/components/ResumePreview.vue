@@ -102,15 +102,16 @@ export default {
 }
 
 .resume-preview {
+  width: 210mm;
+  height: 297mm;
   background-color: var(--background-color);
   color: var(--text-color);
   font-family: var(--body-font);
   font-size: var(--base-size);
   line-height: 1.6;
-  padding: 48px;
-  max-width: 800px;
   margin: 0 auto;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  /* No extra padding or shadow to mirror the original A4 canvas */
 }
 
 .resume-preview h1,
@@ -131,22 +132,21 @@ export default {
 }
 
 .preview-container {
+  width: 100%;
+  min-height: 100%;
   margin: 0;
-  font-family: 'Lato', sans-serif;
   background-color: var(--background-color, #f9f9f9);
   color: var(--text-color, #08294D);
-  width: 210mm;
-  min-height: 297mm;
-  margin: 0 auto;
+  font-family: var(--body-font, 'Lato', sans-serif);
   padding: 0;
 }
 
 .container {
   display: flex;
   flex-direction: row-reverse;
-  width: 210mm;
-  min-height: 297mm;
-  margin: 0 auto;
+  width: 100%;
+  height: 100%;
+  margin: 0;
   background: #fff;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
   overflow: hidden;
@@ -156,7 +156,8 @@ export default {
   background-color: var(--sidebar-color, #08294D);
   color: #eee;
   font-weight: 400;
-  width: 28%;
+  flex: 0 0 28%;
+  height: 100%;
   padding: 28px 28px 48px 28px;
   display: flex;
   flex-direction: column;

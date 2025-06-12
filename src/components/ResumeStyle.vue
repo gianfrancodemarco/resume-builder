@@ -1,6 +1,6 @@
 <template>
     <div class="style-editor">
-        <v-tabs v-model="activeTab" color="primary" class="mb-4">
+        <v-tabs v-model="activeTab" color="primary" class="style-tabs mb-4">
             <v-tab value="colors">
                 <v-icon icon="mdi-palette" class="mr-2" />
                 Colors
@@ -18,25 +18,21 @@
         <v-window v-model="activeTab">
             <v-window-item value="colors">
                 <div class="d-flex flex-column gap-4 pa-4">
-                    <div>
-                        <div class="text-subtitle-2 mb-2">Primary Color</div>
-                        <v-color-picker v-model="local.colors.primary" mode="hex" hide-inputs></v-color-picker>
-                    </div>
-                    <div>
-                        <div class="text-subtitle-2 mb-2">Text Color</div>
-                        <v-color-picker v-model="local.colors.text" mode="hex" hide-inputs></v-color-picker>
-                    </div>
-                    <div>
-                        <div class="text-subtitle-2 mb-2">Background Color</div>
-                        <v-color-picker v-model="local.colors.background" mode="hex" hide-inputs></v-color-picker>
-                    </div>
-                    <div>
-                        <div class="text-subtitle-2 mb-2">Sidebar Color</div>
-                        <v-color-picker v-model="local.colors.sidebar" mode="hex" hide-inputs />
-                    </div>
-                    <div>
-                        <div class="text-subtitle-2 mb-2">Link Color</div>
-                        <v-color-picker v-model="local.colors.link" mode="hex" hide-inputs />
+                    <div v-for="(color, key) in colorFields" :key="key" class="color-field">
+                        <div class="d-flex align-center justify-space-between mb-2">
+                            <span class="text-subtitle-2">{{ color.label }}</span>
+                            <v-menu location="bottom end" :close-on-content-click="false">
+                                <template v-slot:activator="{ props }">
+                                    <div class="color-preview" v-bind="props"
+                                        :style="{ backgroundColor: local.colors[key] }">
+                                        <v-icon icon="mdi-pencil" size="small" class="edit-icon"></v-icon>
+                                    </div>
+                                </template>
+                                <v-card class="color-picker-card">
+                                    <v-color-picker v-model="local.colors[key]" mode="hex" hide-inputs></v-color-picker>
+                                </v-card>
+                            </v-menu>
+                        </div>
                     </div>
                 </div>
             </v-window-item>
@@ -105,7 +101,14 @@ export default {
                 'Lato',
                 'Montserrat',
                 'Poppins'
-            ]
+            ],
+            colorFields: {
+                primary: { label: 'Primary Color' },
+                text: { label: 'Text Color' },
+                background: { label: 'Background Color' },
+                sidebar: { label: 'Sidebar Color' },
+                link: { label: 'Link Color' }
+            }
         }
     },
     watch: {
@@ -124,6 +127,14 @@ export default {
     padding: 16px;
 }
 
+.style-tabs {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background-color: white;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
 :deep(.v-window) {
     background: transparent;
 }
@@ -134,5 +145,67 @@ export default {
 
 :deep(.v-window-item) {
     height: auto !important;
+}
+
+.color-field {
+    background-color: #f8fafc;
+    border-radius: 12px;
+    padding: 12px 16px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.color-preview {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    cursor: pointer;
+    position: relative;
+    border: 2px solid rgba(0, 0, 0, 0.08);
+    transition: all 0.2s ease-in-out;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.color-preview:hover {
+    transform: scale(1.05);
+    border-color: rgba(0, 0, 0, 0.16);
+}
+
+.edit-icon {
+    opacity: 0;
+    color: white;
+    transition: opacity 0.2s ease-in-out;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.color-preview:hover .edit-icon {
+    opacity: 1;
+}
+
+.color-picker-card {
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important;
+}
+
+:deep(.v-slider .v-slider-track__fill) {
+    background-color: rgb(var(--v-theme-primary)) !important;
+}
+
+:deep(.v-slider .v-slider-thumb__surface) {
+    border-color: rgb(var(--v-theme-primary)) !important;
+}
+
+:deep(.v-select .v-field) {
+    border-radius: 8px !important;
+}
+
+:deep(.v-select .v-field__outline) {
+    border-color: rgba(0, 0, 0, 0.12) !important;
+}
+
+:deep(.v-select .v-field--focused .v-field__outline) {
+    border-color: rgb(var(--v-theme-primary)) !important;
 }
 </style>
