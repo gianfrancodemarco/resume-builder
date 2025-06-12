@@ -1,10 +1,13 @@
 <template>
   <v-app>
-    <v-app-bar color="primary">
-      <v-app-bar-title>Resume Builder</v-app-bar-title>
+    <v-app-bar color="primary" elevation="1">
+      <v-app-bar-title class="text-h5 font-weight-bold">Resume Builder</v-app-bar-title>
+      <v-spacer></v-spacer>
+      <v-btn icon="mdi-github" variant="text" href="https://github.com/yourusername/resume-builder"
+        target="_blank"></v-btn>
     </v-app-bar>
 
-    <v-main>
+    <v-main class="app-background">
       <v-container fluid class="pa-4">
         <v-row>
           <v-col cols="8" class="pa-2">
@@ -20,12 +23,14 @@
     <div class="download-buttons">
       <v-tooltip text="Download as PDF" location="top">
         <template v-slot:activator="{ props }">
-          <v-btn v-bind="props" icon="mdi-file-pdf-box" color="primary" @click="downloadPDF" class="mr-2" />
+          <v-btn v-bind="props" icon="mdi-file-pdf-box" color="primary" @click="downloadPDF" class="mr-2 download-btn"
+            elevation="2" />
         </template>
       </v-tooltip>
       <v-tooltip text="Download as HTML" location="top">
         <template v-slot:activator="{ props }">
-          <v-btn v-bind="props" icon="mdi-file-code" color="primary" @click="downloadHTML" />
+          <v-btn v-bind="props" icon="mdi-file-code" color="primary" @click="downloadHTML" class="download-btn"
+            elevation="2" />
         </template>
       </v-tooltip>
     </div>
@@ -131,6 +136,11 @@ const downloadHTML = () => {
 </script>
 
 <style>
+.app-background {
+  background-color: #f5f7fa;
+  min-height: 100vh;
+}
+
 .download-buttons {
   position: fixed;
   bottom: 20px;
@@ -138,5 +148,22 @@ const downloadHTML = () => {
   display: flex;
   gap: 8px;
   z-index: 100;
+}
+
+.download-btn {
+  transition: transform 0.2s ease-in-out;
+}
+
+.download-btn:hover {
+  transform: translateY(-2px);
+}
+
+:deep(.v-app-bar) {
+  backdrop-filter: blur(10px);
+  background-color: rgba(var(--v-theme-primary), 0.95) !important;
+}
+
+:deep(.v-main) {
+  padding-top: 64px;
 }
 </style>
