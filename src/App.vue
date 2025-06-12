@@ -8,13 +8,15 @@
     </v-app-bar>
 
     <v-main class="app-background">
-      <v-container fluid class="pa-4">
-        <v-row>
-          <v-col cols="8" class="pa-2">
-            <ResumePreview :resume-data="resumeData" />
+      <v-container fluid class="pa-0">
+        <v-row no-gutters>
+          <v-col cols="12" md="4" lg="3">
+            <ResumeEditor v-model:resume-data="resumeData" v-model:style="styleData" @update:style="updateStyle" />
           </v-col>
-          <v-col cols="4" class="pa-2">
-            <ResumeEditor v-model:resume-data="resumeData" />
+          <v-col cols="12" md="8" lg="9" class="preview-container">
+            <div class="preview-wrapper">
+              <ResumePreview :resume-data="resumeData" :style-data="styleData" download-id="resume-preview" />
+            </div>
           </v-col>
         </v-row>
       </v-container>
@@ -59,7 +61,7 @@
             </div>
           </div>
           <div class="preview-wrapper" :style="{ transform: `scale(${zoomLevel})`, transformOrigin: 'center top' }">
-            <ResumePreview :resume-data="resumeData" />
+            <ResumePreview :resume-data="resumeData" :style-data="styleData" />
           </div>
         </v-card-text>
       </v-card>
@@ -143,6 +145,26 @@ const resumeData = ref({
   educationVisible: true
 })
 
+const styleData = ref({
+  colors: {
+    primary: '#08294D',
+    text: '#08294D',
+    background: '#ffffff',
+    sidebar: '#08294D',
+    link: '#ffffff'
+  },
+  typography: {
+    headingFont: 'Oswald',
+    bodyFont: 'Lato',
+    baseSize: 16,
+    headingSize: 26
+  },
+  spacing: {
+    section: 24,
+    content: 12
+  }
+})
+
 const zoomIn = () => {
   if (zoomLevel.value < 2) {
     zoomLevel.value = Math.min(zoomLevel.value + 0.1, 2)
@@ -184,6 +206,10 @@ const downloadHTML = () => {
   a.download = 'resume.html'
   a.click()
   window.URL.revokeObjectURL(url)
+}
+
+const updateStyle = (newStyle) => {
+  styleData.value = newStyle
 }
 </script>
 
@@ -246,12 +272,16 @@ const downloadHTML = () => {
 }
 
 .preview-wrapper {
-  transition: transform 0.2s ease-in-out;
-  min-height: 100%;
-  display: flex;
-  justify-content: center;
-  padding: 0 48px 48px 48px;
-  margin-top: 24px;
+  height: 100vh;
+  overflow-y: auto;
+  background-color: #f5f5f5;
+  padding: 48px;
+}
+
+.preview-container {
+  position: relative;
+  height: 100vh;
+  overflow: hidden;
 }
 
 .floating-actions {
