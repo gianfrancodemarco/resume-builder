@@ -1,7 +1,7 @@
 <template>
   <div class="resume-preview" :style="resumeStyle" :id="downloadId || null">
     <div class="preview-container">
-      <div class="container">
+      <div class="container" :class="{ 'sidebar-left': sidebarPosition === 'left' }">
         <div class="sidebar">
           <div v-if="resumeData.personal.visible">
             <h2>About me</h2>
@@ -66,29 +66,34 @@ export default {
       type: Object,
       required: true
     },
-    styleData: {
+    style: {
       type: Object,
       required: true
     },
     downloadId: {
       type: String,
       default: ''
+    },
+    sidebarPosition: {
+      type: String,
+      default: 'right',
+      validator: (value) => ['left', 'right'].includes(value)
     }
   },
   computed: {
     resumeStyle() {
       return {
-        '--primary-color': this.styleData.colors.primary,
-        '--text-color': this.styleData.colors.text,
-        '--background-color': this.styleData.colors.background,
-        '--sidebar-color': this.styleData.colors.sidebar || this.styleData.colors.primary,
-        '--link-color': this.styleData.colors.link || this.styleData.colors.primary,
-        '--heading-font': this.styleData.typography.headingFont,
-        '--body-font': this.styleData.typography.bodyFont,
-        '--base-size': `${this.styleData.typography.baseSize}px`,
-        '--heading-size': `${this.styleData.typography.headingSize}px`,
-        '--section-spacing': `${this.styleData.spacing.section}px`,
-        '--content-spacing': `${this.styleData.spacing.content}px`
+        '--primary-color': this.style.colors.primary,
+        '--text-color': this.style.colors.text,
+        '--background-color': this.style.colors.background,
+        '--sidebar-color': this.style.colors.sidebar || this.style.colors.primary,
+        '--link-color': this.style.colors.link || this.style.colors.primary,
+        '--heading-font': this.style.typography.headingFont,
+        '--body-font': this.style.typography.bodyFont,
+        '--base-size': `${this.style.typography.baseSize}px`,
+        '--heading-size': `${this.style.typography.headingSize}px`,
+        '--section-spacing': `${this.style.spacing.section}px`,
+        '--content-spacing': `${this.style.spacing.content}px`
       }
     }
   }
@@ -150,6 +155,10 @@ export default {
   background: #fff;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
   overflow: hidden;
+}
+
+.container.sidebar-left {
+  flex-direction: row;
 }
 
 .sidebar {
