@@ -216,17 +216,16 @@ const downloadPDF = async () => {
     const style = printWindow.document.createElement('style')
     style.textContent = `
         @page {
-        size: A4;
-        margin: 0;
+            margin: 0;
         }
 
         html, body {
-        margin: 0 !important;
-        padding: 0 !important;
-        width: 100% !important;
-        height: 100% !important;
-        background: white !important;
-        box-sizing: border-box;
+            margin: 0 !important;
+            padding: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            background: white !important;
+            box-sizing: border-box;
         }
     `
     printWindow.document.head.appendChild(style)
