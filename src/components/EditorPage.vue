@@ -9,65 +9,21 @@
                 class="mobile-menu-btn" @click="toggleDrawer" />
         </v-app-bar>
 
-        <!-- Improved mobile navigation drawer -->
-        <v-navigation-drawer v-model="drawer" temporary location="right" class="mobile-drawer" @click.stop>
-            <v-list class="pa-2">
-                <v-list-item class="mb-2">
-                    <v-list-item-title class="text-h6 font-weight-bold">Actions</v-list-item-title>
-                </v-list-item>
-                <v-divider class="mb-2"></v-divider>
-                <v-list-item>
-                    <v-list-item-title class="d-flex align-center" @click.stop="handleExportJSON">
-                        <v-icon icon="mdi-code-json" class="mr-3" color="primary"></v-icon>
-                        Export JSON
-                    </v-list-item-title>
-                </v-list-item>
-                <v-list-item>
-                    <v-list-item-title class="d-flex align-center" @click.stop="handleImportJSON">
-                        <v-icon icon="mdi-upload" class="mr-3" color="primary"></v-icon>
-                        Import JSON
-                    </v-list-item-title>
-                </v-list-item>
-                <v-list-item>
-                    <v-list-item-title class="d-flex align-center" @click.stop="handleDownloadPDF">
-                        <v-icon icon="mdi-file-pdf-box" class="mr-3" color="primary"></v-icon>
-                        Download PDF
-                    </v-list-item-title>
-                </v-list-item>
-                <v-list-item>
-                    <v-list-item-title class="d-flex align-center" @click.stop="handleDownloadHTML">
-                        <v-icon icon="mdi-file-code" class="mr-3" color="primary"></v-icon>
-                        Download HTML
-                    </v-list-item-title>
-                </v-list-item>
-            </v-list>
-        </v-navigation-drawer>
-
         <v-main>
-            <v-container fluid class="pa-0 fill-height">
-                <v-row no-gutters class="fill-height">
-                    <v-col cols="12" md="5" lg="4" class="editor-col"
-                        :class="{ 'mobile-editor': $vuetify.display.smAndDown }">
-                        <ResumeEditor v-model:resume-data="resumeData" v-model:style="styleData"
-                            @update:style="updateStyle" @change="handleFormChange" @save="handleFormSave">
-                            <template #style-extensions>
-                                <div class="sidebar-toggle-row">
-                                    <v-btn icon="mdi-arrow-left-right" color="primary" variant="tonal"
-                                        @click="toggleSidebarPosition" class="sidebar-toggle-btn"></v-btn>
-                                    <span class="sidebar-toggle-label">Sidebar: <b>{{ styleData.spacing.sidebarLeft ?
-                                        'left' : 'right' }}</b></span>
-                                </div>
-                            </template>
-                        </ResumeEditor>
-                    </v-col>
-                    <v-col cols="12" md="7" lg="8" class="preview-container">
-                        <div class="preview-wrapper">
-                            <ResumePreview download-id="resume-preview" :resume-data="resumeData" :style="styleData"
-                                :sidebar-position="styleData.spacing.sidebarLeft ? 'left' : 'right'" />
-                        </div>
-                    </v-col>
-                </v-row>
-            </v-container>
+            <div class="editor-content" :class="{ 'mobile-view': isMobile }">
+                <div class="editor-col"
+                    :style="isMobile ? { height: `${editorHeight}%` } : { width: `${editorWidth}%` }">
+                    <ResumeEditor v-model:resume-data="resumeData" v-model:style="styleData" @change="handleFormChange"
+                        @save="handleFormSave" />
+                </div>
+                <div class="resize-handle" @mousedown.prevent="startResize" @touchstart.prevent="startResize"
+                    @touchmove.prevent="handleResize" @touchend.prevent="stopResize">
+                </div>
+                <div class="preview-col"
+                    :style="isMobile ? { height: `${100 - editorHeight}%` } : { width: `${100 - editorWidth}%` }">
+                    <ResumePreview :resume-data="resumeData" :style="styleData" />
+                </div>
+            </div>
         </v-main>
 
         <!-- Desktop download buttons -->
@@ -104,12 +60,14 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted, onBeforeUnmount } from 'vue'
+import { ref, watch, onMounted, onBeforeUnmount, computed } from 'vue'
 import ResumeEditor from './ResumeEditor.vue'
 import ResumePreview from './ResumePreview.vue'
 import { useRouter } from 'vue-router'
+import { useDisplay } from 'vuetify'
 
 const router = useRouter()
+const { mobile } = useDisplay()
 const resumeData = ref({
     personal: {
         name: 'John Doe',
@@ -207,15 +165,28 @@ const drawer = ref(false)
 
 const showMobileMenu = ref(false)
 const hasUnsavedChanges = ref(false)
+const editorWidth = ref(35)
+const editorHeight = ref(50)
+const isResizing = ref(false)
+
+const isMobile = computed(() => mobile.value)
 
 // Add event listener for page unload
 onMounted(() => {
     window.addEventListener('beforeunload', handleBeforeUnload)
+    window.addEventListener('mousemove', handleResize)
+    window.addEventListener('touchmove', handleResize)
+    window.addEventListener('mouseup', stopResize)
+    window.addEventListener('touchend', stopResize)
 })
 
 // Remove event listener when component is destroyed
 onBeforeUnmount(() => {
     window.removeEventListener('beforeunload', handleBeforeUnload)
+    window.removeEventListener('mousemove', handleResize)
+    window.removeEventListener('touchmove', handleResize)
+    window.removeEventListener('mouseup', stopResize)
+    window.removeEventListener('touchend', stopResize)
 })
 
 // Handle beforeunload event
@@ -373,7 +344,6 @@ const downloadHTML = async () => {
     }, 0)
 }
 
-
 const updateStyle = (newStyle) => {
     styleData.value = newStyle
 }
@@ -458,9 +428,68 @@ const handleDownloadHTML = () => {
     drawer.value = false
     downloadHTML()
 }
+
+// Resize handlers
+const startResize = (e) => {
+    isResizing.value = true
+    e.preventDefault()
+}
+
+const handleResize = (e) => {
+    if (!isResizing.value) return
+
+    const container = document.querySelector('.editor-content')
+    if (!container) return
+
+    if (isMobile.value) {
+        // Handle vertical resize for mobile
+        const containerRect = container.getBoundingClientRect()
+        const clientY = e.clientY || (e.touches && e.touches[0].clientY)
+
+        if (clientY) {
+            const newHeight = ((clientY - containerRect.top) / containerRect.height) * 100
+            editorHeight.value = Math.min(Math.max(newHeight, 20), 80) // Limit between 20% and 80%
+        }
+    } else {
+        // Handle horizontal resize for desktop
+        const containerRect = container.getBoundingClientRect()
+        const clientX = e.clientX || (e.touches && e.touches[0].clientX)
+
+        if (clientX) {
+            const newWidth = ((clientX - containerRect.left) / containerRect.width) * 100
+            editorWidth.value = Math.min(Math.max(newWidth, 20), 80) // Limit between 20% and 80%
+        }
+    }
+}
+
+const stopResize = () => {
+    isResizing.value = false
+}
 </script>
 
 <style scoped>
+.editor-page {
+    min-height: 100vh;
+    background-color: #f5f5f5;
+}
+
+/* Remove navigation drawer scrim */
+:deep(.v-navigation-drawer__scrim) {
+    display: none !important;
+}
+
+.editor-header {
+    background-color: #fff;
+    padding: 16px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
 .editor-col {
     border-right: 1px solid rgba(0, 0, 0, 0.08);
     overflow-y: auto;
@@ -680,5 +709,90 @@ const handleDownloadHTML = () => {
 
 :deep(.v-divider) {
     opacity: 0.1;
+}
+
+.editor-content {
+    display: flex;
+    height: calc(100vh - 64px);
+    position: relative;
+    overflow: hidden;
+}
+
+.editor-col {
+    height: 100%;
+    overflow-y: auto;
+    background: #fff;
+    transition: width 0.1s ease;
+    flex-shrink: 0;
+}
+
+.preview-col {
+    height: 100%;
+    overflow-y: auto;
+    background: #f8f9fa;
+    transition: width 0.1s ease;
+    flex-shrink: 0;
+}
+
+.resize-handle {
+    width: 12px;
+    background: #e0e0e0;
+    cursor: col-resize;
+    position: relative;
+    z-index: 10;
+    flex-shrink: 0;
+    touch-action: none;
+}
+
+.resize-handle:hover,
+.resize-handle:active {
+    background: #bdbdbd;
+}
+
+.resize-handle::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 2px;
+    height: 30px;
+    background: #9e9e9e;
+    border-radius: 1px;
+}
+
+@media (max-width: 960px) {
+    .editor-content {
+        flex-direction: column;
+        height: 100vh;
+        overflow: hidden;
+    }
+
+    .editor-col {
+        width: 100% !important;
+        transition: height 0.1s ease;
+    }
+
+    .preview-col {
+        width: 100% !important;
+        transition: height 0.1s ease;
+    }
+
+    .resize-handle {
+        width: 100%;
+        height: 12px;
+        cursor: row-resize;
+    }
+
+    .resize-handle::after {
+        width: 30px;
+        height: 2px;
+    }
+}
+
+@media (max-width: 600px) {
+    .editor-content {
+        height: calc(100vh - 56px);
+    }
 }
 </style>
