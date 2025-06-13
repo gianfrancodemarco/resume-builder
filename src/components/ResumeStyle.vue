@@ -73,18 +73,22 @@
                 <div class="d-flex flex-column gap-4 pa-4">
                     <div>
                         <div class="text-subtitle-2 mb-2">Section Spacing</div>
-                        <v-slider v-model="local.spacing.section" label="Section Gap" min="8" max="48" step="4"
+                        <v-slider v-model="local.spacing.section" label="Section Gap" min="12" max="48" step="4"
                             thumb-label class="style-slider"></v-slider>
                     </div>
                     <div>
                         <div class="text-subtitle-2 mb-2">Content Spacing</div>
-                        <v-slider v-model="local.spacing.content" label="Content Gap" min="4" max="24" step="2"
+                        <v-slider v-model="local.spacing.content" label="Content Gap" min="8" max="24" step="2"
                             thumb-label class="style-slider"></v-slider>
                     </div>
                     <div>
-                        <div class="text-subtitle-2 mb-2">Sidebar Position</div>
-                        <v-switch v-model="local.spacing.sidebarLeft" label="Move sidebar to left" color="primary"
-                            hide-details></v-switch>
+                        <div class="text-subtitle-2 mb-2">Sidebar Width</div>
+                        <v-slider v-model="local.spacing.sidebarWidth" label="Width" min="200" max="400" step="10"
+                            thumb-label class="style-slider"></v-slider>
+                    </div>
+                    <div>
+                        <v-switch v-model="local.spacing.sidebarLeft" label="Sidebar on Left" hide-details
+                            density="compact" color="primary"></v-switch>
                     </div>
                 </div>
             </v-window-item>
@@ -104,7 +108,13 @@ export default {
     data() {
         return {
             activeTab: 'colors',
-            local: this.styleData,
+            local: {
+                ...this.styleData,
+                spacing: {
+                    ...this.styleData.spacing,
+                    sidebarWidth: this.styleData.spacing.sidebarWidth || 280
+                }
+            },
             fontOptions: [
                 'Roboto',
                 'Arial',

@@ -100,7 +100,8 @@ export default {
         '--base-size': `${this.style.typography.baseSize}px`,
         '--heading-size': `${this.style.typography.headingSize}px`,
         '--section-spacing': `${this.style.spacing.section}px`,
-        '--content-spacing': `${this.style.spacing.content}px`
+        '--content-spacing': `${this.style.spacing.content}px`,
+        '--sidebar-width': `${this.style.spacing.sidebarWidth || 280}px`
       }
     }
   }
@@ -169,17 +170,23 @@ export default {
 }
 
 .sidebar {
+  width: var(--sidebar-width, 280px);
+  min-width: var(--sidebar-width, 280px);
+  max-width: var(--sidebar-width, 280px);
   background-color: var(--sidebar-color, #08294D);
   color: #eee;
   font-weight: 400;
-  flex: 0 0 28%;
   min-height: 297mm;
   padding: 28px 28px 48px 28px;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
 }
 
+.sidebar h1,
 .sidebar h2 {
   font-family: var(--heading-font, 'Oswald', sans-serif);
   font-size: 1em;
@@ -189,6 +196,8 @@ export default {
   font-weight: 700;
   letter-spacing: 0.5px;
   color: #fff;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .sidebar a {
@@ -198,6 +207,8 @@ export default {
   margin-bottom: 3px;
   font-size: 0.9em;
   opacity: 1;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .sidebar a:hover {
@@ -211,6 +222,8 @@ export default {
 .sidebar div {
   margin-bottom: 6px;
   font-size: 0.9em;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .sidebar p {
@@ -218,6 +231,8 @@ export default {
   font-size: 0.85em;
   line-height: 1.4;
   font-weight: 100;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .sidebar .subsubtitle {
@@ -228,6 +243,8 @@ export default {
   text-transform: none;
   font-style: italic;
   line-height: 1.4;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .content {
@@ -235,6 +252,9 @@ export default {
   padding: 16px 48px 64px 48px;
   background: var(--background-color, #fff);
   color: var(--text-color, #08294D);
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
 }
 
 .content h1,
