@@ -19,135 +19,6 @@
           <v-text-field v-model="local.personal.title" label="Title" variant="outlined" density="comfortable" />
         </div>
         <v-expansion-panels class="editor-panels" multiple>
-          <!-- Personal / Sidebar -->
-          <v-expansion-panel class="editor-panel">
-            <v-expansion-panel-title class="panel-title">
-              <v-icon icon="mdi-account" class="mr-2" />
-              About Me
-            </v-expansion-panel-title>
-            <v-expansion-panel-text>
-              <div class="d-flex justify-end mb-4">
-                <v-switch v-model="local.personal.visible" label="Show section" hide-details density="compact"
-                  color="primary" />
-              </div>
-              <div v-for="(desc, index) in local.personal.about" :key="index" class="d-flex align-center mb-2">
-                <v-textarea v-model="local.personal.about[index]" :label="`Description ${index + 1}`"
-                  :disabled="!local.personal.visible" variant="outlined" density="comfortable" />
-                <v-btn icon="mdi-delete" color="error" variant="text" @click="removeDescription(index)" class="ml-2"
-                  :disabled="!local.personal.visible" />
-              </div>
-              <v-btn color="primary" @click="addDescription" :disabled="!local.personal.visible" prepend-icon="mdi-plus"
-                class="mt-2">Add Description</v-btn>
-            </v-expansion-panel-text>
-          </v-expansion-panel>
-
-          <v-expansion-panel class="editor-panel">
-            <v-expansion-panel-title class="panel-title">
-              <v-icon icon="mdi-card-account-details" class="mr-2" />
-              Details
-            </v-expansion-panel-title>
-            <v-expansion-panel-text>
-              <div class="d-flex justify-end mb-4">
-                <v-switch v-model="local.personal.detailsVisible" label="Show section" hide-details density="compact"
-                  color="primary" />
-              </div>
-              <div v-for="(detail, index) in local.personal.details" :key="index" class="detail-card pa-3 mb-3">
-                <div class="d-flex align-center">
-                  <v-text-field v-model="detail.value" label="Value" :disabled="!local.personal.detailsVisible"
-                    variant="outlined" density="comfortable" class="mr-2" hide-details />
-                  <v-switch v-model="detail.isLink" label="Link" hide-details density="compact"
-                    :disabled="!local.personal.detailsVisible" color="primary" class="mr-2" />
-                  <v-btn icon="mdi-delete" color="error" variant="text" @click="removeDetail(index)"
-                    :disabled="!local.personal.detailsVisible" />
-                </div>
-              </div>
-              <div class="detail-card pa-3 mb-3">
-                <v-text-field v-model="newDetail.value" label="New detail" :disabled="!local.personal.detailsVisible"
-                  variant="outlined" density="comfortable" class="mb-2" hide-details />
-                <div class="d-flex align-center">
-                  <v-switch v-model="newDetail.isLink" label="Link" hide-details density="compact"
-                    :disabled="!local.personal.detailsVisible" color="primary" class="mr-2" />
-                  <v-btn color="primary" @click="addDetail" :disabled="!local.personal.detailsVisible"
-                    prepend-icon="mdi-plus" class="ml-auto">Add Detail</v-btn>
-                </div>
-              </div>
-            </v-expansion-panel-text>
-          </v-expansion-panel>
-
-          <v-expansion-panel class="editor-panel">
-            <v-expansion-panel-title class="panel-title">
-              <v-icon icon="mdi-link-variant" class="mr-2" />
-              Links
-            </v-expansion-panel-title>
-            <v-expansion-panel-text>
-              <div class="d-flex justify-end mb-4">
-                <v-switch v-model="local.personal.linksVisible" label="Show section" hide-details density="compact"
-                  color="primary" />
-              </div>
-              <div v-for="(link, index) in local.personal.links" :key="index" class="d-flex align-center mb-2">
-                <v-text-field v-model="local.personal.links[index]" label="Link"
-                  :disabled="!local.personal.linksVisible" variant="outlined" density="comfortable" />
-                <v-btn icon="mdi-delete" color="error" variant="text" @click="removeLink(index)" class="ml-2"
-                  :disabled="!local.personal.linksVisible" />
-              </div>
-              <v-text-field v-model="link" label="Add link (url)" :disabled="!local.personal.linksVisible"
-                variant="outlined" density="comfortable" class="mb-2" />
-              <v-btn color="primary" @click="addLink" :disabled="!local.personal.linksVisible"
-                prepend-icon="mdi-plus">Add
-                Link</v-btn>
-            </v-expansion-panel-text>
-          </v-expansion-panel>
-
-          <v-expansion-panel class="editor-panel">
-            <v-expansion-panel-title class="panel-title">
-              <v-icon icon="mdi-tools" class="mr-2" />
-              Skills
-            </v-expansion-panel-title>
-            <v-expansion-panel-text>
-              <div class="d-flex justify-end mb-4">
-                <v-switch v-model="local.skillsVisible" label="Show section" hide-details density="compact"
-                  color="primary" />
-              </div>
-              <div v-for="(skill, index) in local.skills" :key="index" class="d-flex align-center mb-2">
-                <v-text-field v-model="local.skills[index]" label="Skill" :disabled="!local.skillsVisible"
-                  variant="outlined" density="comfortable" />
-                <v-btn icon="mdi-delete" color="error" variant="text" @click="removeSkill(index)" class="ml-2"
-                  :disabled="!local.skillsVisible" />
-              </div>
-              <v-text-field v-model="skill" label="Skill" :disabled="!local.skillsVisible" variant="outlined"
-                density="comfortable" class="mb-2" />
-              <v-btn color="primary" @click="addSkill" :disabled="!local.skillsVisible" prepend-icon="mdi-plus">Add
-                Skill</v-btn>
-            </v-expansion-panel-text>
-          </v-expansion-panel>
-
-          <v-expansion-panel class="editor-panel">
-            <v-expansion-panel-title class="panel-title">
-              <v-icon icon="mdi-translate" class="mr-2" />
-              Languages
-            </v-expansion-panel-title>
-            <v-expansion-panel-text>
-              <div class="d-flex justify-end mb-4">
-                <v-switch v-model="local.languagesVisible" label="Show section" hide-details density="compact"
-                  color="primary" />
-              </div>
-              <div v-for="(lang, index) in local.languages" :key="index" class="d-flex align-center mb-2">
-                <v-text-field v-model="local.languages[index].name" label="Language" :disabled="!local.languagesVisible"
-                  variant="outlined" density="comfortable" />
-                <v-text-field v-model="local.languages[index].proficiency" label="Proficiency (%)" readonly class="mx-2"
-                  :disabled="!local.languagesVisible" variant="outlined" density="comfortable" />
-                <v-btn icon="mdi-delete" color="error" variant="text" @click="removeLang(index)" class="ml-2"
-                  :disabled="!local.languagesVisible" />
-              </div>
-              <v-text-field v-model="lang.name" label="Language" :disabled="!local.languagesVisible" variant="outlined"
-                density="comfortable" class="mb-2" />
-              <v-text-field v-model="lang.proficiency" label="Proficiency (%)" :disabled="!local.languagesVisible"
-                variant="outlined" density="comfortable" class="mb-2" />
-              <v-btn color="primary" @click="addLang" :disabled="!local.languagesVisible" prepend-icon="mdi-plus">Add
-                Language</v-btn>
-            </v-expansion-panel-text>
-          </v-expansion-panel>
-
           <v-expansion-panel class="editor-panel">
             <v-expansion-panel-title class="panel-title">
               <v-icon icon="mdi-briefcase" class="mr-2" />
@@ -221,6 +92,111 @@
                 Education</v-btn>
             </v-expansion-panel-text>
           </v-expansion-panel>
+
+          <v-expansion-panel class="editor-panel">
+            <v-expansion-panel-title class="panel-title">
+              <v-icon icon="mdi-plus-circle" class="mr-2" />
+              Custom Sections
+            </v-expansion-panel-title>
+            <v-expansion-panel-text>
+              <div class="d-flex justify-end mb-4">
+                <v-switch v-model="local.customSectionsVisible" label="Show section" hide-details density="compact"
+                  color="primary" />
+              </div>
+              <div v-for="(section, index) in local.customSections" :key="index" class="mb-4 custom-section-card pa-3">
+                <div class="d-flex align-center mb-2">
+                  <v-text-field v-model="local.customSections[index].title" label="Section Title"
+                    :disabled="!local.customSectionsVisible" variant="outlined" density="comfortable" class="mr-2" />
+                  <v-select v-model="local.customSections[index].type" :items="sectionTypes" label="Type"
+                    :disabled="!local.customSectionsVisible" variant="outlined" density="comfortable" class="mr-2"
+                    style="max-width: 200px;"
+                    @update:model-value="(val) => handleSectionTypeChange(local.customSections[index], val)"
+                    item-title="label" item-value="value" />
+                  <v-btn icon="mdi-delete" color="error" variant="text" @click="removeCustomSection(index)" class="ml-2"
+                    :disabled="!local.customSectionsVisible" />
+                </div>
+                <template v-if="section.type === 'languages'">
+                  <div v-for="(item, itemIndex) in local.customSections[index].items" :key="itemIndex"
+                    class="d-flex align-center mb-2">
+                    <v-text-field v-model="local.customSections[index].items[itemIndex].name" label="Language"
+                      :disabled="!local.customSectionsVisible" variant="outlined" density="comfortable" class="mr-2" />
+                    <v-slider v-model="local.customSections[index].items[itemIndex].proficiency" label="Proficiency"
+                      :disabled="!local.customSectionsVisible" min="0" max="100" step="5" class="mr-2" />
+                    <v-btn icon="mdi-delete" color="error" variant="text"
+                      @click="removeCustomSectionItem(index, itemIndex)" :disabled="!local.customSectionsVisible" />
+                  </div>
+                  <div class="d-flex align-center mb-2">
+                    <v-text-field v-model="newCustomSectionItem.name" label="Language"
+                      :disabled="!local.customSectionsVisible" variant="outlined" density="comfortable" class="mr-2" />
+                    <v-slider v-model="newCustomSectionItem.proficiency" label="Proficiency"
+                      :disabled="!local.customSectionsVisible" min="0" max="100" step="5" class="mr-2" />
+                    <v-btn color="primary" @click="addCustomSectionItem(index)" :disabled="!local.customSectionsVisible"
+                      prepend-icon="mdi-plus">Add Language</v-btn>
+                  </div>
+                </template>
+                <template v-else-if="section.type === 'list'">
+                  <div v-for="(item, itemIndex) in local.customSections[index].items" :key="itemIndex"
+                    class="d-flex align-center mb-2">
+                    <v-text-field v-model="local.customSections[index].items[itemIndex]" label="Item"
+                      :disabled="!local.customSectionsVisible" variant="outlined" density="comfortable" class="mr-2" />
+                    <v-btn icon="mdi-delete" color="error" variant="text"
+                      @click="removeCustomSectionItem(index, itemIndex)" :disabled="!local.customSectionsVisible" />
+                  </div>
+                  <div class="d-flex align-center mb-2">
+                    <v-text-field v-model="newCustomSectionItem" label="Item" :disabled="!local.customSectionsVisible"
+                      variant="outlined" density="comfortable" class="mr-2" />
+                    <v-btn color="primary" @click="addCustomSectionItem(index)" :disabled="!local.customSectionsVisible"
+                      prepend-icon="mdi-plus">Add Item</v-btn>
+                  </div>
+                </template>
+                <template v-else-if="section.type === 'italic'">
+                  <div v-for="(item, itemIndex) in local.customSections[index].items" :key="itemIndex"
+                    class="d-flex align-center mb-2">
+                    <v-text-field v-model="local.customSections[index].items[itemIndex].value" label="Item"
+                      :disabled="!local.customSectionsVisible" variant="outlined" density="comfortable" class="mr-2" />
+                    <v-switch v-model="local.customSections[index].items[itemIndex].isLink" label="Link"
+                      :disabled="!local.customSectionsVisible" hide-details density="compact" color="primary"
+                      class="mr-2" />
+                    <v-btn icon="mdi-delete" color="error" variant="text"
+                      @click="removeCustomSectionItem(index, itemIndex)" :disabled="!local.customSectionsVisible" />
+                  </div>
+                  <div class="d-flex align-center mb-2">
+                    <v-text-field v-model="newCustomSectionItem.value" label="Item"
+                      :disabled="!local.customSectionsVisible" variant="outlined" density="comfortable" class="mr-2" />
+                    <v-switch v-model="newCustomSectionItem.isLink" label="Link"
+                      :disabled="!local.customSectionsVisible" hide-details density="compact" color="primary"
+                      class="mr-2" />
+                    <v-btn color="primary" @click="addCustomSectionItem(index)" :disabled="!local.customSectionsVisible"
+                      prepend-icon="mdi-plus">Add Item</v-btn>
+                  </div>
+                </template>
+                <template v-else>
+                  <div v-for="(item, itemIndex) in local.customSections[index].items" :key="itemIndex"
+                    class="d-flex align-center mb-2">
+                    <v-text-field v-model="local.customSections[index].items[itemIndex].value" label="Item"
+                      :disabled="!local.customSectionsVisible" variant="outlined" density="comfortable" class="mr-2" />
+                    <v-switch v-model="local.customSections[index].items[itemIndex].isLink" label="Link"
+                      :disabled="!local.customSectionsVisible" hide-details density="compact" color="primary"
+                      class="mr-2" />
+                    <v-btn icon="mdi-delete" color="error" variant="text"
+                      @click="removeCustomSectionItem(index, itemIndex)" :disabled="!local.customSectionsVisible" />
+                  </div>
+                  <div class="d-flex align-center mb-2">
+                    <v-text-field v-model="newCustomSectionItem.value" label="Item"
+                      :disabled="!local.customSectionsVisible" variant="outlined" density="comfortable" class="mr-2" />
+                    <v-switch v-model="newCustomSectionItem.isLink" label="Link"
+                      :disabled="!local.customSectionsVisible" hide-details density="compact" color="primary"
+                      class="mr-2" />
+                    <v-btn color="primary" @click="addCustomSectionItem(index)" :disabled="!local.customSectionsVisible"
+                      prepend-icon="mdi-plus">Add Item</v-btn>
+                  </div>
+                </template>
+              </div>
+              <v-btn color="primary" @click="addCustomSection" :disabled="!local.customSectionsVisible"
+                prepend-icon="mdi-plus">Add
+                Custom Section</v-btn>
+            </v-expansion-panel-text>
+          </v-expansion-panel>
         </v-expansion-panels>
       </v-window-item>
 
@@ -232,10 +208,8 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 import ResumeStyle from './ResumeStyle.vue'
-
-const emit = defineEmits(['update:resume-data', 'update:style', 'change', 'save'])
 
 const props = defineProps({
   resumeData: {
@@ -248,144 +222,215 @@ const props = defineProps({
   }
 })
 
-// Initialize local state with props
-const local = ref(JSON.parse(JSON.stringify(props.resumeData)))
-const styleData = ref(JSON.parse(JSON.stringify(props.style)))
-
-// Watch for changes in props to update local state
-watch(() => props.resumeData, (newVal) => {
-  if (JSON.stringify(newVal) !== JSON.stringify(local.value)) {
-    local.value = JSON.parse(JSON.stringify(newVal))
-  }
-}, { deep: true })
-
-// Watch for changes in local state to emit updates
-watch(local, (newVal) => {
-  if (JSON.stringify(newVal) !== JSON.stringify(props.resumeData)) {
-    emit('update:resume-data', JSON.parse(JSON.stringify(newVal)))
-    emit('change')
-  }
-}, { deep: true })
-
-// Watch for changes in style
-watch(() => props.style, (newVal) => {
-  if (JSON.stringify(newVal) !== JSON.stringify(styleData.value)) {
-    styleData.value = JSON.parse(JSON.stringify(newVal))
-  }
-}, { deep: true })
-
-// Handle save
-const handleSave = () => {
-  emit('save')
-}
+const emit = defineEmits(['update:resumeData', 'update:style', 'save', 'change'])
 
 const activeTab = ref('info')
-const link = ref('')
-const skill = ref('')
-const lang = ref({ name: '', proficiency: 100 })
-const exp = ref({ title: '', company: '', period: '', description: '' })
-const edu = ref({ degree: '', period: '', mark: '', thesis: '' })
-const newDetail = ref({ value: '', isLink: false })
+const styleData = ref(props.style)
+
+const local = ref({
+  personal: {
+    name: props.resumeData.personal.name || '',
+    title: props.resumeData.personal.title || '',
+    visible: props.resumeData.personal.visible || true
+  },
+  experiences: props.resumeData.experiences || [],
+  experiencesVisible: props.resumeData.experiencesVisible || true,
+  education: props.resumeData.education || [],
+  educationVisible: props.resumeData.educationVisible || true,
+  customSections: props.resumeData.customSections || [],
+  customSectionsVisible: props.resumeData.customSectionsVisible || true
+})
+
+// Form data for new items
+const exp = ref({
+  title: '',
+  company: '',
+  period: '',
+  description: ''
+})
+
+const edu = ref({
+  degree: '',
+  period: '',
+  mark: '',
+  thesis: ''
+})
+
+const newCustomSectionItem = ref({
+  value: '',
+  isLink: false,
+  name: '',
+  proficiency: 50
+})
+
+const sectionTypes = [
+  { label: 'Text', value: 'text' },
+  { label: 'List', value: 'list' },
+  { label: 'Languages', value: 'languages' },
+  { label: 'Italic Text', value: 'italic' }
+]
+
+const fonts = [
+  'Oswald',
+  'Lato',
+  'Roboto',
+  'Open Sans',
+  'Montserrat',
+  'Raleway',
+  'Poppins',
+  'Source Sans Pro'
+]
+
+// Watch for changes and emit updates
+watch(local, (newValue) => {
+  emit('update:resumeData', newValue)
+  emit('change')
+}, { deep: true })
+
+// Watch for style changes
+watch(styleData, (newValue) => {
+  emit('update:style', newValue)
+  emit('change')
+}, { deep: true })
 
 const updateStyle = (newStyle) => {
   styleData.value = newStyle
-  emit('update:style', JSON.parse(JSON.stringify(newStyle)))
+  emit('update:style', newStyle)
   emit('change')
 }
 
-const addLink = () => {
-  if (link.value) {
-    local.value.personal.links.push(link.value)
-    link.value = ''
-    emit('change')
-  }
-}
-
-const removeLink = (index) => {
-  local.value.personal.links.splice(index, 1)
-  emit('update:resume-data', JSON.parse(JSON.stringify(local.value)))
-  emit('change')
-}
-
-const addSkill = () => {
-  if (skill.value) {
-    local.value.skills.push(skill.value)
-    skill.value = ''
-    emit('change')
-  }
-}
-
-const removeSkill = (index) => {
-  local.value.skills.splice(index, 1)
-  emit('update:resume-data', JSON.parse(JSON.stringify(local.value)))
-  emit('change')
-}
-
-const addLang = () => {
-  if (lang.value.name) {
-    local.value.languages.push({ ...lang.value })
-    lang.value = { name: '', proficiency: 100 }
-    emit('change')
-  }
-}
-
-const removeLang = (index) => {
-  local.value.languages.splice(index, 1)
-  emit('update:resume-data', JSON.parse(JSON.stringify(local.value)))
-  emit('change')
-}
-
+// Experience methods
 const addExp = () => {
   if (exp.value.title) {
     local.value.experiences.push({ ...exp.value })
-    exp.value = { title: '', company: '', period: '', description: '' }
-    emit('change')
+    exp.value = {
+      title: '',
+      company: '',
+      period: '',
+      description: ''
+    }
   }
 }
 
 const removeExp = (index) => {
   local.value.experiences.splice(index, 1)
-  emit('update:resume-data', JSON.parse(JSON.stringify(local.value)))
-  emit('change')
 }
 
+// Education methods
 const addEdu = () => {
   if (edu.value.degree) {
     local.value.education.push({ ...edu.value })
-    edu.value = { degree: '', period: '', mark: '', thesis: '' }
-    emit('change')
+    edu.value = {
+      degree: '',
+      period: '',
+      mark: '',
+      thesis: ''
+    }
   }
 }
 
 const removeEdu = (index) => {
   local.value.education.splice(index, 1)
-  emit('update:resume-data', JSON.parse(JSON.stringify(local.value)))
-  emit('change')
 }
 
-const addDescription = () => {
-  local.value.personal.about.push('')
-  emit('change')
+// Custom section methods
+const addCustomSection = () => {
+  local.value.customSections.push({
+    title: 'New Section',
+    type: 'text',
+    items: []
+  })
 }
 
-const removeDescription = (index) => {
-  local.value.personal.about.splice(index, 1)
-  emit('update:resume-data', JSON.parse(JSON.stringify(local.value)))
-  emit('change')
+const removeCustomSection = (index) => {
+  local.value.customSections.splice(index, 1)
 }
 
-const addDetail = () => {
-  if (newDetail.value) {
-    local.value.personal.details.push({ ...newDetail.value })
-    newDetail.value = { value: '', isLink: false }
-    emit('change')
+const handleSectionTypeChange = (section, newType) => {
+  if (section.type === newType) {
+    return section
+  }
+
+  // If switching between text and italic, convert the data structure
+  if ((section.type === 'text' && newType === 'italic') ||
+    (section.type === 'italic' && newType === 'text')) {
+    // Convert items to the new format if needed
+    const convertedItems = section.items.map(item => {
+      if (typeof item === 'string') {
+        return {
+          value: item,
+          isLink: false
+        }
+      }
+      return item
+    })
+    return {
+      ...section,
+      type: newType,
+      items: convertedItems
+    }
+  }
+
+  // For other type changes, reset the items
+  section.type = newType
+  section.items = []
+
+  if (newType === 'languages') {
+    newCustomSectionItem.value = {
+      name: '',
+      proficiency: 50
+    }
+  } else if (newType === 'list') {
+    newCustomSectionItem.value = ''
+  } else {
+    newCustomSectionItem.value = {
+      value: '',
+      isLink: false
+    }
   }
 }
 
-const removeDetail = (index) => {
-  local.value.personal.details.splice(index, 1)
-  emit('update:resume-data', JSON.parse(JSON.stringify(local.value)))
-  emit('change')
+const addCustomSectionItem = (sectionIndex) => {
+  const section = local.value.customSections[sectionIndex]
+  if (section.type === 'languages') {
+    if (newCustomSectionItem.value.name) {
+      section.items.push({ ...newCustomSectionItem.value })
+      newCustomSectionItem.value = {
+        name: '',
+        proficiency: 50
+      }
+    }
+  } else if (section.type === 'list') {
+    if (newCustomSectionItem.value) {
+      section.items.push(newCustomSectionItem.value)
+      newCustomSectionItem.value = ''
+    }
+  } else {
+    // Handle both text and italic types
+    if (newCustomSectionItem.value.value) {
+      section.items.push({
+        value: newCustomSectionItem.value.value,
+        isLink: newCustomSectionItem.value.isLink || false
+      })
+      newCustomSectionItem.value = {
+        value: '',
+        isLink: false
+      }
+    }
+  }
+}
+
+const removeCustomSectionItem = (sectionIndex, itemIndex) => {
+  local.value.customSections[sectionIndex].items.splice(itemIndex, 1)
+}
+
+// Style methods
+const colorTooltip = (color) => {
+  return `Color: ${color.toUpperCase()}`
+}
+
+const colorPreview = (color) => {
+  return color.toUpperCase()
 }
 </script>
 
@@ -704,5 +749,18 @@ const removeDetail = (index) => {
     padding: 16px !important;
     margin-bottom: 12px;
   }
+}
+
+.custom-section-card {
+  background-color: #f8fafc;
+  border-radius: 6px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  transition: all 0.2s ease;
+  margin-bottom: 8px;
+  padding: 12px !important;
+}
+
+.custom-section-card:hover {
+  background-color: #f1f5f9;
 }
 </style>

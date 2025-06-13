@@ -4,38 +4,41 @@
       <div class="preview-container">
         <div class="container" :class="{ 'sidebar-left': sidebarPosition === 'left' }">
           <div class="sidebar">
-            <div v-if="resumeData.personal.visible">
-              <h2>About me</h2>
-              <p class="subsubtitle" v-for="(t, i) in resumeData.personal.about" :key="i">{{ t }}</p>
-            </div>
-            <div v-if="resumeData.personal.detailsVisible">
-              <h2>Details</h2>
-              <p v-for="(detail, index) in resumeData.personal.details" :key="index">
-                <template v-if="detail.isLink">
-                  <a :href="detail.value" target="_blank">{{ detail.value }}</a>
-                </template>
-                <template v-else>
-                  {{ detail.value }}
-                </template>
-              </p>
-            </div>
-            <div v-if="resumeData.personal.linksVisible && resumeData.personal.links.length">
-              <h2>Links</h2>
-              <a v-for="(l, i) in resumeData.personal.links" :key="i" :href="l" target="_blank">{{ l }}</a>
-            </div>
-            <div v-if="resumeData.skillsVisible && resumeData.skills.length">
-              <h2>Skills</h2>
-              <p class="skills-list"><span v-for="(s, i) in resumeData.skills" :key="i">{{ s }}<br /></span></p>
-            </div>
-            <div v-if="resumeData.languagesVisible && resumeData.languages.length">
-              <h2>Languages</h2>
-              <div class="language-proficiency" v-for="(l, i) in resumeData.languages" :key="i">
-                <div class="language-proficiency-label">{{ l.name }}</div>
-                <div class="language-proficiency-bar">
-                  <div class="language-proficiency-bar-fill" :style="{ width: l.proficiency + '%' }"></div>
+            <template v-for="(section, index) in resumeData.customSections" :key="index">
+              <h2>{{ section.title }}</h2>
+              <template v-if="section.type === 'list'">
+                <p class="skills-list"><span v-for="(item, itemIndex) in section.items" :key="itemIndex">{{ item
+                }}<br /></span></p>
+              </template>
+              <template v-else-if="section.type === 'languages'">
+                <div class="language-proficiency" v-for="(item, itemIndex) in section.items" :key="itemIndex">
+                  <div class="language-proficiency-label">{{ item.name }}</div>
+                  <div class="language-proficiency-bar">
+                    <div class="language-proficiency-bar-fill" :style="{ width: item.proficiency + '%' }"></div>
+                  </div>
                 </div>
-              </div>
-            </div>
+              </template>
+              <template v-else-if="section.type === 'italic'">
+                <p v-for="(item, itemIndex) in section.items" :key="itemIndex" class="subsubtitle">
+                  <template v-if="item && item.isLink">
+                    <a :href="item.value" target="_blank">{{ item.value }}</a>
+                  </template>
+                  <template v-else>
+                    {{ item && item.value ? item.value : '' }}
+                  </template>
+                </p>
+              </template>
+              <template v-else>
+                <p v-for="(item, itemIndex) in section.items" :key="itemIndex">
+                  <template v-if="item && item.isLink">
+                    <a :href="item.value" target="_blank">{{ item.value }}</a>
+                  </template>
+                  <template v-else>
+                    {{ item && item.value ? item.value : '' }}
+                  </template>
+                </p>
+              </template>
+            </template>
           </div>
           <div class="content">
             <h1>{{ resumeData.personal.name || 'Your Name' }}</h1>
@@ -190,6 +193,7 @@ export default {
 .sidebar h2 {
   font-family: var(--heading-font, 'Oswald', sans-serif);
   font-size: 1em;
+  margin-top: 16px;
   margin-bottom: 6px;
   border-bottom: 2px solid #ffffff33;
   padding-bottom: 3px;
@@ -198,6 +202,11 @@ export default {
   color: #fff;
   word-wrap: break-word;
   overflow-wrap: break-word;
+}
+
+.sidebar h1:first-child,
+.sidebar h2:first-child {
+  margin-top: 0;
 }
 
 .sidebar a {
@@ -390,5 +399,71 @@ li {
 .resume-preview .section p,
 .resume-preview .section li {
   margin-bottom: var(--content-spacing);
+}
+
+/* Custom sections styling to match original sections */
+.resume-preview .custom-section h2 {
+  font-family: var(--heading-font);
+  font-size: var(--heading-size);
+  margin-bottom: var(--content-spacing);
+  color: var(--primary-color);
+}
+
+.resume-preview .custom-section p {
+  font-family: var(--body-font);
+  font-size: var(--base-size);
+  line-height: 1.6;
+  margin-bottom: var(--content-spacing);
+}
+
+.resume-preview .custom-section .skills-list {
+  font-size: var(--base-size);
+  line-height: 1.6;
+}
+
+.resume-preview .custom-section .skills-list span {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.resume-preview .custom-section .language-proficiency {
+  margin-bottom: var(--content-spacing);
+}
+
+.resume-preview .custom-section .language-proficiency-label {
+  font-size: var(--base-size);
+  line-height: 1.2;
+  margin-bottom: 4px;
+}
+
+.resume-preview .custom-section .language-proficiency-bar {
+  height: 8px;
+  background-color: var(--sidebar-color);
+  border-radius: 4px;
+  overflow: hidden;
+  max-width: 250px;
+  margin-bottom: 8px;
+}
+
+.resume-preview .custom-section .language-proficiency-bar-fill {
+  height: 100%;
+  background-color: #ffffff;
+  border-radius: 4px;
+}
+
+.resume-preview .custom-section .subsubtitle {
+  font-style: italic;
+  font-size: var(--base-size);
+  line-height: 1.6;
+  margin-bottom: var(--content-spacing);
+}
+
+.resume-preview .custom-section a {
+  color: var(--link-color);
+  text-decoration: none;
+}
+
+.resume-preview .custom-section a:hover {
+  text-decoration: underline;
 }
 </style>

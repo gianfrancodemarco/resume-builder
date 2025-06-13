@@ -84,39 +84,8 @@ const resumeData = ref({
     personal: {
         name: 'John Doe',
         title: 'Software Engineer',
-        about: [
-            'Passionate software engineer with a strong focus on web development and user experience. Experienced in building modern, responsive applications using Vue.js and other cutting-edge technologies.',
-            'Skilled in both frontend and backend development, with a particular emphasis on creating intuitive user interfaces and robust server-side solutions.'
-        ],
-        details: [
-            { value: 'New York, USA', isLink: false },
-            { value: 'john.doe@example.com', isLink: true }
-        ],
-        links: [
-            'https://github.com/johndoe',
-            'https://linkedin.com/in/johndoe'
-        ],
-        visible: true,
-        detailsVisible: true,
-        linksVisible: true
+        visible: true
     },
-    skills: [
-        'Vue.js',
-        'JavaScript',
-        'TypeScript',
-        'HTML/CSS',
-        'Node.js',
-        'Python',
-        'Git',
-        'Docker'
-    ],
-    skillsVisible: true,
-    languages: [
-        { name: 'Italian', proficiency: 100 },
-        { name: 'English', proficiency: 90 },
-        { name: 'Spanish', proficiency: 70 }
-    ],
-    languagesVisible: true,
     experiences: [
         {
             title: 'Senior Software Engineer',
@@ -146,7 +115,57 @@ const resumeData = ref({
             thesis: 'Introduction to Modern Web Technologies'
         }
     ],
-    educationVisible: true
+    educationVisible: true,
+    customSections: [
+        {
+            title: 'About Me',
+            type: 'italic',
+            items: [
+                { value: 'Passionate software engineer with a strong focus on web development and user experience. Experienced in building modern, responsive applications using Vue.js and other cutting-edge technologies.', isLink: false },
+                { value: 'Skilled in both frontend and backend development, with a particular emphasis on creating intuitive user interfaces and robust server-side solutions.', isLink: false }
+            ]
+        },
+        {
+            title: 'Contact Details',
+            type: 'text',
+            items: [
+                { value: 'New York, USA', isLink: false },
+                { value: 'john.doe@example.com', isLink: true }
+            ]
+        },
+        {
+            title: 'Professional Links',
+            type: 'text',
+            items: [
+                { value: 'https://github.com/johndoe', isLink: true },
+                { value: 'https://linkedin.com/in/johndoe', isLink: true }
+            ]
+        },
+        {
+            title: 'Technical Skills',
+            type: 'list',
+            items: [
+                'Vue.js',
+                'JavaScript',
+                'TypeScript',
+                'HTML/CSS',
+                'Node.js',
+                'Python',
+                'Git',
+                'Docker'
+            ]
+        },
+        {
+            title: 'Languages',
+            type: 'languages',
+            items: [
+                { name: 'Italian', proficiency: 100 },
+                { name: 'English', proficiency: 90 },
+                { name: 'Spanish', proficiency: 70 }
+            ]
+        }
+    ],
+    customSectionsVisible: true
 })
 
 const resumeStyle = ref({
@@ -377,6 +396,7 @@ const colorPreview = (color) => {
 
 const exportJSON = () => {
     const data = {
+        version: 1,
         resumeData: resumeData.value,
         resumeStyle: resumeStyle.value
     }

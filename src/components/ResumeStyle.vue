@@ -96,76 +96,85 @@
     </div>
 </template>
 
-<script>
-export default {
-    props: {
-        styleData: {
-            type: Object,
-            required: true
-        }
-    },
-    emits: ['update:style-data', 'change'],
-    data() {
-        return {
-            activeTab: 'colors',
-            local: {
-                ...this.styleData,
-                spacing: {
-                    ...this.styleData.spacing,
-                    sidebarWidth: this.styleData.spacing.sidebarWidth || 280
-                }
-            },
-            fontOptions: [
-                'Roboto',
-                'Arial',
-                'Helvetica',
-                'Times New Roman',
-                'Georgia',
-                'Verdana',
-                'Open Sans',
-                'Lato',
-                'Montserrat',
-                'Poppins'
-            ],
-            colorFields: {
-                primary: { label: 'Primary Color' },
-                text: { label: 'Text Color' },
-                background: { label: 'Background Color' },
-                sidebar: { label: 'Sidebar Color' },
-                link: { label: 'Link Color' }
-            }
-        }
-    },
-    watch: {
-        local: {
-            handler(newVal) {
-                this.$emit('update:style-data', JSON.parse(JSON.stringify(newVal)))
-                this.$emit('change')
-            },
-            deep: true
-        }
-    },
-    methods: {
-        validateHex(key) {
-            const value = this.local.colors[key]
-            // Remove any non-hex characters
-            let cleanValue = value.replace(/[^0-9A-Fa-f]/g, '')
+<script setup>
+import { ref, watch } from 'vue'
 
-            // Ensure it starts with #
-            if (!cleanValue.startsWith('#')) {
-                cleanValue = '#' + cleanValue
-            }
-
-            // Ensure it's 6 characters after the #
-            if (cleanValue.length > 7) {
-                cleanValue = cleanValue.slice(0, 7)
-            }
-
-            // Update the value
-            this.local.colors[key] = cleanValue
-            this.$emit('change')
-        }
+const props = defineProps({
+    styleData: {
+        type: Object,
+        required: true
     }
+})
+
+const emit = defineEmits(['update:style-data', 'change'])
+
+const activeTab = ref('colors')
+const local = ref({
+    colors: {
+        primary: props.styleData.colors?.primary || '#08294D',
+        text: props.styleData.colors?.text || '#08294D',
+        background: props.styleData.colors?.background || '#ffffff',
+        sidebar: props.styleData.colors?.sidebar || '#08294D',
+        link: props.styleData.colors?.link || '#ffffff'
+    },
+    typography: {
+        headingFont: props.styleData.typography?.headingFont || 'Oswald',
+        bodyFont: props.styleData.typography?.bodyFont || 'Lato',
+        baseSize: props.styleData.typography?.baseSize || 16,
+        headingSize: props.styleData.typography?.headingSize || 26
+    },
+    spacing: {
+        section: props.styleData.spacing?.section || 24,
+        content: props.styleData.spacing?.content || 12,
+        sidebarLeft: props.styleData.spacing?.sidebarLeft || false,
+        sidebarWidth: props.styleData.spacing?.sidebarWidth || 280
+    }
+})
+
+const fontOptions = [
+    'Roboto',
+    'Arial',
+    'Helvetica',
+    'Times New Roman',
+    'Georgia',
+    'Verdana',
+    'Open Sans',
+    'Lato',
+    'Montserrat',
+    'Poppins'
+]
+
+const colorFields = {
+    primary: { label: 'Primary Color' },
+    text: { label: 'Text Color' },
+    background: { label: 'Background Color' },
+    sidebar: { label: 'Sidebar Color' },
+    link: { label: 'Link Color' }
+}
+
+watch(local, (newVal) => {
+    emit('update:style-data', JSON.parse(JSON.stringify(newVal)))
+    emit('change')
+}, { deep: true })
+
+const validateHex = (key) => {
+    const value = local.value.colors[key]
+    // Remove any non-hex characters
+    let cleanValue = value.replace(/[^0-9A-Fa-f]/g, '')
+
+    // Ensure it starts with #
+    if (!cleanValue.startsWith('#')) {
+        cleanValue = '#' + cleanValue
+    }
+
+    // Ensure it's 6 characters after the #
+    if (cleanValue.length > 7) {
+        cleanValue = cleanValue.slice(0, 7)
+    }
+
+    // Update the value
+    local.value.colors[key] = cleanValue
+    emit('change')
 }
 </script>
 
