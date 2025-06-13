@@ -29,28 +29,30 @@
                 <v-switch v-model="local.experiencesVisible" label="Show section" hide-details density="compact"
                   color="primary" />
               </div>
-              <div v-for="(exp, index) in local.experiences" :key="index" class="mb-4 experience-card pa-3">
-                <div class="d-flex align-center mb-2">
-                  <v-text-field v-model="local.experiences[index].title" label="Job title"
-                    :disabled="!local.experiencesVisible" variant="outlined" density="comfortable" />
-                  <v-btn icon="mdi-delete" color="error" variant="text" @click="removeExp(index)" class="ml-2"
-                    :disabled="!local.experiencesVisible" />
-                </div>
-                <v-text-field v-model="local.experiences[index].company" label="Company (+ location)"
-                  :disabled="!local.experiencesVisible" variant="outlined" density="comfortable" class="mb-2" />
-                <v-text-field v-model="local.experiences[index].period" label="Period"
-                  :disabled="!local.experiencesVisible" variant="outlined" density="comfortable" class="mb-2" />
-                <v-textarea v-model="local.experiences[index].description" label="Description"
-                  :disabled="!local.experiencesVisible" variant="outlined" density="comfortable" />
-              </div>
-              <v-text-field v-model="exp.title" label="Job title" :disabled="!local.experiencesVisible"
-                variant="outlined" density="comfortable" class="mb-2" />
-              <v-text-field v-model="exp.company" label="Company (+ location)" :disabled="!local.experiencesVisible"
-                variant="outlined" density="comfortable" class="mb-2" />
-              <v-text-field v-model="exp.period" label="Period" :disabled="!local.experiencesVisible" variant="outlined"
-                density="comfortable" class="mb-2" />
-              <v-textarea v-model="exp.description" label="Description" :disabled="!local.experiencesVisible"
-                variant="outlined" density="comfortable" class="mb-2" />
+
+              <v-expansion-panels>
+                <v-expansion-panel v-for="(exp, index) in local.experiences" :key="index"
+                  class="mb-4 experience-card pa-3">
+                  <v-expansion-panel-title>
+                    {{ exp.title }} - {{ exp.company }}
+                    <v-btn icon="mdi-delete" color="error" variant="text" @click="removeExp(index)" class="ml-2"
+                      :disabled="!local.experiencesVisible" />
+                  </v-expansion-panel-title>
+                  <v-expansion-panel-text>
+                    <div class="d-flex align-center mb-2">
+                      <v-text-field v-model="local.experiences[index].title" label="Job title"
+                        :disabled="!local.experiencesVisible" variant="outlined" density="comfortable" />
+                    </div>
+                    <v-text-field v-model="local.experiences[index].company" label="Company (+ location)"
+                      :disabled="!local.experiencesVisible" variant="outlined" density="comfortable" class="mb-2" />
+                    <v-text-field v-model="local.experiences[index].period" label="Period"
+                      :disabled="!local.experiencesVisible" variant="outlined" density="comfortable" class="mb-2" />
+                    <v-textarea v-model="local.experiences[index].description" label="Description"
+                      :disabled="!local.experiencesVisible" variant="outlined" density="comfortable" />
+                  </v-expansion-panel-text>
+                </v-expansion-panel>
+              </v-expansion-panels>
+
               <v-btn color="primary" @click="addExp" :disabled="!local.experiencesVisible" prepend-icon="mdi-plus">Add
                 Experience</v-btn>
             </v-expansion-panel-text>
@@ -66,32 +68,29 @@
                 <v-switch v-model="local.educationVisible" label="Show section" hide-details density="compact"
                   color="primary" />
               </div>
-              <div v-for="(edu, index) in local.education" :key="index" class="mb-4 education-card pa-3">
-                <div class="d-flex align-center mb-2">
-                  <v-text-field v-model="local.education[index].degree" label="Degree"
-                    :disabled="!local.educationVisible" variant="outlined" density="comfortable" />
-                  <v-btn icon="mdi-delete" color="error" variant="text" @click="removeEdu(index)" class="ml-2"
-                    :disabled="!local.educationVisible" />
-                </div>
-                <v-text-field v-model="local.education[index].school" label="School" :disabled="!local.educationVisible"
-                  variant="outlined" density="comfortable" class="mb-2" />
-                <v-text-field v-model="local.education[index].period" label="Period" :disabled="!local.educationVisible"
-                  variant="outlined" density="comfortable" class="mb-2" />
-                <v-text-field v-model="local.education[index].mark" label="Grade" :disabled="!local.educationVisible"
-                  variant="outlined" density="comfortable" class="mb-2" />
-                <v-textarea v-model="local.education[index].thesis" label="Thesis / Notes"
-                  :disabled="!local.educationVisible" variant="outlined" density="comfortable" />
-              </div>
-              <v-text-field v-model="edu.degree" label="Degree" :disabled="!local.educationVisible" variant="outlined"
-                density="comfortable" class="mb-2" />
-              <v-text-field v-model="edu.school" label="School" :disabled="!local.educationVisible" variant="outlined"
-                density="comfortable" class="mb-2" />
-              <v-text-field v-model="edu.period" label="Period" :disabled="!local.educationVisible" variant="outlined"
-                density="comfortable" class="mb-2" />
-              <v-text-field v-model="edu.mark" label="Grade" :disabled="!local.educationVisible" variant="outlined"
-                density="comfortable" class="mb-2" />
-              <v-textarea v-model="edu.thesis" label="Thesis / Notes" :disabled="!local.educationVisible"
-                variant="outlined" density="comfortable" class="mb-2" />
+              <v-expansion-panels>
+                <v-expansion-panel v-for="(edu, index) in local.education" :key="index"
+                  class="mb-4 education-card pa-3">
+                  <v-expansion-panel-title>
+                    {{ edu.degree }} - {{ edu.school }}
+                    <v-btn icon="mdi-delete" color="error" variant="text" @click="removeEdu(index)" class="ml-2"
+                      :disabled="!local.educationVisible" />
+                  </v-expansion-panel-title>
+                  <v-expansion-panel-text>
+                    <v-text-field v-model="local.education[index].degree" label="Degree"
+                      :disabled="!local.educationVisible" variant="outlined" density="comfortable" />
+                    <v-text-field v-model="local.education[index].school" label="School"
+                      :disabled="!local.educationVisible" variant="outlined" density="comfortable" class="mb-2" />
+                    <v-text-field v-model="local.education[index].period" label="Period"
+                      :disabled="!local.educationVisible" variant="outlined" density="comfortable" class="mb-2" />
+                    <v-text-field v-model="local.education[index].mark" label="Grade"
+                      :disabled="!local.educationVisible" variant="outlined" density="comfortable" class="mb-2" />
+                    <v-textarea v-model="local.education[index].thesis" label="Thesis / Notes"
+                      :disabled="!local.educationVisible" variant="outlined" density="comfortable" />
+                  </v-expansion-panel-text>
+                </v-expansion-panel>
+              </v-expansion-panels>
+
               <v-btn color="primary" @click="addEdu" :disabled="!local.educationVisible" prepend-icon="mdi-plus">Add
                 Education</v-btn>
             </v-expansion-panel-text>
