@@ -21,7 +21,8 @@
             <div class="editor-content" :class="{ 'mobile-view': isMobile }">
                 <div class="editor-col"
                     :style="isMobile ? { height: `${editorHeight}%` } : { width: `${editorWidth}%` }">
-                    <ResumeEditor v-model:resume-data="resumeData" v-model:style="resumeStyle" @save="handleFormSave" />
+                    <ResumeEditor v-model:resume-data="resumeData" v-model:style="resumeStyle" @save="handleFormSave"
+                        @change="handleFormChange" />
                 </div>
                 <div class="resize-handle" @mousedown.prevent="startResize" @touchstart.prevent="startResize"
                     @touchmove.prevent="handleResize" @touchend.prevent="stopResize">
@@ -207,8 +208,7 @@ const handleBeforeUnload = (e) => {
 
 // Handle form changes
 const handleFormChange = () => {
-    // Remove this handler since it's causing recursive updates
-    // hasUnsavedChanges.value = true
+    hasUnsavedChanges.value = true
 }
 
 // Handle form save

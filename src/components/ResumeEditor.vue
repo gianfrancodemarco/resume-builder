@@ -263,6 +263,7 @@ watch(() => props.resumeData, (newVal) => {
 watch(local, (newVal) => {
   if (JSON.stringify(newVal) !== JSON.stringify(props.resumeData)) {
     emit('update:resume-data', JSON.parse(JSON.stringify(newVal)))
+    emit('change')
   }
 }, { deep: true })
 
@@ -289,12 +290,14 @@ const newDetail = ref({ value: '', isLink: false })
 const updateStyle = (newStyle) => {
   styleData.value = newStyle
   emit('update:style', JSON.parse(JSON.stringify(newStyle)))
+  emit('change')
 }
 
 const addLink = () => {
   if (link.value) {
     local.value.personal.links.push(link.value)
     link.value = ''
+    emit('change')
   }
 }
 
@@ -308,6 +311,7 @@ const addSkill = () => {
   if (skill.value) {
     local.value.skills.push(skill.value)
     skill.value = ''
+    emit('change')
   }
 }
 
@@ -321,6 +325,7 @@ const addLang = () => {
   if (lang.value.name) {
     local.value.languages.push({ ...lang.value })
     lang.value = { name: '', proficiency: 100 }
+    emit('change')
   }
 }
 
@@ -334,6 +339,7 @@ const addExp = () => {
   if (exp.value.title) {
     local.value.experiences.push({ ...exp.value })
     exp.value = { title: '', company: '', period: '', description: '' }
+    emit('change')
   }
 }
 
@@ -347,6 +353,7 @@ const addEdu = () => {
   if (edu.value.degree) {
     local.value.education.push({ ...edu.value })
     edu.value = { degree: '', period: '', mark: '', thesis: '' }
+    emit('change')
   }
 }
 
@@ -358,6 +365,7 @@ const removeEdu = (index) => {
 
 const addDescription = () => {
   local.value.personal.about.push('')
+  emit('change')
 }
 
 const removeDescription = (index) => {
@@ -370,6 +378,7 @@ const addDetail = () => {
   if (newDetail.value) {
     local.value.personal.details.push({ ...newDetail.value })
     newDetail.value = { value: '', isLink: false }
+    emit('change')
   }
 }
 
