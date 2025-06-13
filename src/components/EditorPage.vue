@@ -205,44 +205,87 @@ const downloadPDF = async () => {
 
 }
 
-const downloadHTML = () => {
+const downloadHTML = async () => {
     const srcEl = document.getElementById('printable-area')
     if (!srcEl) return
 
     const filename = getFilename('html')
-    var printWindow = window.open('', filename)
-    printWindow.document.title = filename
-    printWindow.document.head.append(document.head.cloneNode(true))
-    const style = printWindow.document.createElement('style')
-    style.textContent = `
-        @page {
-            margin: 0;
-        }
+    const printWindow = window.open('', filename)
+    if (!printWindow) {
+        alert('Popup blocked. Please allow popups for this site.')
+        return
+    }
 
-        html, body {
-            margin: 0 !important;
-            padding: 0 !important;
-            width: 100% !important;
-            height: 100% !important;
-            background: white !important;
-            box-sizing: border-box;
+    printWindow.document.title = filename
+
+    // Step 1: Collect local (non-CORS) styles from <style> and <link>
+    const localCSS = Array.from(document.styleSheets).map(sheet => {
+        try {
+            return Array.from(sheet.cssRules || []).map(rule => rule.cssText).join('\n')
+        } catch (e) {
+            return '' // Ignore cross-origin styles
         }
-    `
-    printWindow.document.head.appendChild(style)
-    printWindow.document.body.innerHTML = srcEl.outerHTML
-    printWindow.document.fonts.ready.then(() => {
+    }).join('\n')
+
+    // Step 2: Attempt to fetch CORS-allowed external stylesheets
+    const fetchExternalStyles = async () => {
+        const externalLinks = Array.from(document.querySelectorAll('link[rel="stylesheet"]'))
+        const fetched = await Promise.all(externalLinks.map(async link => {
+            try {
+                const res = await fetch(link.href)
+                if (!res.ok) throw new Error('fetch failed')
+                return await res.text()
+            } catch {
+                console.warn(`Could not fetch: ${link.href}`)
+                return ''
+            }
+        }))
+        return fetched.join('\n')
+    }
+
+    const externalCSS = await fetchExternalStyles()
+
+    // Step 3: Append combined CSS
+    const styleTag = document.createElement('style')
+    styleTag.textContent = `
+    @page {
+      margin: 0;
+    }
+
+    html, body {
+      margin: 0 !important;
+      padding: 0 !important;
+      width: 100% !important;
+      height: 100% !important;
+      background: white !important;
+      box-sizing: border-box;
+    }
+
+    ${localCSS}
+    ${externalCSS}
+  `
+    printWindow.document.head.appendChild(styleTag)
+
+    // Step 4: Clone content
+    const clone = srcEl.cloneNode(true)
+    printWindow.document.body.appendChild(clone)
+
+    // Step 5: Wait for fonts to load, then generate downloadable HTML
+    await printWindow.document.fonts.ready
+    setTimeout(() => {
         const blob = new Blob([printWindow.document.documentElement.outerHTML], { type: 'text/html' })
-        const url = window.URL.createObjectURL(blob)
+        const url = URL.createObjectURL(blob)
         const a = document.createElement('a')
         a.href = url
         a.download = filename.replace(/\s+/g, '_')
         document.body.appendChild(a)
         a.click()
-        window.URL.revokeObjectURL(url)
         document.body.removeChild(a)
+        URL.revokeObjectURL(url)
         printWindow.close()
-    })
+    }, 0)
 }
+
 
 const updateStyle = (newStyle) => {
     styleData.value = newStyle
