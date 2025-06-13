@@ -11,9 +11,12 @@
 
         <v-navigation-drawer v-model="drawer" app temporary>
             <v-list>
-                <v-list-item to="/" prepend-icon="mdi-home" title="Home"></v-list-item>
-                <v-list-item to="/editor" prepend-icon="mdi-pencil" title="Editor"></v-list-item>
-                <v-list-item to="/preview" prepend-icon="mdi-eye" title="Preview"></v-list-item>
+                <v-list-item @click="handleExportJSON" prepend-icon="mdi-code-json" title="Export JSON"></v-list-item>
+                <v-list-item @click="handleImportJSON" prepend-icon="mdi-upload" title="Import JSON"></v-list-item>
+                <v-list-item @click="handleDownloadPDF" prepend-icon="mdi-file-pdf-box"
+                    title="Download PDF"></v-list-item>
+                <v-list-item @click="handleDownloadHTML" prepend-icon="mdi-file-code"
+                    title="Download HTML"></v-list-item>
             </v-list>
         </v-navigation-drawer>
 
@@ -695,8 +698,8 @@ const stopResize = () => {
 :deep(.v-list-item) {
     min-height: 48px;
     border-radius: 8px;
-    margin: 2px 0;
-    transition: background-color 0.2s ease;
+    margin: 4px 8px;
+    transition: all 0.2s ease;
 }
 
 :deep(.v-list-item:hover) {
@@ -707,16 +710,16 @@ const stopResize = () => {
     font-size: 0.95rem;
     font-weight: 500;
     color: rgba(0, 0, 0, 0.87);
-    cursor: pointer;
-    padding: 8px 0;
 }
 
 :deep(.v-icon) {
     font-size: 1.25rem;
+    color: rgba(0, 0, 0, 0.6);
 }
 
 :deep(.v-divider) {
     opacity: 0.1;
+    margin: 8px 0;
 }
 
 .editor-content {
@@ -802,5 +805,10 @@ const stopResize = () => {
     .editor-content {
         height: calc(100vh - 56px);
     }
+}
+
+:deep(.v-navigation-drawer) {
+    background-color: #fff !important;
+    border-right: 1px solid rgba(0, 0, 0, 0.08);
 }
 </style>
