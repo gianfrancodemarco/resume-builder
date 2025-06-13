@@ -254,26 +254,28 @@ const styleData = ref(JSON.parse(JSON.stringify(props.style)))
 
 // Watch for changes in props to update local state
 watch(() => props.resumeData, (newVal) => {
-  local.value = JSON.parse(JSON.stringify(newVal))
-  emit('change')
+  if (JSON.stringify(newVal) !== JSON.stringify(local.value)) {
+    local.value = JSON.parse(JSON.stringify(newVal))
+  }
 }, { deep: true })
 
 // Watch for changes in local state to emit updates
 watch(local, (newVal) => {
-  emit('update:resume-data', JSON.parse(JSON.stringify(newVal)))
-  emit('change')
+  if (JSON.stringify(newVal) !== JSON.stringify(props.resumeData)) {
+    emit('update:resume-data', JSON.parse(JSON.stringify(newVal)))
+  }
 }, { deep: true })
 
 // Watch for changes in style
 watch(() => props.style, (newVal) => {
-  styleData.value = JSON.parse(JSON.stringify(newVal))
-  emit('change')
+  if (JSON.stringify(newVal) !== JSON.stringify(styleData.value)) {
+    styleData.value = JSON.parse(JSON.stringify(newVal))
+  }
 }, { deep: true })
 
 // Handle save
 const handleSave = () => {
   emit('save')
-  // Add your save logic here
 }
 
 const activeTab = ref('info')
@@ -298,6 +300,8 @@ const addLink = () => {
 
 const removeLink = (index) => {
   local.value.personal.links.splice(index, 1)
+  emit('update:resume-data', JSON.parse(JSON.stringify(local.value)))
+  emit('change')
 }
 
 const addSkill = () => {
@@ -309,6 +313,8 @@ const addSkill = () => {
 
 const removeSkill = (index) => {
   local.value.skills.splice(index, 1)
+  emit('update:resume-data', JSON.parse(JSON.stringify(local.value)))
+  emit('change')
 }
 
 const addLang = () => {
@@ -320,6 +326,8 @@ const addLang = () => {
 
 const removeLang = (index) => {
   local.value.languages.splice(index, 1)
+  emit('update:resume-data', JSON.parse(JSON.stringify(local.value)))
+  emit('change')
 }
 
 const addExp = () => {
@@ -331,6 +339,8 @@ const addExp = () => {
 
 const removeExp = (index) => {
   local.value.experiences.splice(index, 1)
+  emit('update:resume-data', JSON.parse(JSON.stringify(local.value)))
+  emit('change')
 }
 
 const addEdu = () => {
@@ -342,6 +352,8 @@ const addEdu = () => {
 
 const removeEdu = (index) => {
   local.value.education.splice(index, 1)
+  emit('update:resume-data', JSON.parse(JSON.stringify(local.value)))
+  emit('change')
 }
 
 const addDescription = () => {
@@ -350,6 +362,8 @@ const addDescription = () => {
 
 const removeDescription = (index) => {
   local.value.personal.about.splice(index, 1)
+  emit('update:resume-data', JSON.parse(JSON.stringify(local.value)))
+  emit('change')
 }
 
 const addDetail = () => {
@@ -361,6 +375,8 @@ const addDetail = () => {
 
 const removeDetail = (index) => {
   local.value.personal.details.splice(index, 1)
+  emit('update:resume-data', JSON.parse(JSON.stringify(local.value)))
+  emit('change')
 }
 </script>
 
