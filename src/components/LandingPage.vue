@@ -246,6 +246,12 @@ onMounted(() => {
 
     .website-link {
         bottom: 1.5rem;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .website-link .separator {
+        display: none;
     }
 
     .website-link a {
