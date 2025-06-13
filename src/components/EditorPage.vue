@@ -42,26 +42,26 @@
         <div class="download-buttons" v-if="!$vuetify.display.smAndDown">
             <v-tooltip text="Export JSON" location="top">
                 <template v-slot:activator="{ props }">
-                    <v-btn v-bind="props" icon="mdi-code-json" color="primary" @click="exportJSON"
+                    <v-btn v-bind="props" icon="mdi-code-json" color="white" @click="exportJSON"
                         class="mr-2 download-btn" elevation="2" />
                 </template>
             </v-tooltip>
             <v-tooltip text="Import JSON" location="top">
                 <template v-slot:activator="{ props }">
-                    <v-btn v-bind="props" icon="mdi-upload" color="primary" @click="importJSON"
-                        class="mr-2 download-btn" elevation="2" />
+                    <v-btn v-bind="props" icon="mdi-upload" color="white" @click="importJSON" class="mr-2 download-btn"
+                        elevation="2" />
                 </template>
             </v-tooltip>
             <v-tooltip text="Download as PDF" location="top">
                 <template v-slot:activator="{ props }">
-                    <v-btn v-bind="props" icon="mdi-file-pdf-box" color="primary" @click="downloadPDF"
+                    <v-btn v-bind="props" icon="mdi-file-pdf-box" color="white" @click="downloadPDF"
                         class="mr-2 download-btn" elevation="2" />
                 </template>
             </v-tooltip>
             <v-tooltip text="Download as HTML" location="top">
                 <template v-slot:activator="{ props }">
-                    <v-btn v-bind="props" icon="mdi-file-code" color="primary" @click="downloadHTML"
-                        class="download-btn" elevation="2" />
+                    <v-btn v-bind="props" icon="mdi-file-code" color="white" @click="downloadHTML" class="download-btn"
+                        elevation="2" />
                 </template>
             </v-tooltip>
         </div>
@@ -542,12 +542,14 @@ const stopResize = () => {
 .download-btn {
     transition: all 0.2s ease-in-out;
     background: #0f2027 !important;
+    color: white !important;
     box-shadow: 0 4px 12px rgba(15, 32, 39, 0.1) !important;
 }
 
 .download-btn:hover {
     transform: translateY(-2px);
     background: #1a2c35 !important;
+    color: white !important;
     box-shadow: 0 6px 16px rgba(15, 32, 39, 0.15) !important;
 }
 
@@ -716,7 +718,6 @@ const stopResize = () => {
 
 :deep(.v-icon) {
     font-size: 1.25rem;
-    color: rgba(0, 0, 0, 0.6);
 }
 
 :deep(.v-divider) {
