@@ -317,6 +317,7 @@ export default {
 }
 
 .editor-tabs {
+  margin-left: 20px;
   position: sticky;
   top: 0;
   z-index: 2;

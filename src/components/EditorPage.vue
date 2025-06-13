@@ -1,7 +1,7 @@
 <template>
     <v-app>
-        <v-app-bar color="primary" elevation="0" class="px-4">
-            <v-app-bar-title class="text-h5 font-weight-bold">
+        <v-app-bar elevation="0" class="px-4 gradient-navbar custom-navbar">
+            <v-app-bar-title class="text-h5 font-weight-bold navbar-title">
                 <a href="/" class="text-decoration-none text-white">Resume Builder</a>
             </v-app-bar-title>
         </v-app-bar>
@@ -24,7 +24,7 @@
                     </v-col>
                     <v-col cols="12" md="7" lg="8" class="preview-container">
                         <div class="preview-wrapper">
-                            <ResumePreview :resume-data="resumeData" :style="styleData"
+                            <ResumePreview download-id="resume-preview" :resume-data="resumeData" :style="styleData"
                                 :sidebar-position="styleData.spacing.sidebarLeft ? 'left' : 'right'" />
                         </div>
                     </v-col>
@@ -201,9 +201,18 @@ const downloadPDF = async () => {
     const srcEl = document.getElementById('resume-preview')
     if (!srcEl) return
 
+    // Get name and position from resume data
+    const name = resumeData.value.personal.name?.trim()
+    const position = resumeData.value.personal.title?.trim()
+
+    // Create filename: "Name_Position.pdf" or "resume.pdf" if no name/position
+    const filename = (name && position)
+        ? `${name}_${position}.pdf`
+        : (name || position || 'resume') + '.pdf'
+
     const opt = {
         margin: 0.0,
-        filename: 'document.pdf',
+        filename: filename.replace(/\s+/g, '_'),
         image: { type: 'jpeg', quality: 0.98 },
         html2canvas: { scale: 1 },
         jsPDF: { unit: 'mm', format: 'A4', orientation: 'portrait' }
@@ -214,15 +223,28 @@ const downloadPDF = async () => {
 }
 
 const downloadHTML = () => {
-    const element = document.getElementById('resume-preview')
-    const html = element.outerHTML
-    const blob = new Blob([html], { type: 'text/html' })
+    const srcEl = document.getElementById('resume-preview')
+    if (!srcEl) return
+
+    // Get name and position from resume data
+    const name = resumeData.value.personal.name?.trim()
+    const position = resumeData.value.personal.title?.trim()
+
+    // Create filename: "Name_Position.html" or "resume.html" if no name/position
+    const filename = (name && position)
+        ? `${name}_${position}.html`
+        : (name || position || 'resume') + '.html'
+
+    // Create a blob with the HTML content
+    const blob = new Blob([srcEl.outerHTML], { type: 'text/html' })
     const url = window.URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = 'resume.html'
+    a.download = filename.replace(/\s+/g, '_')
+    document.body.appendChild(a)
     a.click()
     window.URL.revokeObjectURL(url)
+    document.body.removeChild(a)
 }
 
 const updateStyle = (newStyle) => {
@@ -237,7 +259,6 @@ const toggleSidebarPosition = () => {
 <style scoped>
 .editor-col {
     border-right: 1px solid rgba(0, 0, 0, 0.08);
-    height: 100vh;
     overflow-y: auto;
 }
 
@@ -260,14 +281,47 @@ const toggleSidebarPosition = () => {
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15) !important;
 }
 
-:deep(.v-app-bar) {
-    backdrop-filter: blur(12px);
-    background-color: rgba(var(--v-theme-primary), 0.98) !important;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+.gradient-navbar {
+    background: linear-gradient(135deg, #0f2027 0%, #2c5364 100%) !important;
+    box-shadow: 0 4px 16px rgba(44, 83, 100, 0.10);
+    border-bottom: none !important;
+    min-height: 48px !important;
+    height: 56px !important;
+    padding-left: 24px !important;
+    padding-right: 24px !important;
+    display: flex;
+    align-items: center;
+    background-color: #2c5364 !important;
+    backdrop-filter: none !important;
+    opacity: 1 !important;
 }
 
-:deep(.v-main) {
-    padding-top: 64px;
+.custom-navbar {
+    color: #fff !important;
+    font-size: 1.1rem;
+    font-family: 'Oswald', sans-serif;
+    letter-spacing: 1px;
+}
+
+.navbar-title {
+    margin: 0;
+    padding: 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #fff !important;
+    display: flex;
+    align-items: center;
+    height: 100%;
+}
+
+:deep(.v-app-bar) {
+    box-shadow: none !important;
+    border-bottom: none !important;
+    min-height: 48px !important;
+    height: 56px !important;
+    padding: 0 !important;
+    backdrop-filter: none !important;
+    opacity: 1 !important;
 }
 
 .preview-dialog {
@@ -304,7 +358,7 @@ const toggleSidebarPosition = () => {
 
 .preview-container {
     height: 100%;
-    background-color: #000;
+    background-color: #f8fafc;
 }
 
 .floating-actions {
