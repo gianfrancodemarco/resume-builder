@@ -104,7 +104,7 @@ export default {
             required: true
         }
     },
-    emits: ['update:style-data'],
+    emits: ['update:style-data', 'change'],
     data() {
         return {
             activeTab: 'colors',
@@ -140,6 +140,7 @@ export default {
         local: {
             handler(newVal) {
                 this.$emit('update:style-data', JSON.parse(JSON.stringify(newVal)))
+                this.$emit('change')
             },
             deep: true
         }
@@ -162,6 +163,7 @@ export default {
 
             // Update the value
             this.local.colors[key] = cleanValue
+            this.$emit('change')
         }
     }
 }
