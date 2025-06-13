@@ -104,10 +104,10 @@ export default {
 
 <style>
 #printable-area {
+  margin: auto;
   width: 210mm;
   min-height: 297mm;
   padding: 0;
-  margin: 0;
   background-color: black !important;
 }
 

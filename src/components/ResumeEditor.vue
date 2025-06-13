@@ -64,7 +64,7 @@
                   color="primary" />
               </div>
               <div v-for="(link, index) in local.personal.links" :key="index" class="d-flex align-center mb-2">
-                <v-text-field v-model="local.personal.links[index]" label="Link" readonly
+                <v-text-field v-model="local.personal.links[index]" label="Link"
                   :disabled="!local.personal.linksVisible" variant="outlined" density="comfortable" />
                 <v-btn icon="mdi-delete" color="error" variant="text" @click="removeLink(index)" class="ml-2"
                   :disabled="!local.personal.linksVisible" />
@@ -88,7 +88,7 @@
                   color="primary" />
               </div>
               <div v-for="(skill, index) in local.skills" :key="index" class="d-flex align-center mb-2">
-                <v-text-field v-model="local.skills[index]" label="Skill" readonly :disabled="!local.skillsVisible"
+                <v-text-field v-model="local.skills[index]" label="Skill" :disabled="!local.skillsVisible"
                   variant="outlined" density="comfortable" />
                 <v-btn icon="mdi-delete" color="error" variant="text" @click="removeSkill(index)" class="ml-2"
                   :disabled="!local.skillsVisible" />
@@ -111,8 +111,8 @@
                   color="primary" />
               </div>
               <div v-for="(lang, index) in local.languages" :key="index" class="d-flex align-center mb-2">
-                <v-text-field v-model="local.languages[index].name" label="Language" readonly
-                  :disabled="!local.languagesVisible" variant="outlined" density="comfortable" />
+                <v-text-field v-model="local.languages[index].name" label="Language" :disabled="!local.languagesVisible"
+                  variant="outlined" density="comfortable" />
                 <v-text-field v-model="local.languages[index].proficiency" label="Proficiency (%)" readonly class="mx-2"
                   :disabled="!local.languagesVisible" variant="outlined" density="comfortable" />
                 <v-btn icon="mdi-delete" color="error" variant="text" @click="removeLang(index)" class="ml-2"
@@ -139,16 +139,16 @@
               </div>
               <div v-for="(exp, index) in local.experiences" :key="index" class="mb-4 experience-card pa-3">
                 <div class="d-flex align-center mb-2">
-                  <v-text-field v-model="local.experiences[index].title" label="Job title" readonly
+                  <v-text-field v-model="local.experiences[index].title" label="Job title"
                     :disabled="!local.experiencesVisible" variant="outlined" density="comfortable" />
                   <v-btn icon="mdi-delete" color="error" variant="text" @click="removeExp(index)" class="ml-2"
                     :disabled="!local.experiencesVisible" />
                 </div>
-                <v-text-field v-model="local.experiences[index].company" label="Company (+ location)" readonly
+                <v-text-field v-model="local.experiences[index].company" label="Company (+ location)"
                   :disabled="!local.experiencesVisible" variant="outlined" density="comfortable" class="mb-2" />
-                <v-text-field v-model="local.experiences[index].period" label="Period" readonly
+                <v-text-field v-model="local.experiences[index].period" label="Period"
                   :disabled="!local.experiencesVisible" variant="outlined" density="comfortable" class="mb-2" />
-                <v-textarea v-model="local.experiences[index].description" label="Description" readonly
+                <v-textarea v-model="local.experiences[index].description" label="Description"
                   :disabled="!local.experiencesVisible" variant="outlined" density="comfortable" />
               </div>
               <v-text-field v-model="exp.title" label="Job title" :disabled="!local.experiencesVisible"
@@ -176,16 +176,16 @@
               </div>
               <div v-for="(edu, index) in local.education" :key="index" class="mb-4 education-card pa-3">
                 <div class="d-flex align-center mb-2">
-                  <v-text-field v-model="local.education[index].degree" label="Degree" readonly
+                  <v-text-field v-model="local.education[index].degree" label="Degree"
                     :disabled="!local.educationVisible" variant="outlined" density="comfortable" />
                   <v-btn icon="mdi-delete" color="error" variant="text" @click="removeEdu(index)" class="ml-2"
                     :disabled="!local.educationVisible" />
                 </div>
-                <v-text-field v-model="local.education[index].period" label="Period" readonly
-                  :disabled="!local.educationVisible" variant="outlined" density="comfortable" class="mb-2" />
-                <v-text-field v-model="local.education[index].mark" label="Grade" readonly
-                  :disabled="!local.educationVisible" variant="outlined" density="comfortable" class="mb-2" />
-                <v-textarea v-model="local.education[index].thesis" label="Thesis / Notes" readonly
+                <v-text-field v-model="local.education[index].period" label="Period" :disabled="!local.educationVisible"
+                  variant="outlined" density="comfortable" class="mb-2" />
+                <v-text-field v-model="local.education[index].mark" label="Grade" :disabled="!local.educationVisible"
+                  variant="outlined" density="comfortable" class="mb-2" />
+                <v-textarea v-model="local.education[index].thesis" label="Thesis / Notes"
                   :disabled="!local.educationVisible" variant="outlined" density="comfortable" />
               </div>
               <v-text-field v-model="edu.degree" label="Degree" :disabled="!local.educationVisible" variant="outlined"

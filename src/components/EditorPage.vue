@@ -33,6 +33,18 @@
         </v-main>
 
         <div class="download-buttons">
+            <v-tooltip text="Export JSON" location="top">
+                <template v-slot:activator="{ props }">
+                    <v-btn v-bind="props" icon="mdi-code-json" color="primary" @click="exportJSON"
+                        class="mr-2 download-btn" elevation="2" />
+                </template>
+            </v-tooltip>
+            <v-tooltip text="Import JSON" location="top">
+                <template v-slot:activator="{ props }">
+                    <v-btn v-bind="props" icon="mdi-upload" color="primary" @click="importJSON"
+                        class="mr-2 download-btn" elevation="2" />
+                </template>
+            </v-tooltip>
             <v-tooltip text="Download as PDF" location="top">
                 <template v-slot:activator="{ props }">
                     <v-btn v-bind="props" icon="mdi-file-pdf-box" color="primary" @click="downloadPDF"
@@ -46,6 +58,9 @@
                 </template>
             </v-tooltip>
         </div>
+
+        <!-- Hidden file input for JSON import -->
+        <input type="file" ref="fileInput" style="display: none" accept=".json" @change="handleFileUpload" />
     </v-app>
 </template>
 
@@ -142,19 +157,24 @@ const styleData = ref({
     }
 })
 
-const downloadPDF = async () => {
-    const srcEl = document.getElementById('printable-area')
-    if (!srcEl) return
+const fileInput = ref(null)
 
+const getFilename = (extension) => {
     // Get name and position from resume data
     const name = resumeData.value.personal.name?.trim()
     const position = resumeData.value.personal.title?.trim()
 
-    // Create filename: "Name_Position.pdf" or "resume.pdf" if no name/position
-    const filename = (name && position)
-        ? `${name}_${position}.pdf`
-        : (name || position || 'resume') + '.pdf'
+    // Create filename: "Name_Position.extension" or "resume.extension" if no name/position
+    return (name && position)
+        ? `${name}_${position}.${extension}`
+        : (name || position || 'resume') + `.${extension}`
+}
 
+const downloadPDF = async () => {
+    const srcEl = document.getElementById('printable-area')
+    if (!srcEl) return
+
+    const filename = getFilename('pdf')
     var printWindow = window.open('', filename)
     printWindow.document.title = filename
     printWindow.document.head.append(document.head.cloneNode(true))
@@ -185,15 +205,7 @@ const downloadHTML = () => {
     const srcEl = document.getElementById('printable-area')
     if (!srcEl) return
 
-    // Get name and position from resume data
-    const name = resumeData.value.personal.name?.trim()
-    const position = resumeData.value.personal.title?.trim()
-
-    // Create filename: "Name_Position.html" or "resume.html" if no name/position
-    const filename = (name && position)
-        ? `${name}_${position}.html`
-        : (name || position || 'resume') + '.html'
-
+    const filename = getFilename('html')
     var printWindow = window.open('', filename)
     printWindow.document.title = filename
     printWindow.document.head.append(document.head.cloneNode(true))
@@ -244,6 +256,49 @@ const colorTooltip = (color) => {
 // Add color preview formatter
 const colorPreview = (color) => {
     return color.toUpperCase()
+}
+
+const exportJSON = () => {
+    const data = {
+        resumeData: resumeData.value,
+        styleData: styleData.value
+    }
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
+    const url = window.URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = getFilename('json')
+    document.body.appendChild(a)
+    a.click()
+    window.URL.revokeObjectURL(url)
+    document.body.removeChild(a)
+}
+
+const importJSON = () => {
+    fileInput.value.click()
+}
+
+const handleFileUpload = (event) => {
+    const file = event.target.files[0]
+    if (file) {
+        const reader = new FileReader()
+        reader.onload = (e) => {
+            try {
+                const data = JSON.parse(e.target.result)
+                if (data.resumeData && data.styleData) {
+                    resumeData.value = data.resumeData
+                    styleData.value = data.styleData
+                } else {
+                    alert('Invalid resume data format')
+                }
+            } catch (error) {
+                alert('Error loading file: ' + error.message)
+            }
+        }
+        reader.readAsText(file)
+    }
+    // Reset the input so the same file can be selected again
+    event.target.value = ''
 }
 </script>
 
