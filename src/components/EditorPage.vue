@@ -53,7 +53,6 @@
 import { ref, watch } from 'vue'
 import ResumeEditor from './ResumeEditor.vue'
 import ResumePreview from './ResumePreview.vue'
-import html2pdf from 'html2pdf.js'
 
 const resumeData = ref({
     personal: {
