@@ -231,155 +231,148 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { ref, watch } from 'vue'
 import ResumeStyle from './ResumeStyle.vue'
 
-export default {
-  components: {
-    ResumeStyle
-  },
-  props: {
-    resumeData: {
-      type: Object,
-      required: true
-    },
-    style: {
-      type: Object,
-      required: true
-    }
-  },
-  emits: ['update:resume-data', 'update:style'],
-  data() {
-    // Initialize the data structure with defaults
-    const defaultData = {
-      personal: {
-        name: '',
-        title: '',
-        visible: true,
-        detailsVisible: true,
-        linksVisible: true,
-        about: [''],
-        details: [
-          { value: '', isLink: false },
-          { value: '', isLink: true }
-        ],
-        links: []
-      },
-      skills: [],
-      skillsVisible: true,
-      languages: [],
-      languagesVisible: true,
-      experiences: [],
-      experiencesVisible: true,
-      education: [],
-      educationVisible: true
-    }
+const emit = defineEmits(['update:resume-data', 'update:style', 'change', 'save'])
 
-    // Merge the provided data with defaults
-    const mergedData = {
-      ...defaultData,
-      ...this.resumeData,
-      personal: {
-        ...defaultData.personal,
-        ...this.resumeData.personal,
-        about: this.resumeData.personal?.about || [''],
-        details: this.resumeData.personal?.details || defaultData.personal.details,
-        links: this.resumeData.personal?.links || []
-      }
-    }
-
-    return {
-      activeTab: 'info',
-      styleData: JSON.parse(JSON.stringify(this.style)),
-      local: mergedData,
-      link: '',
-      skill: '',
-      lang: { name: '', proficiency: 100 },
-      exp: { title: '', company: '', period: '', description: '' },
-      edu: { degree: '', period: '', mark: '', thesis: '' },
-      newDetail: { value: '', isLink: false }
-    }
+const props = defineProps({
+  resumeData: {
+    type: Object,
+    required: true
   },
-  watch: {
-    local: {
-      handler(newVal) {
-        this.$emit('update:resume-data', newVal)
-      },
-      deep: true
-    },
-    style: {
-      handler(newVal) {
-        this.styleData = JSON.parse(JSON.stringify(newVal))
-      },
-      deep: true
-    }
-  },
-  methods: {
-    updateStyle(newStyle) {
-      this.styleData = newStyle
-      this.$emit('update:style', JSON.parse(JSON.stringify(newStyle)))
-    },
-    addLink() {
-      if (this.link) {
-        this.local.personal.links.push(this.link)
-        this.link = ''
-      }
-    },
-    removeLink(index) {
-      this.local.personal.links.splice(index, 1)
-    },
-    addSkill() {
-      if (this.skill) {
-        this.local.skills.push(this.skill)
-        this.skill = ''
-      }
-    },
-    removeSkill(index) {
-      this.local.skills.splice(index, 1)
-    },
-    addLang() {
-      if (this.lang.name) {
-        this.local.languages.push({ ...this.lang })
-        this.lang = { name: '', proficiency: 100 }
-      }
-    },
-    removeLang(index) {
-      this.local.languages.splice(index, 1)
-    },
-    addExp() {
-      if (this.exp.title) {
-        this.local.experiences.push({ ...this.exp })
-        this.exp = { title: '', company: '', period: '', description: '' }
-      }
-    },
-    removeExp(index) {
-      this.local.experiences.splice(index, 1)
-    },
-    addEdu() {
-      if (this.edu.degree) {
-        this.local.education.push({ ...this.edu })
-        this.edu = { degree: '', period: '', mark: '', thesis: '' }
-      }
-    },
-    removeEdu(index) {
-      this.local.education.splice(index, 1)
-    },
-    addDescription() {
-      this.local.personal.about.push('')
-    },
-    removeDescription(index) {
-      this.local.personal.about.splice(index, 1)
-    },
-    addDetail() {
-      if (this.newDetail.value) {
-        this.local.personal.details.push({ ...this.newDetail })
-        this.newDetail = { value: '', isLink: false }
-      }
-    },
-    removeDetail(index) {
-      this.local.personal.details.splice(index, 1)
-    }
+  style: {
+    type: Object,
+    required: true
   }
+})
+
+// Watch for changes in form data
+watch(() => props.resumeData, () => {
+  emit('change')
+}, { deep: true })
+
+// Watch for changes in style
+watch(() => props.style, () => {
+  emit('change')
+}, { deep: true })
+
+// Handle save
+const handleSave = () => {
+  emit('save')
+  // Add your save logic here
+}
+
+const activeTab = ref('info')
+const styleData = ref(JSON.parse(JSON.stringify(props.style)))
+const local = ref({
+  personal: {
+    name: '',
+    title: '',
+    visible: true,
+    detailsVisible: true,
+    linksVisible: true,
+    about: [''],
+    details: [
+      { value: '', isLink: false },
+      { value: '', isLink: true }
+    ],
+    links: []
+  },
+  skills: [],
+  skillsVisible: true,
+  languages: [],
+  languagesVisible: true,
+  experiences: [],
+  experiencesVisible: true,
+  education: [],
+  educationVisible: true
+})
+const link = ref('')
+const skill = ref('')
+const lang = ref({ name: '', proficiency: 100 })
+const exp = ref({ title: '', company: '', period: '', description: '' })
+const edu = ref({ degree: '', period: '', mark: '', thesis: '' })
+const newDetail = ref({ value: '', isLink: false })
+
+const updateStyle = (newStyle) => {
+  styleData.value = newStyle
+  emit('update:style', JSON.parse(JSON.stringify(newStyle)))
+}
+
+const addLink = () => {
+  if (link.value) {
+    local.value.personal.links.push(link.value)
+    link.value = ''
+  }
+}
+
+const removeLink = (index) => {
+  local.value.personal.links.splice(index, 1)
+}
+
+const addSkill = () => {
+  if (skill.value) {
+    local.value.skills.push(skill.value)
+    skill.value = ''
+  }
+}
+
+const removeSkill = (index) => {
+  local.value.skills.splice(index, 1)
+}
+
+const addLang = () => {
+  if (lang.value.name) {
+    local.value.languages.push({ ...lang.value })
+    lang.value = { name: '', proficiency: 100 }
+  }
+}
+
+const removeLang = (index) => {
+  local.value.languages.splice(index, 1)
+}
+
+const addExp = () => {
+  if (exp.value.title) {
+    local.value.experiences.push({ ...exp.value })
+    exp.value = { title: '', company: '', period: '', description: '' }
+  }
+}
+
+const removeExp = (index) => {
+  local.value.experiences.splice(index, 1)
+}
+
+const addEdu = () => {
+  if (edu.value.degree) {
+    local.value.education.push({ ...edu.value })
+    edu.value = { degree: '', period: '', mark: '', thesis: '' }
+  }
+}
+
+const removeEdu = (index) => {
+  local.value.education.splice(index, 1)
+}
+
+const addDescription = () => {
+  local.value.personal.about.push('')
+}
+
+const removeDescription = (index) => {
+  local.value.personal.about.splice(index, 1)
+}
+
+const addDetail = () => {
+  if (newDetail.value) {
+    local.value.personal.details.push({ ...newDetail.value })
+    newDetail.value = { value: '', isLink: false }
+  }
+}
+
+const removeDetail = (index) => {
+  local.value.personal.details.splice(index, 1)
 }
 </script>
 

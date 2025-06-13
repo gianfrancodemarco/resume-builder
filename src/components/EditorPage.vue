@@ -49,7 +49,7 @@
                     <v-col cols="12" md="5" lg="4" class="editor-col"
                         :class="{ 'mobile-editor': $vuetify.display.smAndDown }">
                         <ResumeEditor v-model:resume-data="resumeData" v-model:style="styleData"
-                            @update:style="updateStyle">
+                            @update:style="updateStyle" @change="handleFormChange" @save="handleFormSave">
                             <template #style-extensions>
                                 <div class="sidebar-toggle-row">
                                     <v-btn icon="mdi-arrow-left-right" color="primary" variant="tonal"
@@ -104,10 +104,12 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch, onMounted, onBeforeUnmount } from 'vue'
 import ResumeEditor from './ResumeEditor.vue'
 import ResumePreview from './ResumePreview.vue'
+import { useRouter } from 'vue-router'
 
+const router = useRouter()
 const resumeData = ref({
     personal: {
         name: 'John Doe',
@@ -202,6 +204,49 @@ const fileInput = ref(null)
 
 // Add drawer ref for mobile menu
 const drawer = ref(false)
+
+const showMobileMenu = ref(false)
+const hasUnsavedChanges = ref(false)
+
+// Add event listener for page unload
+onMounted(() => {
+    window.addEventListener('beforeunload', handleBeforeUnload)
+})
+
+// Remove event listener when component is destroyed
+onBeforeUnmount(() => {
+    window.removeEventListener('beforeunload', handleBeforeUnload)
+})
+
+// Handle beforeunload event
+const handleBeforeUnload = (e) => {
+    if (hasUnsavedChanges.value) {
+        e.preventDefault()
+        e.returnValue = ''
+        return ''
+    }
+}
+
+// Handle form changes
+const handleFormChange = () => {
+    hasUnsavedChanges.value = true
+}
+
+// Handle form save
+const handleFormSave = () => {
+    hasUnsavedChanges.value = false
+}
+
+// Handle navigation
+const handleNavigation = (to) => {
+    if (hasUnsavedChanges.value) {
+        if (confirm('You have unsaved changes. Are you sure you want to leave?')) {
+            router.push(to)
+        }
+    } else {
+        router.push(to)
+    }
+}
 
 const getFilename = (extension) => {
     // Get name and position from resume data
