@@ -254,6 +254,16 @@ const updateStyle = (newStyle) => {
 const toggleSidebarPosition = () => {
     styleData.value.spacing.sidebarLeft = !styleData.value.spacing.sidebarLeft
 }
+
+// Add color picker tooltip formatter
+const colorTooltip = (color) => {
+    return `Color: ${color.toUpperCase()}`
+}
+
+// Add color preview formatter
+const colorPreview = (color) => {
+    return color.toUpperCase()
+}
 </script>
 
 <style scoped>
@@ -273,12 +283,14 @@ const toggleSidebarPosition = () => {
 
 .download-btn {
     transition: all 0.2s ease-in-out;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+    background: #0f2027 !important;
+    box-shadow: 0 4px 12px rgba(15, 32, 39, 0.1) !important;
 }
 
 .download-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15) !important;
+    background: #1a2c35 !important;
+    box-shadow: 0 6px 16px rgba(15, 32, 39, 0.15) !important;
 }
 
 .gradient-navbar {
@@ -396,12 +408,41 @@ const toggleSidebarPosition = () => {
 }
 
 .sidebar-toggle-btn {
-    box-shadow: 0 2px 8px rgba(44, 83, 100, 0.10);
+    background: #0f2027 !important;
+    box-shadow: 0 2px 8px rgba(15, 32, 39, 0.10);
+}
+
+.sidebar-toggle-btn:hover {
+    background: #1a2c35 !important;
 }
 
 .sidebar-toggle-label {
     font-size: 0.95em;
     color: #333;
     opacity: 0.8;
+}
+
+:deep(.v-color-picker) {
+    .v-color-picker__input {
+        .v-color-picker__input__value {
+            font-family: monospace;
+            font-size: 0.9em;
+        }
+    }
+}
+
+:deep(.v-color-picker__preview) {
+    position: relative;
+
+    &::after {
+        content: attr(data-color);
+        position: absolute;
+        right: -60px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-family: monospace;
+        font-size: 0.9em;
+        color: rgba(0, 0, 0, 0.6);
+    }
 }
 </style>

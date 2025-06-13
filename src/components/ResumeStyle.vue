@@ -21,17 +21,27 @@
                     <div v-for="(color, key) in colorFields" :key="key" class="color-field">
                         <div class="d-flex align-center justify-space-between mb-2">
                             <span class="text-subtitle-2">{{ color.label }}</span>
-                            <v-menu location="bottom end" :close-on-content-click="false">
-                                <template v-slot:activator="{ props }">
-                                    <div class="color-preview" v-bind="props"
-                                        :style="{ backgroundColor: local.colors[key] }">
-                                        <v-icon icon="mdi-pencil" size="small" class="edit-icon"></v-icon>
-                                    </div>
-                                </template>
-                                <v-card class="color-picker-card">
-                                    <v-color-picker v-model="local.colors[key]" mode="hex" hide-inputs></v-color-picker>
-                                </v-card>
-                            </v-menu>
+                            <div class="d-flex align-center">
+                                <span class="color-hex mr-2">{{ local.colors[key].toUpperCase() }}</span>
+                                <v-menu location="bottom end" :close-on-content-click="false">
+                                    <template v-slot:activator="{ props }">
+                                        <div class="color-preview" v-bind="props"
+                                            :style="{ backgroundColor: local.colors[key] }">
+                                            <v-icon icon="mdi-pencil" size="small" class="edit-icon"></v-icon>
+                                        </div>
+                                    </template>
+                                    <v-card class="color-picker-card">
+                                        <v-color-picker v-model="local.colors[key]" mode="hex"
+                                            hide-inputs></v-color-picker>
+                                        <v-divider></v-divider>
+                                        <div class="pa-2">
+                                            <v-text-field v-model="local.colors[key]" class="color-input"
+                                                density="compact" hide-details variant="outlined"
+                                                @input="validateHex(key)" placeholder="#000000"></v-text-field>
+                                        </div>
+                                    </v-card>
+                                </v-menu>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -123,6 +133,26 @@ export default {
             },
             deep: true
         }
+    },
+    methods: {
+        validateHex(key) {
+            const value = this.local.colors[key]
+            // Remove any non-hex characters
+            let cleanValue = value.replace(/[^0-9A-Fa-f]/g, '')
+
+            // Ensure it starts with #
+            if (!cleanValue.startsWith('#')) {
+                cleanValue = '#' + cleanValue
+            }
+
+            // Ensure it's 6 characters after the #
+            if (cleanValue.length > 7) {
+                cleanValue = cleanValue.slice(0, 7)
+            }
+
+            // Update the value
+            this.local.colors[key] = cleanValue
+        }
     }
 }
 </script>
@@ -212,5 +242,58 @@ export default {
 
 :deep(.v-select .v-field--focused .v-field__outline) {
     border-color: rgb(var(--v-theme-primary)) !important;
+}
+
+.color-pickers {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 16px;
+}
+
+.color-picker-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.color-picker-item label {
+    min-width: 120px;
+    font-weight: 500;
+    color: rgba(0, 0, 0, 0.87);
+}
+
+.color-hex {
+    font-family: monospace;
+    font-size: 0.9em;
+    color: rgba(0, 0, 0, 0.6);
+}
+
+:deep(.v-color-picker) {
+    width: 100%;
+    max-width: 200px;
+}
+
+:deep(.v-color-picker__input) {
+    display: none;
+}
+
+.color-input {
+    width: 100%;
+}
+
+:deep(.color-input .v-field__input) {
+    font-family: monospace;
+    font-size: 0.9em;
+    padding: 0 8px;
+    min-height: 32px;
+}
+
+:deep(.color-input .v-field__outline) {
+    border-color: rgba(0, 0, 0, 0.12);
+}
+
+:deep(.color-input .v-field--focused .v-field__outline) {
+    border-color: rgb(var(--v-theme-primary));
 }
 </style>
