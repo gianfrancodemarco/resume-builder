@@ -198,7 +198,7 @@ watch(showFullPreview, (newVal) => {
 })
 
 const downloadPDF = async () => {
-    const srcEl = document.getElementById('resume-preview')
+    const srcEl = document.getElementById('printable-area')
     if (!srcEl) return
 
     // Get name and position from resume data
@@ -210,16 +210,31 @@ const downloadPDF = async () => {
         ? `${name}_${position}.pdf`
         : (name || position || 'resume') + '.pdf'
 
-    const opt = {
-        margin: 0.0,
-        filename: filename.replace(/\s+/g, '_'),
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 1 },
-        jsPDF: { unit: 'mm', format: 'A4', orientation: 'portrait' }
-    };
+    var printWindow = window.open('', filename)
+    printWindow.document.title = filename
+    printWindow.document.head.append(document.head.cloneNode(true))
+    const style = printWindow.document.createElement('style')
+    style.textContent = `
+        @page {
+        size: A4;
+        margin: 0;
+        }
 
-    // Generate and save the PDF
-    html2pdf().set(opt).from(srcEl).save();
+        html, body {
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        background: white !important;
+        box-sizing: border-box;
+        }
+    `
+    printWindow.document.head.appendChild(style)
+    printWindow.document.body.innerHTML = srcEl.outerHTML
+    printWindow.document.fonts.ready.then(() => {
+        printWindow.print()
+        //printWindow.close()
+    })
 }
 
 const downloadHTML = () => {
