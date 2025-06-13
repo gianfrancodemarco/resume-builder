@@ -128,7 +128,7 @@ export default {
   margin-bottom: var(--content-spacing);
 }
 
-.resume-preview section {
+.resume-preview .section {
   margin-bottom: var(--section-spacing);
 }
 
@@ -353,6 +353,16 @@ li {
   color: #666;
   margin: 0 0 0 8px;
   display: inline-block;
+}
+
+.resume-preview .section .job-title,
+.resume-preview .section .job-desc,
+.resume-preview .section .date,
+.resume-preview .section .graduation-mark,
+.resume-preview .section .thesis,
+.resume-preview .section p,
+.resume-preview .section li {
+  margin-bottom: var(--content-spacing);
 }
 
 @media print {

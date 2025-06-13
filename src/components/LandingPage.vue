@@ -13,6 +13,9 @@
             <p class="landing-subtitle">Create a stunning resume in minutes.<br>Modern, fast, and free.</p>
             <v-btn color="primary" class="landing-btn" large to="/editor">Start Editing</v-btn>
         </div>
+        <div class="website-link">
+            <a href="https://gianfrancodemarco.dev" target="_blank" rel="noopener noreferrer">gianfrancodemarco.dev</a>
+        </div>
     </div>
 </template>
 
@@ -102,5 +105,23 @@
 .landing-btn:hover {
     background: #1a2c35 !important;
     box-shadow: 0 8px 32px rgba(15, 32, 39, 0.22);
+}
+
+.website-link {
+    position: absolute;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.website-link a {
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    font-size: 0.95rem;
+    transition: color 0.3s ease;
+}
+
+.website-link a:hover {
+    color: #fff;
 }
 </style>
