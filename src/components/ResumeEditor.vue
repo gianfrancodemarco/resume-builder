@@ -73,6 +73,8 @@
                   <v-btn icon="mdi-delete" color="error" variant="text" @click="removeEdu(index)" class="ml-2"
                     :disabled="!local.educationVisible" />
                 </div>
+                <v-text-field v-model="local.education[index].school" label="School" :disabled="!local.educationVisible"
+                  variant="outlined" density="comfortable" class="mb-2" />
                 <v-text-field v-model="local.education[index].period" label="Period" :disabled="!local.educationVisible"
                   variant="outlined" density="comfortable" class="mb-2" />
                 <v-text-field v-model="local.education[index].mark" label="Grade" :disabled="!local.educationVisible"
@@ -81,6 +83,8 @@
                   :disabled="!local.educationVisible" variant="outlined" density="comfortable" />
               </div>
               <v-text-field v-model="edu.degree" label="Degree" :disabled="!local.educationVisible" variant="outlined"
+                density="comfortable" class="mb-2" />
+              <v-text-field v-model="edu.school" label="School" :disabled="!local.educationVisible" variant="outlined"
                 density="comfortable" class="mb-2" />
               <v-text-field v-model="edu.period" label="Period" :disabled="!local.educationVisible" variant="outlined"
                 density="comfortable" class="mb-2" />
@@ -251,6 +255,7 @@ const exp = ref({
 
 const edu = ref({
   degree: '',
+  school: '',
   period: '',
   mark: '',
   thesis: ''
@@ -322,6 +327,7 @@ const addEdu = () => {
     local.value.education.push({ ...edu.value })
     edu.value = {
       degree: '',
+      school: '',
       period: '',
       mark: '',
       thesis: ''

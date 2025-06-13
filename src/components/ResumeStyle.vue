@@ -78,7 +78,7 @@
                     </div>
                     <div>
                         <div class="text-subtitle-2 mb-2">Content Spacing</div>
-                        <v-slider v-model="local.spacing.content" label="Content Gap" min="8" max="24" step="2"
+                        <v-slider v-model="local.spacing.content" label="Content Gap" min="0" max="24" step="2"
                             thumb-label class="style-slider"></v-slider>
                     </div>
                     <div>
