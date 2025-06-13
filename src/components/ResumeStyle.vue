@@ -62,9 +62,9 @@
                     <div>
                         <div class="text-subtitle-2 mb-2">Font Sizes</div>
                         <v-slider v-model="local.typography.baseSize" label="Base Size" min="12" max="20" step="1"
-                            thumb-label></v-slider>
+                            thumb-label class="style-slider"></v-slider>
                         <v-slider v-model="local.typography.headingSize" label="Heading Size" min="16" max="32" step="1"
-                            thumb-label></v-slider>
+                            thumb-label class="style-slider"></v-slider>
                     </div>
                 </div>
             </v-window-item>
@@ -74,12 +74,12 @@
                     <div>
                         <div class="text-subtitle-2 mb-2">Section Spacing</div>
                         <v-slider v-model="local.spacing.section" label="Section Gap" min="8" max="48" step="4"
-                            thumb-label></v-slider>
+                            thumb-label class="style-slider"></v-slider>
                     </div>
                     <div>
                         <div class="text-subtitle-2 mb-2">Content Spacing</div>
                         <v-slider v-model="local.spacing.content" label="Content Gap" min="4" max="24" step="2"
-                            thumb-label></v-slider>
+                            thumb-label class="style-slider"></v-slider>
                     </div>
                     <div>
                         <div class="text-subtitle-2 mb-2">Sidebar Position</div>
@@ -295,5 +295,13 @@ export default {
 
 :deep(.color-input .v-field--focused .v-field__outline) {
     border-color: rgb(var(--v-theme-primary));
+}
+
+.style-slider {
+    max-width: 340px;
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
 }
 </style>
