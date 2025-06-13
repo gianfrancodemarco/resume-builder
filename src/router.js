@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHashHistory } from 'vue-router'
 import LandingPage from './components/LandingPage.vue'
 import EditorPage from './components/EditorPage.vue'
 
