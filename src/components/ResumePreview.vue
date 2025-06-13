@@ -105,7 +105,7 @@ export default {
 <style>
 #printable-area {
   width: 210mm;
-  height: 297mm;
+  min-height: 297mm;
   padding: 0;
   margin: 0;
   background-color: black !important;
@@ -152,7 +152,6 @@ export default {
   display: flex;
   flex-direction: row-reverse;
   width: 100%;
-  height: 297mm;
   margin: 0;
   padding: 0;
   background: #fff;
@@ -169,7 +168,7 @@ export default {
   color: #eee;
   font-weight: 400;
   flex: 0 0 28%;
-  height: 100%;
+  min-height: 297mm;
   padding: 28px 28px 48px 28px;
   display: flex;
   flex-direction: column;
@@ -264,7 +263,7 @@ export default {
 
 .content .subtitle {
   font-size: calc(var(--base-size, 16px) * 0.75);
-  padding-left: 3px;
+  padding-left: 0px;
   color: #aaa;
 }
 
