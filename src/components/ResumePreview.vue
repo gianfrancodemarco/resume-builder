@@ -1,56 +1,58 @@
 <template>
-  <div class="resume-preview" :style="resumeStyle" :id="downloadId || null">
-    <div class="preview-container">
-      <div class="container" :class="{ 'sidebar-left': sidebarPosition === 'left' }">
-        <div class="sidebar">
-          <div v-if="resumeData.personal.visible">
-            <h2>About me</h2>
-            <p class="subsubtitle" v-for="(t, i) in resumeData.personal.about" :key="i">{{ t }}</p>
-          </div>
-          <div v-if="resumeData.personal.detailsVisible">
-            <h2>Details</h2>
-            <p>{{ resumeData.personal.location }}<br />
-              <a :href="'mailto:' + resumeData.personal.email">{{ resumeData.personal.email }}</a>
-            </p>
-          </div>
-          <div v-if="resumeData.personal.linksVisible && resumeData.personal.links.length">
-            <h2>Links</h2>
-            <a v-for="(l, i) in resumeData.personal.links" :key="i" :href="l" target="_blank">{{ l }}</a>
-          </div>
-          <div v-if="resumeData.skillsVisible && resumeData.skills.length">
-            <h2>Skills</h2>
-            <p class="skills-list"><span v-for="(s, i) in resumeData.skills" :key="i">{{ s }}<br /></span></p>
-          </div>
-          <div v-if="resumeData.languagesVisible && resumeData.languages.length">
-            <h2>Languages</h2>
-            <div class="language-proficiency" v-for="(l, i) in resumeData.languages" :key="i">
-              <div class="language-proficiency-label">{{ l.name }}</div>
-              <div class="language-proficiency-bar">
-                <div class="language-proficiency-bar-fill" :style="{ width: l.proficiency + '%' }"></div>
+  <div id="printable-area">
+    <div class="resume-preview" :style="resumeStyle">
+      <div class="preview-container">
+        <div class="container" :class="{ 'sidebar-left': sidebarPosition === 'left' }">
+          <div class="sidebar">
+            <div v-if="resumeData.personal.visible">
+              <h2>About me</h2>
+              <p class="subsubtitle" v-for="(t, i) in resumeData.personal.about" :key="i">{{ t }}</p>
+            </div>
+            <div v-if="resumeData.personal.detailsVisible">
+              <h2>Details</h2>
+              <p>{{ resumeData.personal.location }}<br />
+                <a :href="'mailto:' + resumeData.personal.email">{{ resumeData.personal.email }}</a>
+              </p>
+            </div>
+            <div v-if="resumeData.personal.linksVisible && resumeData.personal.links.length">
+              <h2>Links</h2>
+              <a v-for="(l, i) in resumeData.personal.links" :key="i" :href="l" target="_blank">{{ l }}</a>
+            </div>
+            <div v-if="resumeData.skillsVisible && resumeData.skills.length">
+              <h2>Skills</h2>
+              <p class="skills-list"><span v-for="(s, i) in resumeData.skills" :key="i">{{ s }}<br /></span></p>
+            </div>
+            <div v-if="resumeData.languagesVisible && resumeData.languages.length">
+              <h2>Languages</h2>
+              <div class="language-proficiency" v-for="(l, i) in resumeData.languages" :key="i">
+                <div class="language-proficiency-label">{{ l.name }}</div>
+                <div class="language-proficiency-bar">
+                  <div class="language-proficiency-bar-fill" :style="{ width: l.proficiency + '%' }"></div>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-        <div class="content">
-          <h1>{{ resumeData.personal.name || 'Your Name' }}</h1>
-          <h2 class="subtitle">{{ resumeData.personal.title }}</h2>
+          <div class="content">
+            <h1>{{ resumeData.personal.name || 'Your Name' }}</h1>
+            <h2 class="subtitle">{{ resumeData.personal.title }}</h2>
 
-          <div class="section" v-if="resumeData.experiencesVisible && resumeData.experiences.length">
-            <h2>Employment History</h2>
-            <div v-for="(e, i) in resumeData.experiences" :key="i">
-              <p class="job-title">{{ e.title }}</p>
-              <p class="date">{{ e.period }}</p>
-              <p class="job-desc" v-html="e.description"></p>
+            <div class="section" v-if="resumeData.experiencesVisible && resumeData.experiences.length">
+              <h2>Employment History</h2>
+              <div v-for="(e, i) in resumeData.experiences" :key="i">
+                <p class="job-title">{{ e.title }}</p>
+                <p class="date">{{ e.period }}</p>
+                <p class="job-desc" v-html="e.description"></p>
+              </div>
             </div>
-          </div>
 
-          <div class="section" v-if="resumeData.educationVisible && resumeData.education.length">
-            <h2>Education</h2>
-            <div v-for="(ed, i) in resumeData.education" :key="i">
-              <p class="job-title">{{ ed.degree }}</p>
-              <p class="date">{{ ed.period }}</p>
-              <p class="graduation-mark">{{ ed.mark }}</p>
-              <p class="thesis">{{ ed.thesis }}</p>
+            <div class="section" v-if="resumeData.educationVisible && resumeData.education.length">
+              <h2>Education</h2>
+              <div v-for="(ed, i) in resumeData.education" :key="i">
+                <p class="job-title">{{ ed.degree }}</p>
+                <p class="date">{{ ed.period }}</p>
+                <p class="graduation-mark">{{ ed.mark }}</p>
+                <p class="thesis">{{ ed.thesis }}</p>
+              </div>
             </div>
           </div>
         </div>
@@ -100,23 +102,23 @@ export default {
 }
 </script>
 
-<style scoped>
-@page {
-  size: A4;
+<style>
+#printable-area {
+  width: 210mm;
+  height: 297mm;
+  padding: 0;
   margin: 0;
+  background-color: black !important;
 }
 
 .resume-preview {
-  width: 210mm;
-  height: 297mm;
   background-color: var(--background-color);
   color: var(--text-color);
   font-family: var(--body-font);
   font-size: var(--base-size);
   line-height: 1.6;
-  margin: 0 auto;
+  padding: 0;
   overflow: hidden;
-  /* No extra padding or shadow to mirror the original A4 canvas */
 }
 
 .resume-preview h1,
@@ -152,6 +154,7 @@ export default {
   width: 100%;
   height: 297mm;
   margin: 0;
+  padding: 0;
   background: #fff;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
   overflow: hidden;
@@ -363,14 +366,5 @@ li {
 .resume-preview .section p,
 .resume-preview .section li {
   margin-bottom: var(--content-spacing);
-}
-
-@media print {
-  .container {
-    width: 210mm;
-    height: 297mm;
-    padding: 20mm;
-    margin: 0;
-  }
 }
 </style>
