@@ -11,6 +11,10 @@
         </div>
         <div class="website-link">
             <a href="https://gianfrancodemarco.dev" target="_blank" rel="noopener noreferrer">gianfrancodemarco.dev</a>
+            <span class="separator">•</span>
+            <a href="https://github.com/gianfrancodemarco/resume-builder" target="_blank" rel="noopener noreferrer">
+                ⭐ Star on GitHub
+            </a>
         </div>
     </div>
 </template>
@@ -168,6 +172,9 @@ onMounted(() => {
     bottom: 2rem;
     left: 50%;
     transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 .website-link a {
@@ -175,10 +182,18 @@ onMounted(() => {
     text-decoration: none;
     font-size: 0.95rem;
     transition: color 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 4px;
 }
 
 .website-link a:hover {
     color: #fff;
+}
+
+.separator {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.8rem;
 }
 
 /* Tablet styles */
