@@ -71,6 +71,11 @@
                         <v-slider v-model="local.spacing.content" label="Content Gap" min="4" max="24" step="2"
                             thumb-label></v-slider>
                     </div>
+                    <div>
+                        <div class="text-subtitle-2 mb-2">Sidebar Position</div>
+                        <v-switch v-model="local.spacing.sidebarLeft" label="Move sidebar to left" color="primary"
+                            hide-details></v-switch>
+                    </div>
                 </div>
             </v-window-item>
         </v-window>

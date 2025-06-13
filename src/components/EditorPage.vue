@@ -11,12 +11,21 @@
                 <v-row no-gutters class="fill-height">
                     <v-col cols="12" md="5" lg="4" class="editor-col">
                         <ResumeEditor v-model:resume-data="resumeData" v-model:style="styleData"
-                            @update:style="updateStyle" />
+                            @update:style="updateStyle">
+                            <template #style-extensions>
+                                <div class="sidebar-toggle-row">
+                                    <v-btn icon="mdi-arrow-left-right" color="primary" variant="tonal"
+                                        @click="toggleSidebarPosition" class="sidebar-toggle-btn"></v-btn>
+                                    <span class="sidebar-toggle-label">Sidebar: <b>{{ styleData.spacing.sidebarLeft ?
+                                        'left' : 'right' }}</b></span>
+                                </div>
+                            </template>
+                        </ResumeEditor>
                     </v-col>
                     <v-col cols="12" md="7" lg="8" class="preview-container">
                         <div class="preview-wrapper">
-                            <ResumePreview :resume-data="resumeData" :style-data="styleData"
-                                download-id="resume-preview" />
+                            <ResumePreview :resume-data="resumeData" :style="styleData"
+                                :sidebar-position="styleData.spacing.sidebarLeft ? 'left' : 'right'" />
                         </div>
                     </v-col>
                 </v-row>
@@ -64,7 +73,7 @@
                     </div>
                     <div class="preview-wrapper"
                         :style="{ transform: `scale(${zoomLevel})`, transformOrigin: 'center top' }">
-                        <ResumePreview :resume-data="resumeData" :style-data="styleData" />
+                        <ResumePreview :resume-data="resumeData" :style="styleData" />
                     </div>
                 </v-card-text>
             </v-card>
@@ -164,7 +173,8 @@ const styleData = ref({
     },
     spacing: {
         section: 24,
-        content: 12
+        content: 12,
+        sidebarLeft: false
     }
 })
 
@@ -217,6 +227,10 @@ const downloadHTML = () => {
 
 const updateStyle = (newStyle) => {
     styleData.value = newStyle
+}
+
+const toggleSidebarPosition = () => {
+    styleData.value.spacing.sidebarLeft = !styleData.value.spacing.sidebarLeft
 }
 </script>
 
@@ -318,5 +332,22 @@ const updateStyle = (newStyle) => {
 
 :deep(.v-btn--disabled) {
     opacity: 0.5 !important;
+}
+
+.sidebar-toggle-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 16px 0 0 0;
+}
+
+.sidebar-toggle-btn {
+    box-shadow: 0 2px 8px rgba(44, 83, 100, 0.10);
+}
+
+.sidebar-toggle-label {
+    font-size: 0.95em;
+    color: #333;
+    opacity: 0.8;
 }
 </style>
