@@ -32,7 +32,8 @@
                 </div>
                 <div class="preview-col"
                     :style="isMobile ? { height: `${100 - editorHeight}%` } : { width: `${100 - editorWidth}%` }">
-                    <ResumePreview :resume-data="resumeData" :style="resumeStyle" />
+                    <ResumePreview :resume-data="resumeData" :style="resumeStyle"
+                        :sidebar-position="resumeStyle.spacing.sidebarLeft ? 'left' : 'right'" />
                 </div>
             </div>
         </v-main>
@@ -165,7 +166,8 @@ const resumeStyle = ref({
     spacing: {
         section: 24,
         content: 12,
-        sidebarLeft: false
+        sidebarLeft: false,
+        sidebarWidth: 280
     }
 })
 
