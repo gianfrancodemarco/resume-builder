@@ -89,16 +89,18 @@
 }
 
 .landing-btn {
-    font-size: 1.1rem;
+    height: 40px !important;
+    font-size: 1rem;
     font-weight: 600;
-    padding: 12px 32px;
+    padding: 12px 16px;
     border-radius: 32px;
-    box-shadow: 0 4px 16px rgba(44, 83, 100, 0.18);
+    background: #0f2027 !important;
+    box-shadow: 0 4px 16px rgba(15, 32, 39, 0.18);
     transition: background 0.2s, box-shadow 0.2s;
 }
 
 .landing-btn:hover {
-    background: #1c3c5a !important;
-    box-shadow: 0 8px 32px rgba(44, 83, 100, 0.22);
+    background: #1a2c35 !important;
+    box-shadow: 0 8px 32px rgba(15, 32, 39, 0.22);
 }
 </style>
