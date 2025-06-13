@@ -97,111 +97,118 @@
             </v-expansion-panel-text>
           </v-expansion-panel>
 
-          <v-expansion-panel class="editor-panel">
-            <v-expansion-panel-title class="panel-title">
-              <v-icon icon="mdi-plus-circle" class="mr-2" />
-              Custom Sections
-            </v-expansion-panel-title>
-            <v-expansion-panel-text>
-              <div class="d-flex justify-end mb-4">
-                <v-switch v-model="local.customSectionsVisible" label="Show section" hide-details density="compact"
-                  color="primary" />
-              </div>
-              <div v-for="(section, index) in local.customSections" :key="index" class="mb-4 custom-section-card pa-3">
+          <template v-for="(section, index) in local.customSections" :key="index">
+            <v-expansion-panel class="editor-panel">
+              <v-expansion-panel-title class="panel-title">
+                <v-icon icon="mdi-plus-circle" class="mr-2" />
+                {{ section.title }}
+              </v-expansion-panel-title>
+              <v-expansion-panel-text>
                 <div class="d-flex align-center mb-2">
                   <v-text-field v-model="local.customSections[index].title" label="Section Title"
-                    :disabled="!local.customSectionsVisible" variant="outlined" density="comfortable" class="mr-2" />
+                    :disabled="!local.customSections[index].visible" variant="outlined" density="comfortable"
+                    class="mr-2" />
                   <v-select v-model="local.customSections[index].type" :items="sectionTypes" label="Type"
-                    :disabled="!local.customSectionsVisible" variant="outlined" density="comfortable" class="mr-2"
-                    style="max-width: 200px;"
+                    :disabled="!local.customSections[index].visible" variant="outlined" density="comfortable"
+                    class="mr-2" style="max-width: 200px;"
                     @update:model-value="(val) => handleSectionTypeChange(local.customSections[index], val)"
                     item-title="label" item-value="value" />
+                  <v-switch v-model="local.customSections[index].visible" label="Show section" hide-details
+                    density="compact" color="primary" class="mr-2" />
                   <v-btn icon="mdi-delete" color="error" variant="text" @click="removeCustomSection(index)" class="ml-2"
-                    :disabled="!local.customSectionsVisible" />
+                    :disabled="!local.customSections[index].visible" />
                 </div>
+
                 <template v-if="section.type === 'languages'">
                   <div v-for="(item, itemIndex) in local.customSections[index].items" :key="itemIndex"
                     class="d-flex align-center mb-2">
                     <v-text-field v-model="local.customSections[index].items[itemIndex].name" label="Language"
-                      :disabled="!local.customSectionsVisible" variant="outlined" density="comfortable" class="mr-2" />
+                      :disabled="!local.customSections[index].visible" variant="outlined" density="comfortable"
+                      class="mr-2" />
                     <v-slider v-model="local.customSections[index].items[itemIndex].proficiency" label="Proficiency"
-                      :disabled="!local.customSectionsVisible" min="0" max="100" step="5" class="mr-2" />
+                      :disabled="!local.customSections[index].visible" min="0" max="100" step="5" class="mr-2" />
                     <v-btn icon="mdi-delete" color="error" variant="text"
-                      @click="removeCustomSectionItem(index, itemIndex)" :disabled="!local.customSectionsVisible" />
+                      @click="removeCustomSectionItem(index, itemIndex)"
+                      :disabled="!local.customSections[index].visible" />
                   </div>
                   <div class="d-flex align-center mb-2">
                     <v-text-field v-model="newCustomSectionItem.name" label="Language"
-                      :disabled="!local.customSectionsVisible" variant="outlined" density="comfortable" class="mr-2" />
+                      :disabled="!local.customSections[index].visible" variant="outlined" density="comfortable"
+                      class="mr-2" />
                     <v-slider v-model="newCustomSectionItem.proficiency" label="Proficiency"
-                      :disabled="!local.customSectionsVisible" min="0" max="100" step="5" class="mr-2" />
-                    <v-btn color="primary" @click="addCustomSectionItem(index)" :disabled="!local.customSectionsVisible"
-                      prepend-icon="mdi-plus">Add Language</v-btn>
+                      :disabled="!local.customSections[index].visible" min="0" max="100" step="5" class="mr-2" />
+                    <v-btn color="primary" @click="addCustomSectionItem(index)"
+                      :disabled="!local.customSections[index].visible" prepend-icon="mdi-plus">Add Language</v-btn>
                   </div>
                 </template>
+
                 <template v-else-if="section.type === 'list'">
                   <div v-for="(item, itemIndex) in local.customSections[index].items" :key="itemIndex"
                     class="d-flex align-center mb-2">
                     <v-text-field v-model="local.customSections[index].items[itemIndex]" label="Item"
-                      :disabled="!local.customSectionsVisible" variant="outlined" density="comfortable" class="mr-2" />
-                    <v-btn icon="mdi-delete" color="error" variant="text"
-                      @click="removeCustomSectionItem(index, itemIndex)" :disabled="!local.customSectionsVisible" />
-                  </div>
-                  <div class="d-flex align-center mb-2">
-                    <v-text-field v-model="newCustomSectionItem" label="Item" :disabled="!local.customSectionsVisible"
-                      variant="outlined" density="comfortable" class="mr-2" />
-                    <v-btn color="primary" @click="addCustomSectionItem(index)" :disabled="!local.customSectionsVisible"
-                      prepend-icon="mdi-plus">Add Item</v-btn>
-                  </div>
-                </template>
-                <template v-else-if="section.type === 'italic'">
-                  <div v-for="(item, itemIndex) in local.customSections[index].items" :key="itemIndex"
-                    class="d-flex align-center mb-2">
-                    <v-text-field v-model="local.customSections[index].items[itemIndex].value" label="Item"
-                      :disabled="!local.customSectionsVisible" variant="outlined" density="comfortable" class="mr-2" />
-                    <v-switch v-model="local.customSections[index].items[itemIndex].isLink" label="Link"
-                      :disabled="!local.customSectionsVisible" hide-details density="compact" color="primary"
+                      :disabled="!local.customSections[index].visible" variant="outlined" density="comfortable"
                       class="mr-2" />
                     <v-btn icon="mdi-delete" color="error" variant="text"
-                      @click="removeCustomSectionItem(index, itemIndex)" :disabled="!local.customSectionsVisible" />
+                      @click="removeCustomSectionItem(index, itemIndex)"
+                      :disabled="!local.customSections[index].visible" />
                   </div>
                   <div class="d-flex align-center mb-2">
-                    <v-text-field v-model="newCustomSectionItem.value" label="Item"
-                      :disabled="!local.customSectionsVisible" variant="outlined" density="comfortable" class="mr-2" />
-                    <v-switch v-model="newCustomSectionItem.isLink" label="Link"
-                      :disabled="!local.customSectionsVisible" hide-details density="compact" color="primary"
+                    <v-text-field v-model="newCustomSectionItem" label="Item"
+                      :disabled="!local.customSections[index].visible" variant="outlined" density="comfortable"
                       class="mr-2" />
-                    <v-btn color="primary" @click="addCustomSectionItem(index)" :disabled="!local.customSectionsVisible"
-                      prepend-icon="mdi-plus">Add Item</v-btn>
+                    <v-btn color="primary" @click="addCustomSectionItem(index)"
+                      :disabled="!local.customSections[index].visible" prepend-icon="mdi-plus">Add Item</v-btn>
                   </div>
                 </template>
+
                 <template v-else>
                   <div v-for="(item, itemIndex) in local.customSections[index].items" :key="itemIndex"
-                    class="d-flex align-center mb-2">
-                    <v-text-field v-model="local.customSections[index].items[itemIndex].value" label="Item"
-                      :disabled="!local.customSectionsVisible" variant="outlined" density="comfortable" class="mr-2" />
-                    <v-switch v-model="local.customSections[index].items[itemIndex].isLink" label="Link"
-                      :disabled="!local.customSectionsVisible" hide-details density="compact" color="primary"
-                      class="mr-2" />
-                    <v-btn icon="mdi-delete" color="error" variant="text"
-                      @click="removeCustomSectionItem(index, itemIndex)" :disabled="!local.customSectionsVisible" />
+                    class="custom-section-item mb-4">
+                    <div class="d-flex align-center mb-2">
+                      <v-textarea v-model="local.customSections[index].items[itemIndex].value" label="Item"
+                        :disabled="!local.customSections[index].visible" variant="outlined" density="comfortable"
+                        class="flex-grow-1" />
+                    </div>
+                    <div class="d-flex align-center justify-end">
+                      <v-switch v-model="local.customSections[index].items[itemIndex].isLink" label="Link"
+                        :disabled="!local.customSections[index].visible" hide-details density="compact" color="primary"
+                        class="mr-2" />
+                      <v-btn icon="mdi-delete" color="error" variant="text"
+                        @click="removeCustomSectionItem(index, itemIndex)"
+                        :disabled="!local.customSections[index].visible" />
+                    </div>
+                    <div v-if="local.customSections[index].items[itemIndex].isLink" class="mt-2">
+                      <v-text-field v-model="local.customSections[index].items[itemIndex].href" label="URL"
+                        :disabled="!local.customSections[index].visible" variant="outlined" density="comfortable"
+                        placeholder="https://example.com" />
+                    </div>
                   </div>
-                  <div class="d-flex align-center mb-2">
-                    <v-text-field v-model="newCustomSectionItem.value" label="Item"
-                      :disabled="!local.customSectionsVisible" variant="outlined" density="comfortable" class="mr-2" />
-                    <v-switch v-model="newCustomSectionItem.isLink" label="Link"
-                      :disabled="!local.customSectionsVisible" hide-details density="compact" color="primary"
-                      class="mr-2" />
-                    <v-btn color="primary" @click="addCustomSectionItem(index)" :disabled="!local.customSectionsVisible"
-                      prepend-icon="mdi-plus">Add Item</v-btn>
+
+                  <div class="custom-section-item mb-4">
+                    <div class="d-flex align-center mb-2">
+                      <v-textarea v-model="newCustomSectionItem.value" label="New Item"
+                        :disabled="!local.customSections[index].visible" variant="outlined" density="comfortable"
+                        class="flex-grow-1" />
+                    </div>
+                    <div class="d-flex align-center justify-end">
+                      <v-switch v-model="newCustomSectionItem.isLink" label="Link"
+                        :disabled="!local.customSections[index].visible" hide-details density="compact" color="primary"
+                        class="mr-2" />
+                      <v-btn color="primary" @click="addCustomSectionItem(index)"
+                        :disabled="!local.customSections[index].visible" prepend-icon="mdi-plus">Add Item</v-btn>
+                    </div>
+                    <div v-if="newCustomSectionItem.isLink" class="mt-2">
+                      <v-text-field v-model="newCustomSectionItem.href" label="URL"
+                        :disabled="!local.customSections[index].visible" variant="outlined" density="comfortable"
+                        placeholder="https://example.com" />
+                    </div>
                   </div>
                 </template>
-              </div>
-              <v-btn color="primary" @click="addCustomSection" :disabled="!local.customSectionsVisible"
-                prepend-icon="mdi-plus">Add
-                Custom Section</v-btn>
-            </v-expansion-panel-text>
-          </v-expansion-panel>
+              </v-expansion-panel-text>
+            </v-expansion-panel>
+          </template>
         </v-expansion-panels>
+        <v-btn color="primary" @click="addCustomSection" prepend-icon="mdi-plus" class="mt-4">Add Custom Section</v-btn>
       </v-window-item>
 
       <v-window-item value="style">
@@ -241,7 +248,10 @@ const local = ref({
   experiencesVisible: props.resumeData.experiencesVisible || true,
   education: props.resumeData.education || [],
   educationVisible: props.resumeData.educationVisible || true,
-  customSections: props.resumeData.customSections || [],
+  customSections: (props.resumeData.customSections || []).map(section => ({
+    ...section,
+    visible: section.visible !== undefined ? section.visible : true
+  })),
   customSectionsVisible: props.resumeData.customSectionsVisible || true
 })
 
@@ -264,6 +274,7 @@ const edu = ref({
 const newCustomSectionItem = ref({
   value: '',
   isLink: false,
+  href: '',
   name: '',
   proficiency: 50
 })
@@ -288,7 +299,10 @@ const fonts = [
 
 // Watch for changes and emit updates
 watch(local, (newValue) => {
-  emit('update:resumeData', newValue)
+  emit('update:resumeData', {
+    ...newValue,
+    customSectionsVisible: newValue.customSectionsVisible
+  })
   emit('change')
 }, { deep: true })
 
@@ -344,7 +358,8 @@ const addCustomSection = () => {
   local.value.customSections.push({
     title: 'New Section',
     type: 'text',
-    items: []
+    items: [],
+    visible: true
   })
 }
 
@@ -354,10 +369,14 @@ const removeCustomSection = (index) => {
 
 const handleSectionTypeChange = (section, newType) => {
   if (section.type === newType) {
-    return section
+    return
   }
 
-  // If switching between text and italic, convert the data structure
+  // Find the section index in the array
+  const sectionIndex = local.value.customSections.findIndex(s => s === section)
+  if (sectionIndex === -1) return
+
+  // If switching between text and italic, preserve the content
   if ((section.type === 'text' && newType === 'italic') ||
     (section.type === 'italic' && newType === 'text')) {
     // Convert items to the new format if needed
@@ -365,33 +384,36 @@ const handleSectionTypeChange = (section, newType) => {
       if (typeof item === 'string') {
         return {
           value: item,
-          isLink: false
+          isLink: false,
+          href: ''
         }
       }
-      return item
+      return {
+        ...item,
+        href: item.href || ''
+      }
     })
-    return {
-      ...section,
-      type: newType,
-      items: convertedItems
-    }
-  }
-
-  // For other type changes, reset the items
-  section.type = newType
-  section.items = []
-
-  if (newType === 'languages') {
-    newCustomSectionItem.value = {
-      name: '',
-      proficiency: 50
-    }
-  } else if (newType === 'list') {
-    newCustomSectionItem.value = ''
+    local.value.customSections[sectionIndex].type = newType
+    local.value.customSections[sectionIndex].items = convertedItems
   } else {
-    newCustomSectionItem.value = {
-      value: '',
-      isLink: false
+    // For other type changes, reset the items
+    local.value.customSections[sectionIndex].type = newType
+    local.value.customSections[sectionIndex].items = []
+
+    // Reset the new item template based on type
+    if (newType === 'languages') {
+      newCustomSectionItem.value = {
+        name: '',
+        proficiency: 50
+      }
+    } else if (newType === 'list') {
+      newCustomSectionItem.value = ''
+    } else {
+      newCustomSectionItem.value = {
+        value: '',
+        isLink: false,
+        href: ''
+      }
     }
   }
 }
@@ -416,11 +438,13 @@ const addCustomSectionItem = (sectionIndex) => {
     if (newCustomSectionItem.value.value) {
       section.items.push({
         value: newCustomSectionItem.value.value,
-        isLink: newCustomSectionItem.value.isLink || false
+        isLink: newCustomSectionItem.value.isLink || false,
+        href: newCustomSectionItem.value.href || ''
       })
       newCustomSectionItem.value = {
         value: '',
-        isLink: false
+        isLink: false,
+        href: ''
       }
     }
   }
@@ -768,5 +792,21 @@ const colorPreview = (color) => {
 
 .custom-section-card:hover {
   background-color: #f1f5f9;
+}
+
+.custom-section-item {
+  background-color: #f8fafc;
+  border-radius: 6px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  padding: 12px;
+  transition: all 0.2s ease;
+}
+
+.custom-section-item:hover {
+  background-color: #f1f5f9;
+}
+
+:deep(.v-textarea .v-field__input) {
+  min-height: 80px;
 }
 </style>

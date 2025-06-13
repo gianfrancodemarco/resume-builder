@@ -4,11 +4,12 @@
       <div class="preview-container">
         <div class="container" :class="{ 'sidebar-left': sidebarPosition === 'left' }">
           <div class="sidebar">
-            <template v-for="(section, index) in resumeData.customSections" :key="index">
+            <template v-for="(section, index) in resumeData.customSections.filter(s => s && s.visible !== false)"
+              :key="index">
               <h2>{{ section.title }}</h2>
               <template v-if="section.type === 'list'">
                 <p class="skills-list"><span v-for="(item, itemIndex) in section.items" :key="itemIndex">{{ item
-                }}<br /></span></p>
+                    }}<br /></span></p>
               </template>
               <template v-else-if="section.type === 'languages'">
                 <div class="language-proficiency" v-for="(item, itemIndex) in section.items" :key="itemIndex">
@@ -21,7 +22,7 @@
               <template v-else-if="section.type === 'italic'">
                 <p v-for="(item, itemIndex) in section.items" :key="itemIndex" class="subsubtitle">
                   <template v-if="item && item.isLink">
-                    <a :href="item.value" target="_blank">{{ item.value }}</a>
+                    <a :href="item.href" target="_blank">{{ item.value }}</a>
                   </template>
                   <template v-else>
                     {{ item && item.value ? item.value : '' }}
@@ -31,7 +32,7 @@
               <template v-else>
                 <p v-for="(item, itemIndex) in section.items" :key="itemIndex">
                   <template v-if="item && item.isLink">
-                    <a :href="item.value" target="_blank">{{ item.value }}</a>
+                    <a :href="item.href" target="_blank">{{ item.value }}</a>
                   </template>
                   <template v-else>
                     {{ item && item.value ? item.value : '' }}

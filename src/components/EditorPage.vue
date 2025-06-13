@@ -122,30 +122,34 @@ const resumeData = ref({
         {
             title: 'About Me',
             type: 'italic',
+            visible: true,
             items: [
-                { value: 'Passionate software engineer with a strong focus on web development and user experience. Experienced in building modern, responsive applications using Vue.js and other cutting-edge technologies.', isLink: false },
-                { value: 'Skilled in both frontend and backend development, with a particular emphasis on creating intuitive user interfaces and robust server-side solutions.', isLink: false }
+                { value: 'Passionate software engineer with a strong focus on web development and user experience. Experienced in building modern, responsive applications using Vue.js and other cutting-edge technologies.', isLink: false, href: '' },
+                { value: 'Skilled in both frontend and backend development, with a particular emphasis on creating intuitive user interfaces and robust server-side solutions.', isLink: false, href: '' }
             ]
         },
         {
             title: 'Contact Details',
             type: 'text',
+            visible: true,
             items: [
-                { value: 'New York, USA', isLink: false },
-                { value: 'john.doe@example.com', isLink: true }
+                { value: 'New York, USA', isLink: false, href: '' },
+                { value: 'john.doe@example.com', isLink: true, href: 'mailto:john.doe@example.com' }
             ]
         },
         {
             title: 'Professional Links',
             type: 'text',
+            visible: true,
             items: [
-                { value: 'https://github.com/johndoe', isLink: true },
-                { value: 'https://linkedin.com/in/johndoe', isLink: true }
+                { value: 'GitHub Profile', isLink: true, href: 'https://github.com/johndoetest1999' },
+                { value: 'LinkedIn Profile', isLink: true, href: 'https://linkedin.com/in/johndoe' }
             ]
         },
         {
             title: 'Technical Skills',
             type: 'list',
+            visible: true,
             items: [
                 'Vue.js',
                 'JavaScript',
@@ -160,6 +164,7 @@ const resumeData = ref({
         {
             title: 'Languages',
             type: 'languages',
+            visible: true,
             items: [
                 { name: 'Italian', proficiency: 100 },
                 { name: 'English', proficiency: 90 },
@@ -505,51 +510,64 @@ const stopResize = () => {
 <style scoped>
 .editor-page {
     min-height: 100vh;
-    background-color: #f5f5f5;
+    background-color: #f8fafc;
 }
 
-/* Remove navigation drawer scrim */
 :deep(.v-navigation-drawer__scrim) {
     display: none !important;
 }
 
-.editor-header {
-    background-color: #fff;
-    padding: 16px 24px;
+.editor-content {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    position: sticky;
-    top: 0;
-    z-index: 100;
+    height: calc(100vh - 64px);
+    position: relative;
+    overflow: hidden;
+    background: #fff;
 }
 
 .editor-col {
-    border-right: 1px solid rgba(0, 0, 0, 0.08);
+    height: 100%;
     overflow-y: auto;
-    height: calc(100vh - 56px);
-    /* Subtract navbar height */
+    background: #fff;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+    border-right: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.preview-col {
+    height: 100%;
+    overflow-y: auto;
+    background: #f8fafc;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.resize-handle {
+    width: 8px;
+    background: transparent;
+    cursor: col-resize;
     position: relative;
+    z-index: 10;
+    flex-shrink: 0;
+    touch-action: none;
+    transition: background-color 0.2s ease;
 }
 
-.mobile-editor {
-    border-right: none;
-    border-bottom: none;
-    height: auto;
-    max-height: 50vh;
+.resize-handle:hover,
+.resize-handle:active {
+    background: rgba(0, 0, 0, 0.05);
 }
 
-.mobile-editor::after {
+.resize-handle::after {
     content: '';
     position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 8px;
-    background: linear-gradient(90deg, #0f2027 0%, #2c5364 100%);
-    z-index: 1;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 2px;
+    height: 24px;
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 1px;
 }
 
 .download-buttons {
@@ -557,61 +575,50 @@ const stopResize = () => {
     bottom: 24px;
     right: 24px;
     display: flex;
-    gap: 12px;
+    gap: 8px;
     z-index: 100;
 }
 
 .download-btn {
-    transition: all 0.2s ease-in-out;
+    transition: all 0.2s ease;
     background: #0f2027 !important;
     color: white !important;
-    box-shadow: 0 4px 12px rgba(15, 32, 39, 0.1) !important;
+    box-shadow: 0 2px 8px rgba(15, 32, 39, 0.1) !important;
 }
 
 .download-btn:hover {
     transform: translateY(-2px);
     background: #1a2c35 !important;
-    color: white !important;
-    box-shadow: 0 6px 16px rgba(15, 32, 39, 0.15) !important;
+    box-shadow: 0 4px 12px rgba(15, 32, 39, 0.15) !important;
 }
 
 .gradient-navbar {
     background: linear-gradient(135deg, #0f2027 0%, #2c5364 100%) !important;
-    box-shadow: 0 4px 16px rgba(44, 83, 100, 0.10);
+    box-shadow: 0 2px 8px rgba(44, 83, 100, 0.08);
     border-bottom: none !important;
     min-height: 48px !important;
     height: 56px !important;
-    padding-left: 24px !important;
-    padding-right: 24px !important;
+    padding: 0 24px !important;
     display: flex;
     align-items: center;
-    background-color: #2c5364 !important;
-    backdrop-filter: none !important;
-    opacity: 1 !important;
 }
 
 .custom-navbar {
     color: #fff !important;
     font-size: 1.1rem;
     font-family: 'Oswald', sans-serif;
-    letter-spacing: 1px;
+    letter-spacing: 0.5px;
 }
 
 .navbar-title {
     margin: 0;
     padding: 0;
-    font-size: 1.5rem;
-    font-weight: 700;
+    font-size: 1.4rem;
+    font-weight: 600;
     color: #fff !important;
     display: flex;
     align-items: center;
     height: 100%;
-}
-
-@media (max-width: 600px) {
-    .navbar-title {
-        font-size: 1.2rem;
-    }
 }
 
 :deep(.v-app-bar) {
@@ -624,69 +631,66 @@ const stopResize = () => {
     opacity: 1 !important;
 }
 
-.preview-container {
-    height: 100%;
-    background-color: #f8fafc;
-    overflow-y: auto;
+:deep(.v-navigation-drawer) {
+    background-color: #fff !important;
+    border-right: 1px solid rgba(0, 0, 0, 0.06);
 }
 
-@media (max-width: 960px) {
-    .preview-container {
-        height: calc(100vh - 56px - 50vh);
-        /* Subtract navbar and editor height */
-    }
+:deep(.v-list-item) {
+    min-height: 44px;
+    border-radius: 6px;
+    margin: 2px 8px;
+    transition: all 0.2s ease;
 }
 
-.sidebar-toggle-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin: 16px 0 0 0;
+:deep(.v-list-item:hover) {
+    background-color: rgba(var(--v-theme-primary), 0.04);
 }
 
-.sidebar-toggle-btn {
-    background: #0f2027 !important;
-    box-shadow: 0 2px 8px rgba(15, 32, 39, 0.10);
+:deep(.v-list-item-title) {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: rgba(0, 0, 0, 0.8);
 }
 
-.sidebar-toggle-btn:hover {
-    background: #1a2c35 !important;
-}
-
-.sidebar-toggle-label {
-    font-size: 0.95em;
-    color: #333;
+:deep(.v-icon) {
+    font-size: 1.2rem;
     opacity: 0.8;
 }
 
-:deep(.v-color-picker) {
-    .v-color-picker__input {
-        .v-color-picker__input__value {
-            font-family: monospace;
-            font-size: 0.9em;
-        }
+@media (max-width: 960px) {
+    .editor-content {
+        flex-direction: column;
+        height: 100vh;
+    }
+
+    .editor-col {
+        width: 100% !important;
+    }
+
+    .preview-col {
+        width: 100% !important;
+    }
+
+    .resize-handle {
+        width: 100%;
+        height: 8px;
+        cursor: row-resize;
+    }
+
+    .resize-handle::after {
+        width: 24px;
+        height: 2px;
     }
 }
 
-:deep(.v-color-picker__preview) {
-    position: relative;
-
-    &::after {
-        content: attr(data-color);
-        position: absolute;
-        right: -60px;
-        top: 50%;
-        transform: translateY(-50%);
-        font-family: monospace;
-        font-size: 0.9em;
-        color: rgba(0, 0, 0, 0.6);
-    }
-}
-
-/* Mobile optimizations */
 @media (max-width: 600px) {
-    .preview-wrapper {
-        padding: 8px;
+    .editor-content {
+        height: calc(100vh - 56px);
+    }
+
+    .navbar-title {
+        font-size: 1.2rem;
     }
 
     .download-buttons {
@@ -698,142 +702,5 @@ const stopResize = () => {
         width: 40px;
         height: 40px;
     }
-}
-
-/* Mobile menu improvements */
-.mobile-menu-btn {
-    margin-left: auto;
-    opacity: 0.9;
-    transition: opacity 0.2s ease;
-}
-
-.mobile-menu-btn:hover {
-    opacity: 1;
-}
-
-.mobile-drawer {
-    :deep(.v-list) {
-        padding: 8px;
-    }
-}
-
-:deep(.v-navigation-drawer__content) {
-    overflow-y: auto;
-}
-
-:deep(.v-list-item) {
-    min-height: 48px;
-    border-radius: 8px;
-    margin: 4px 8px;
-    transition: all 0.2s ease;
-}
-
-:deep(.v-list-item:hover) {
-    background-color: rgba(var(--v-theme-primary), 0.05);
-}
-
-:deep(.v-list-item-title) {
-    font-size: 0.95rem;
-    font-weight: 500;
-    color: rgba(0, 0, 0, 0.87);
-}
-
-:deep(.v-icon) {
-    font-size: 1.25rem;
-}
-
-:deep(.v-divider) {
-    opacity: 0.1;
-    margin: 8px 0;
-}
-
-.editor-content {
-    display: flex;
-    height: calc(100vh - 64px);
-    position: relative;
-    overflow: hidden;
-}
-
-.editor-col {
-    height: 100%;
-    overflow-y: auto;
-    background: #fff;
-    transition: width 0.1s ease;
-    flex-shrink: 0;
-}
-
-.preview-col {
-    height: 100%;
-    overflow-y: auto;
-    background: #f8f9fa;
-    transition: width 0.1s ease;
-    flex-shrink: 0;
-}
-
-.resize-handle {
-    width: 12px;
-    background: #e0e0e0;
-    cursor: col-resize;
-    position: relative;
-    z-index: 10;
-    flex-shrink: 0;
-    touch-action: none;
-}
-
-.resize-handle:hover,
-.resize-handle:active {
-    background: #bdbdbd;
-}
-
-.resize-handle::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 2px;
-    height: 30px;
-    background: #9e9e9e;
-    border-radius: 1px;
-}
-
-@media (max-width: 960px) {
-    .editor-content {
-        flex-direction: column;
-        height: 100vh;
-        overflow: hidden;
-    }
-
-    .editor-col {
-        width: 100% !important;
-        transition: height 0.1s ease;
-    }
-
-    .preview-col {
-        width: 100% !important;
-        transition: height 0.1s ease;
-    }
-
-    .resize-handle {
-        width: 100%;
-        height: 12px;
-        cursor: row-resize;
-    }
-
-    .resize-handle::after {
-        width: 30px;
-        height: 2px;
-    }
-}
-
-@media (max-width: 600px) {
-    .editor-content {
-        height: calc(100vh - 56px);
-    }
-}
-
-:deep(.v-navigation-drawer) {
-    background-color: #fff !important;
-    border-right: 1px solid rgba(0, 0, 0, 0.08);
 }
 </style>
