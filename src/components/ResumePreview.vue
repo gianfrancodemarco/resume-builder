@@ -47,7 +47,7 @@
             <div class="section" v-if="resumeData.experiencesVisible && resumeData.experiences.length">
               <h2>Employment History</h2>
               <div v-for="(e, i) in resumeData.experiences" :key="i">
-                <p class="job-title">{{ e.title }}</p>
+                <p class="job-title">{{ e.title }} - {{ e.company }}</p>
                 <p class="date">{{ e.period }}</p>
                 <p class="job-desc" v-html="e.description"></p>
               </div>
@@ -56,7 +56,7 @@
             <div class="section" v-if="resumeData.educationVisible && resumeData.education.length">
               <h2>Education</h2>
               <div v-for="(ed, i) in resumeData.education" :key="i">
-                <p class="job-title">{{ ed.degree }}</p>
+                <p class="job-title">{{ ed.degree }} - {{ ed.school }}</p>
                 <p class="date">{{ ed.period }}</p>
                 <p class="graduation-mark">{{ ed.mark }}</p>
                 <p class="thesis">{{ ed.thesis }}</p>
@@ -254,6 +254,7 @@ export default {
   line-height: 1.4;
   word-wrap: break-word;
   overflow-wrap: break-word;
+  font-family: var(--heading-font, 'Oswald', sans-serif);
 }
 
 .content {
@@ -269,7 +270,6 @@ export default {
 .content h1,
 .content h2,
 .content p,
-.content .job-title,
 .content .job-desc,
 .content strong,
 .content span {
@@ -330,6 +330,8 @@ export default {
   margin-top: 20px;
   margin-bottom: 0;
   font-size: calc(var(--heading-size, 24px) * 0.5);
+  font-family: var(--heading-font, 'Oswald', sans-serif) !important;
+  margin-bottom: 0 !important;
 }
 
 .date {
@@ -391,7 +393,6 @@ li {
   display: inline-block;
 }
 
-.resume-preview .section .job-title,
 .resume-preview .section .job-desc,
 .resume-preview .section .date,
 .resume-preview .section .graduation-mark,
@@ -465,5 +466,12 @@ li {
 
 .resume-preview .custom-section a:hover {
   text-decoration: underline;
+}
+
+.school {
+  font-size: calc(var(--base-size, 16px) * 0.75);
+  color: #666;
+  margin: 0 0 4px 0;
+  font-style: italic;
 }
 </style>

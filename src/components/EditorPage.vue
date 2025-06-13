@@ -104,12 +104,14 @@ const resumeData = ref({
     education: [
         {
             degree: 'Master in Computer Science',
+            school: 'University of Milan',
             period: '2016 - 2018',
             mark: '110/110',
             thesis: 'Advanced Web Development Techniques and Best Practices'
         },
         {
             degree: 'Bachelor in Computer Engineering',
+            school: 'University of Rome',
             period: '2013 - 2016',
             mark: '108/110',
             thesis: 'Introduction to Modern Web Technologies'
