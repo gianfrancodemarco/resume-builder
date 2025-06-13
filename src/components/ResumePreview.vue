@@ -151,9 +151,9 @@ export default {
   width: 100%;
   min-height: 100%;
   margin: 0;
-  background-color: var(--background-color, #f9f9f9);
-  color: var(--text-color, #08294D);
-  font-family: var(--body-font, 'Lato', sans-serif);
+  background-color: var(--background-color);
+  color: var(--text-color);
+  font-family: var(--body-font);
   padding: 0;
 }
 
@@ -173,14 +173,14 @@ export default {
 }
 
 .sidebar {
-  width: var(--sidebar-width, 280px);
-  min-width: var(--sidebar-width, 280px);
-  max-width: var(--sidebar-width, 280px);
-  background-color: var(--sidebar-color, #08294D);
+  width: var(--sidebar-width);
+  min-width: var(--sidebar-width);
+  max-width: var(--sidebar-width);
+  background-color: var(--sidebar-color);
   color: #eee;
   font-weight: 400;
   min-height: 297mm;
-  padding: 28px 28px 48px 28px;
+  padding: 28px 28px 48px;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
@@ -191,17 +191,15 @@ export default {
 
 .sidebar h1,
 .sidebar h2 {
-  font-family: var(--heading-font, 'Oswald', sans-serif);
+  font-family: var(--heading-font);
   font-size: 1em;
-  margin-top: 16px;
-  margin-bottom: 6px;
+  margin: 16px 0 6px;
   border-bottom: 2px solid #ffffff33;
   padding-bottom: 3px;
   font-weight: 700;
   letter-spacing: 0.5px;
   color: #fff;
   word-wrap: break-word;
-  overflow-wrap: break-word;
 }
 
 .sidebar h1:first-child,
@@ -210,58 +208,48 @@ export default {
 }
 
 .sidebar a {
-  color: var(--link-color, #eee);
+  color: var(--link-color);
   text-decoration: underline;
   display: block;
   margin-bottom: 3px;
   font-size: 0.9em;
   opacity: 1;
   word-wrap: break-word;
-  overflow-wrap: break-word;
 }
 
 .sidebar a:hover {
   opacity: 0.8;
 }
 
-.sidebar div:first-child {
-  margin-top: 0;
-}
-
 .sidebar div {
   margin-bottom: 6px;
   font-size: 0.9em;
   word-wrap: break-word;
-  overflow-wrap: break-word;
 }
 
 .sidebar p {
-  margin: 0 0 4px 0;
+  margin: 0 0 4px;
   font-size: 0.85em;
   line-height: 1.4;
   font-weight: 100;
   word-wrap: break-word;
-  overflow-wrap: break-word;
 }
 
 .sidebar .subsubtitle {
   font-size: 0.75em;
   font-weight: 400;
   color: #eee;
-  margin: 8px 0 0 0;
-  text-transform: none;
+  margin: 8px 0 0;
   font-style: italic;
   line-height: 1.4;
-  word-wrap: break-word;
-  overflow-wrap: break-word;
-  font-family: var(--heading-font, 'Oswald', sans-serif);
+  font-family: var(--body-font);
 }
 
 .content {
   width: 72%;
-  padding: 16px 48px 64px 48px;
-  background: var(--background-color, #fff);
-  color: var(--text-color, #08294D);
+  padding: 16px 48px 64px;
+  background: var(--background-color);
+  color: var(--text-color);
   overflow-wrap: break-word;
   word-wrap: break-word;
   word-break: break-word;
@@ -273,8 +261,8 @@ export default {
 .content .job-desc,
 .content strong,
 .content span {
-  color: var(--text-color, #08294D);
-  font-family: var(--body-font, 'Lato', sans-serif);
+  color: var(--text-color);
+  font-family: var(--body-font);
 }
 
 .content .date {
@@ -282,34 +270,32 @@ export default {
 }
 
 .content a {
-  color: var(--link-color, #0b7dda);
+  color: var(--link-color);
   text-decoration: underline;
 }
 
 .content h1 {
-  font-family: var(--heading-font, 'Oswald', sans-serif);
-  font-size: var(--heading-size, 1.6em);
+  font-family: var(--heading-font);
+  font-size: var(--heading-size);
   margin-bottom: 0;
   font-weight: 700;
   letter-spacing: 0.5px;
-  color: var(--primary-color, #08294D);
+  color: var(--primary-color);
 }
 
 .content .subtitle {
-  font-size: calc(var(--base-size, 16px) * 0.75);
-  padding-left: 0px;
+  font-size: calc(var(--base-size) * 0.75);
   color: #aaa;
 }
 
 .content h2 {
-  font-family: var(--heading-font, 'Oswald', sans-serif);
+  font-family: var(--heading-font);
   font-weight: 600;
-  font-size: calc(var(--heading-size, 24px) * 0.56);
+  font-size: calc(var(--heading-size) * 0.56);
   letter-spacing: 2px;
-  margin-top: 6px;
-  margin-bottom: 0;
+  margin: 6px 0 0;
   text-transform: uppercase;
-  color: var(--primary-color, #08294D);
+  color: var(--primary-color);
 }
 
 .section {
@@ -317,26 +303,23 @@ export default {
 }
 
 .section h2 {
-  font-family: var(--heading-font, 'Oswald', sans-serif);
-  font-size: var(--heading-size, 1em);
+  font-family: var(--heading-font);
+  font-size: var(--heading-size);
   margin-bottom: 12px;
   font-weight: 700;
   letter-spacing: 0.5px;
 }
 
 .job-title {
-  font-family: var(--heading-font, 'Oswald', sans-serif);
+  font-family: var(--heading-font);
   font-weight: 700;
-  margin-top: 20px;
-  margin-bottom: 0;
-  font-size: calc(var(--heading-size, 24px) * 0.5);
-  font-family: var(--heading-font, 'Oswald', sans-serif) !important;
-  margin-bottom: 0 !important;
+  margin: 20px 0 0;
+  font-size: calc(var(--heading-size) * 0.5);
 }
 
 .date {
   text-transform: uppercase;
-  font-size: calc(var(--base-size, 16px) * 0.7);
+  font-size: calc(var(--base-size) * 0.7);
   font-weight: 600;
   margin-top: 0;
   display: inline-block;
@@ -348,8 +331,8 @@ export default {
 
 p,
 li {
-  font-family: var(--body-font, 'Lato', sans-serif);
-  font-size: calc(var(--base-size, 16px) * 0.75);
+  font-family: var(--body-font);
+  font-size: calc(var(--base-size) * 0.75);
   line-height: 1.5;
   margin-bottom: 6px;
 }
@@ -364,7 +347,6 @@ li {
 }
 
 .language-proficiency-bar {
-  flex-grow: 1;
   height: 8px;
   background-color: #526A82;
   border-radius: 4px;
@@ -375,7 +357,7 @@ li {
 
 .language-proficiency-bar-fill {
   height: 100%;
-  background-color: #ffffff;
+  background-color: #fff;
   border-radius: 4px;
 }
 
@@ -393,13 +375,11 @@ li {
   display: inline-block;
 }
 
-.resume-preview .section .job-desc,
-.resume-preview .section .date,
-.resume-preview .section .graduation-mark,
-.resume-preview .section .thesis,
-.resume-preview .section p,
-.resume-preview .section li {
-  margin-bottom: var(--content-spacing);
+.school {
+  font-size: calc(var(--base-size) * 0.75);
+  color: #666;
+  margin: 0 0 4px;
+  font-style: italic;
 }
 
 /* Custom sections styling to match original sections */
@@ -466,12 +446,5 @@ li {
 
 .resume-preview .custom-section a:hover {
   text-decoration: underline;
-}
-
-.school {
-  font-size: calc(var(--base-size, 16px) * 0.75);
-  color: #666;
-  margin: 0 0 4px 0;
-  font-style: italic;
 }
 </style>
