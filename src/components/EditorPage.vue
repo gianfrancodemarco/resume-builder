@@ -33,12 +33,6 @@
         </v-main>
 
         <div class="download-buttons">
-            <v-tooltip text="Preview" location="top">
-                <template v-slot:activator="{ props }">
-                    <v-btn v-bind="props" icon="mdi-eye" color="primary" @click="showFullPreview = true"
-                        class="mr-2 download-btn" elevation="2" />
-                </template>
-            </v-tooltip>
             <v-tooltip text="Download as PDF" location="top">
                 <template v-slot:activator="{ props }">
                     <v-btn v-bind="props" icon="mdi-file-pdf-box" color="primary" @click="downloadPDF"
@@ -52,32 +46,6 @@
                 </template>
             </v-tooltip>
         </div>
-
-        <!-- Preview Modal -->
-        <v-dialog v-model="showFullPreview" max-width="90vw" class="preview-dialog">
-            <v-card class="preview-card">
-                <v-card-text class="preview-content pa-0">
-                    <div class="floating-actions">
-                        <div class="d-flex align-center">
-                            <v-btn icon="mdi-close" variant="text" @click="showFullPreview = false"
-                                color="white"></v-btn>
-                            <v-divider vertical class="mx-2" color="white"></v-divider>
-                            <div class="zoom-controls">
-                                <v-btn icon="mdi-magnify-minus" variant="text" @click="zoomOut" color="white"
-                                    :disabled="zoomLevel <= 0.5"></v-btn>
-                                <span class="text-white mx-2">{{ Math.round(zoomLevel * 100) }}%</span>
-                                <v-btn icon="mdi-magnify-plus" variant="text" @click="zoomIn" color="white"
-                                    :disabled="zoomLevel >= 2"></v-btn>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="preview-wrapper"
-                        :style="{ transform: `scale(${zoomLevel})`, transformOrigin: 'center top' }">
-                        <ResumePreview :resume-data="resumeData" :style="styleData" />
-                    </div>
-                </v-card-text>
-            </v-card>
-        </v-dialog>
     </v-app>
 </template>
 
@@ -86,9 +54,6 @@ import { ref, watch } from 'vue'
 import ResumeEditor from './ResumeEditor.vue'
 import ResumePreview from './ResumePreview.vue'
 import html2pdf from 'html2pdf.js'
-
-const showFullPreview = ref(false)
-const zoomLevel = ref(1)
 
 const resumeData = ref({
     personal: {
@@ -178,25 +143,6 @@ const styleData = ref({
     }
 })
 
-const zoomIn = () => {
-    if (zoomLevel.value < 2) {
-        zoomLevel.value = Math.min(zoomLevel.value + 0.1, 2)
-    }
-}
-
-const zoomOut = () => {
-    if (zoomLevel.value > 0.5) {
-        zoomLevel.value = Math.max(zoomLevel.value - 0.1, 0.5)
-    }
-}
-
-// Reset zoom when closing modal
-watch(showFullPreview, (newVal) => {
-    if (!newVal) {
-        zoomLevel.value = 1
-    }
-})
-
 const downloadPDF = async () => {
     const srcEl = document.getElementById('printable-area')
     if (!srcEl) return
@@ -237,7 +183,7 @@ const downloadPDF = async () => {
 }
 
 const downloadHTML = () => {
-    const srcEl = document.getElementById('resume-preview')
+    const srcEl = document.getElementById('printable-area')
     if (!srcEl) return
 
     // Get name and position from resume data
@@ -249,16 +195,38 @@ const downloadHTML = () => {
         ? `${name}_${position}.html`
         : (name || position || 'resume') + '.html'
 
-    // Create a blob with the HTML content
-    const blob = new Blob([srcEl.outerHTML], { type: 'text/html' })
-    const url = window.URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = filename.replace(/\s+/g, '_')
-    document.body.appendChild(a)
-    a.click()
-    window.URL.revokeObjectURL(url)
-    document.body.removeChild(a)
+    var printWindow = window.open('', filename)
+    printWindow.document.title = filename
+    printWindow.document.head.append(document.head.cloneNode(true))
+    const style = printWindow.document.createElement('style')
+    style.textContent = `
+        @page {
+            margin: 0;
+        }
+
+        html, body {
+            margin: 0 !important;
+            padding: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            background: white !important;
+            box-sizing: border-box;
+        }
+    `
+    printWindow.document.head.appendChild(style)
+    printWindow.document.body.innerHTML = srcEl.outerHTML
+    printWindow.document.fonts.ready.then(() => {
+        const blob = new Blob([printWindow.document.documentElement.outerHTML], { type: 'text/html' })
+        const url = window.URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = filename.replace(/\s+/g, '_')
+        document.body.appendChild(a)
+        a.click()
+        window.URL.revokeObjectURL(url)
+        document.body.removeChild(a)
+        printWindow.close()
+    })
 }
 
 const updateStyle = (newStyle) => {
@@ -350,68 +318,9 @@ const colorPreview = (color) => {
     opacity: 1 !important;
 }
 
-.preview-dialog {
-    :deep(.v-overlay__content) {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-}
-
-.preview-card {
-    background-color: white;
-    border-radius: 16px;
-    overflow: hidden;
-    max-height: 90vh;
-    display: flex;
-    flex-direction: column;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-}
-
-.preview-content {
-    position: relative;
-    overflow-y: auto;
-    max-height: 90vh;
-    padding-top: 80px;
-    display: flex;
-    justify-content: center;
-}
-
-.preview-wrapper {
-    overflow-y: auto;
-    padding: 24px;
-}
-
 .preview-container {
     height: 100%;
     background-color: #f8fafc;
-}
-
-.floating-actions {
-    position: fixed;
-    top: 24px;
-    right: 24px;
-    z-index: 2;
-    background: rgba(0, 0, 0, 0.6);
-    padding: 8px 16px;
-    border-radius: 12px;
-    backdrop-filter: blur(8px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.zoom-controls {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-:deep(.v-overlay__scrim) {
-    opacity: 0.85 !important;
-    backdrop-filter: blur(4px);
-}
-
-:deep(.v-btn--disabled) {
-    opacity: 0.5 !important;
 }
 
 .sidebar-toggle-row {
