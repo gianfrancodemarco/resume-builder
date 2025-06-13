@@ -145,7 +145,7 @@ export default {
   display: flex;
   flex-direction: row-reverse;
   width: 100%;
-  height: 100%;
+  height: 297mm;
   margin: 0;
   background: #fff;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
