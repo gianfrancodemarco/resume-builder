@@ -77,8 +77,10 @@ const resumeData = ref({
             'Passionate software engineer with a strong focus on web development and user experience. Experienced in building modern, responsive applications using Vue.js and other cutting-edge technologies.',
             'Skilled in both frontend and backend development, with a particular emphasis on creating intuitive user interfaces and robust server-side solutions.'
         ],
-        location: 'New York, USA',
-        email: 'john.doe@example.com',
+        details: [
+            { value: 'New York, USA', isLink: false },
+            { value: 'john.doe@example.com', isLink: true }
+        ],
         links: [
             'https://github.com/johndoe',
             'https://linkedin.com/in/johndoe'
@@ -171,7 +173,7 @@ const getFilename = (extension) => {
 }
 
 const downloadPDF = async () => {
-    const srcEl = document.getElementById('printable-area')
+    const srcEl = document.getElementById('printable-area').cloneNode(true)
     if (!srcEl) return
 
     const filename = getFilename('pdf')
@@ -188,7 +190,6 @@ const downloadPDF = async () => {
             margin: 0 !important;
             padding: 0 !important;
             width: 100% !important;
-            height: 100% !important;
             background: white !important;
             box-sizing: border-box;
         }
@@ -196,9 +197,12 @@ const downloadPDF = async () => {
     printWindow.document.head.appendChild(style)
     printWindow.document.body.innerHTML = srcEl.outerHTML
     printWindow.document.fonts.ready.then(() => {
-        printWindow.print()
-        //printWindow.close()
+        setTimeout(() => {
+            printWindow.print()
+            //printWindow.close()
+        }, 0) // Safari needs time to render layout
     })
+
 }
 
 const downloadHTML = () => {

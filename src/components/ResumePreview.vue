@@ -10,8 +10,13 @@
             </div>
             <div v-if="resumeData.personal.detailsVisible">
               <h2>Details</h2>
-              <p>{{ resumeData.personal.location }}<br />
-                <a :href="'mailto:' + resumeData.personal.email">{{ resumeData.personal.email }}</a>
+              <p v-for="(detail, index) in resumeData.personal.details" :key="index">
+                <template v-if="detail.isLink">
+                  <a :href="detail.value" target="_blank">{{ detail.value }}</a>
+                </template>
+                <template v-else>
+                  {{ detail.value }}
+                </template>
               </p>
             </div>
             <div v-if="resumeData.personal.linksVisible && resumeData.personal.links.length">

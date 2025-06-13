@@ -13,6 +13,11 @@
 
     <v-window v-model="activeTab" class="editor-window">
       <v-window-item value="info">
+        <div class="mb-4">
+          <v-text-field v-model="local.personal.name" label="Name" variant="outlined" density="comfortable"
+            class="mb-2" />
+          <v-text-field v-model="local.personal.title" label="Title" variant="outlined" density="comfortable" />
+        </div>
         <v-expansion-panels class="editor-panels" multiple>
           <!-- Personal / Sidebar -->
           <v-expansion-panel class="editor-panel">
@@ -25,14 +30,14 @@
                 <v-switch v-model="local.personal.visible" label="Show section" hide-details density="compact"
                   color="primary" />
               </div>
-              <v-text-field v-model="local.personal.name" label="Name" :disabled="!local.personal.visible"
-                variant="outlined" density="comfortable" class="mb-2" />
-              <v-text-field v-model="local.personal.title" label="Title" :disabled="!local.personal.visible"
-                variant="outlined" density="comfortable" class="mb-2" />
-              <v-textarea v-model="local.personal.about[0]" label="Description 1" :disabled="!local.personal.visible"
-                variant="outlined" density="comfortable" class="mb-2" />
-              <v-textarea v-model="local.personal.about[1]" label="Description 2" :disabled="!local.personal.visible"
-                variant="outlined" density="comfortable" />
+              <div v-for="(desc, index) in local.personal.about" :key="index" class="d-flex align-center mb-2">
+                <v-textarea v-model="local.personal.about[index]" :label="`Description ${index + 1}`"
+                  :disabled="!local.personal.visible" variant="outlined" density="comfortable" />
+                <v-btn icon="mdi-delete" color="error" variant="text" @click="removeDescription(index)" class="ml-2"
+                  :disabled="!local.personal.visible" />
+              </div>
+              <v-btn color="primary" @click="addDescription" :disabled="!local.personal.visible" prepend-icon="mdi-plus"
+                class="mt-2">Add Description</v-btn>
             </v-expansion-panel-text>
           </v-expansion-panel>
 
@@ -46,10 +51,26 @@
                 <v-switch v-model="local.personal.detailsVisible" label="Show section" hide-details density="compact"
                   color="primary" />
               </div>
-              <v-text-field v-model="local.personal.location" label="Location"
-                :disabled="!local.personal.detailsVisible" variant="outlined" density="comfortable" class="mb-2" />
-              <v-text-field v-model="local.personal.email" label="Email" :disabled="!local.personal.detailsVisible"
-                variant="outlined" density="comfortable" />
+              <div v-for="(detail, index) in local.personal.details" :key="index" class="detail-card pa-3 mb-3">
+                <div class="d-flex align-center">
+                  <v-text-field v-model="detail.value" label="Value" :disabled="!local.personal.detailsVisible"
+                    variant="outlined" density="comfortable" class="mr-2" hide-details />
+                  <v-switch v-model="detail.isLink" label="Link" hide-details density="compact"
+                    :disabled="!local.personal.detailsVisible" color="primary" class="mr-2" />
+                  <v-btn icon="mdi-delete" color="error" variant="text" @click="removeDetail(index)"
+                    :disabled="!local.personal.detailsVisible" />
+                </div>
+              </div>
+              <div class="detail-card pa-3 mb-3">
+                <v-text-field v-model="newDetail.value" label="New detail" :disabled="!local.personal.detailsVisible"
+                  variant="outlined" density="comfortable" class="mb-2" hide-details />
+                <div class="d-flex align-center">
+                  <v-switch v-model="newDetail.isLink" label="Link" hide-details density="compact"
+                    :disabled="!local.personal.detailsVisible" color="primary" class="mr-2" />
+                  <v-btn color="primary" @click="addDetail" :disabled="!local.personal.detailsVisible"
+                    prepend-icon="mdi-plus" class="ml-auto">Add Detail</v-btn>
+                </div>
+              </div>
             </v-expansion-panel-text>
           </v-expansion-panel>
 
@@ -229,15 +250,54 @@ export default {
   },
   emits: ['update:resume-data', 'update:style'],
   data() {
+    // Initialize the data structure with defaults
+    const defaultData = {
+      personal: {
+        name: '',
+        title: '',
+        visible: true,
+        detailsVisible: true,
+        linksVisible: true,
+        about: [''],
+        details: [
+          { value: '', isLink: false },
+          { value: '', isLink: true }
+        ],
+        links: []
+      },
+      skills: [],
+      skillsVisible: true,
+      languages: [],
+      languagesVisible: true,
+      experiences: [],
+      experiencesVisible: true,
+      education: [],
+      educationVisible: true
+    }
+
+    // Merge the provided data with defaults
+    const mergedData = {
+      ...defaultData,
+      ...this.resumeData,
+      personal: {
+        ...defaultData.personal,
+        ...this.resumeData.personal,
+        about: this.resumeData.personal?.about || [''],
+        details: this.resumeData.personal?.details || defaultData.personal.details,
+        links: this.resumeData.personal?.links || []
+      }
+    }
+
     return {
       activeTab: 'info',
       styleData: JSON.parse(JSON.stringify(this.style)),
-      local: this.resumeData,
+      local: mergedData,
       link: '',
       skill: '',
       lang: { name: '', proficiency: 100 },
       exp: { title: '', company: '', period: '', description: '' },
-      edu: { degree: '', period: '', mark: '', thesis: '' }
+      edu: { degree: '', period: '', mark: '', thesis: '' },
+      newDetail: { value: '', isLink: false }
     }
   },
   watch: {
@@ -303,6 +363,21 @@ export default {
     },
     removeEdu(index) {
       this.local.education.splice(index, 1)
+    },
+    addDescription() {
+      this.local.personal.about.push('')
+    },
+    removeDescription(index) {
+      this.local.personal.about.splice(index, 1)
+    },
+    addDetail() {
+      if (this.newDetail.value) {
+        this.local.personal.details.push({ ...this.newDetail })
+        this.newDetail = { value: '', isLink: false }
+      }
+    },
+    removeDetail(index) {
+      this.local.personal.details.splice(index, 1)
     }
   }
 }
@@ -314,21 +389,24 @@ export default {
   background-color: white;
   display: flex;
   flex-direction: column;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
 }
 
 .editor-tabs {
-  margin-left: 20px;
+  margin: 0 12px;
   position: sticky;
   top: 0;
   z-index: 2;
   background-color: white;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  padding: 4px 0;
 }
 
 .editor-window {
   flex: 1;
   overflow-y: auto;
-  padding: 16px;
+  padding: 12px;
 }
 
 .editor-panels {
@@ -337,58 +415,151 @@ export default {
 
 :deep(.editor-panel) {
   background-color: white;
-  border: 1px solid rgba(0, 0, 0, 0.08) !important;
-  border-radius: 12px !important;
-  margin-bottom: 16px;
+  border: 1px solid rgba(0, 0, 0, 0.06) !important;
+  border-radius: 8px !important;
+  margin-bottom: 12px;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-  transition: all 0.2s ease-in-out;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.02);
+  transition: all 0.2s ease;
 }
 
 :deep(.editor-panel:hover) {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
 :deep(.panel-title) {
   font-weight: 500;
   color: rgba(0, 0, 0, 0.87);
-  padding: 16px;
+  padding: 12px 16px;
+  font-size: 0.95rem;
 }
 
 :deep(.v-expansion-panel-text__wrapper) {
-  padding: 0 16px 16px;
+  padding: 0 12px 12px;
 }
 
 .experience-card,
 .education-card {
   background-color: #f8fafc;
-  border-radius: 8px;
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 6px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  transition: all 0.2s ease;
+  margin-bottom: 8px;
+  padding: 12px !important;
+}
+
+.experience-card:hover,
+.education-card:hover {
+  background-color: #f1f5f9;
 }
 
 :deep(.v-field) {
-  border-radius: 8px !important;
+  border-radius: 6px !important;
+  transition: all 0.2s ease;
 }
 
 :deep(.v-field__outline) {
-  border-color: rgba(0, 0, 0, 0.12) !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
 }
 
 :deep(.v-field--focused .v-field__outline) {
   border-color: rgb(var(--v-theme-primary)) !important;
+  border-width: 1px !important;
 }
 
 :deep(.v-btn) {
-  border-radius: 8px;
+  border-radius: 6px;
   font-weight: 500;
+  text-transform: none;
+  letter-spacing: 0.2px;
+  transition: all 0.2s ease;
+  height: 36px;
 }
 
 :deep(.v-btn--icon) {
-  border-radius: 8px;
+  border-radius: 6px;
+  width: 32px;
+  height: 32px;
 }
 
 :deep(.v-switch .v-label) {
-  font-size: 0.875rem;
-  opacity: 0.7;
+  font-size: 0.85rem;
+  opacity: 0.8;
+  font-weight: 500;
+}
+
+:deep(.v-tab) {
+  text-transform: none;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+  font-size: 0.9rem;
+}
+
+:deep(.v-tab--selected) {
+  font-weight: 600;
+}
+
+:deep(.v-expansion-panel-title__overlay) {
+  opacity: 0;
+}
+
+:deep(.v-expansion-panel--active > .v-expansion-panel-title) {
+  color: rgb(var(--v-theme-primary));
+}
+
+:deep(.v-text-field .v-field__input) {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  font-size: 0.9rem;
+}
+
+:deep(.v-textarea .v-field__input) {
+  min-height: 80px;
+  font-size: 0.9rem;
+}
+
+:deep(.v-field__label) {
+  font-size: 0.85rem;
+}
+
+:deep(.v-field--variant-outlined .v-field__outline) {
+  --v-field-border-width: 1px;
+}
+
+:deep(.v-expansion-panel-text) {
+  font-size: 0.9rem;
+}
+
+.detail-card {
+  background-color: #f8fafc;
+  border-radius: 8px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  transition: all 0.2s ease;
+}
+
+.detail-card:hover {
+  background-color: #f1f5f9;
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+:deep(.v-field__input) {
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+:deep(.v-field--variant-outlined .v-field__outline) {
+  --v-field-border-width: 1px;
+}
+
+:deep(.v-switch .v-label) {
+  font-size: 0.85rem;
+  opacity: 0.8;
+  font-weight: 500;
+}
+
+:deep(.v-btn) {
+  text-transform: none;
+  letter-spacing: 0.2px;
+  font-weight: 500;
 }
 </style>
