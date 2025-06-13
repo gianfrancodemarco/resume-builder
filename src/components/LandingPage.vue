@@ -83,13 +83,16 @@ onMounted(() => {
     z-index: 2;
     position: relative;
     padding: 48px 24px 32px 24px;
+    width: 100%;
+    max-width: 800px;
 }
 
 .typing-container {
     min-height: 60px;
     height: 60px;
-    width: 500px;
-    margin: 0 0 48px 0;
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto 48px auto;
     font-size: 1.2rem;
     font-weight: 400;
     opacity: 0.92;
@@ -176,5 +179,77 @@ onMounted(() => {
 
 .website-link a:hover {
     color: #fff;
+}
+
+/* Tablet styles */
+@media (max-width: 960px) {
+    .landing-title {
+        font-size: 2.4rem;
+    }
+
+    .landing-subtitle {
+        font-size: 1.1rem;
+    }
+
+    .typing-container {
+        font-size: 1.1rem;
+        min-height: 50px;
+        height: 50px;
+    }
+}
+
+/* Mobile styles */
+@media (max-width: 600px) {
+    .center-content {
+        padding: 32px 16px 24px 16px;
+    }
+
+    .landing-title {
+        font-size: 2rem;
+        margin-bottom: 8px;
+    }
+
+    .landing-subtitle {
+        font-size: 1rem;
+        margin-bottom: 32px;
+        padding: 0 16px;
+    }
+
+    .typing-container {
+        font-size: 0.95rem;
+        min-height: 40px;
+        height: 40px;
+        margin-bottom: 32px;
+        padding: 0 16px;
+    }
+
+    .landing-btn {
+        height: 36px !important;
+        font-size: 0.95rem;
+        padding: 8px 16px;
+    }
+
+    .website-link {
+        bottom: 1.5rem;
+    }
+
+    .website-link a {
+        font-size: 0.85rem;
+    }
+}
+
+/* Small mobile styles */
+@media (max-width: 360px) {
+    .landing-title {
+        font-size: 1.8rem;
+    }
+
+    .landing-subtitle {
+        font-size: 0.9rem;
+    }
+
+    .typing-container {
+        font-size: 0.85rem;
+    }
 }
 </style>

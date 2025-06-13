@@ -4,12 +4,50 @@
             <v-app-bar-title class="text-h5 font-weight-bold navbar-title">
                 <a href="/" class="text-decoration-none text-white">Resume Builder</a>
             </v-app-bar-title>
+            <!-- Improved mobile menu button -->
+            <v-btn v-if="$vuetify.display.smAndDown" icon="mdi-menu" color="white" variant="text"
+                class="mobile-menu-btn" @click="toggleDrawer" />
         </v-app-bar>
+
+        <!-- Improved mobile navigation drawer -->
+        <v-navigation-drawer v-model="drawer" temporary location="right" class="mobile-drawer" @click.stop>
+            <v-list class="pa-2">
+                <v-list-item class="mb-2">
+                    <v-list-item-title class="text-h6 font-weight-bold">Actions</v-list-item-title>
+                </v-list-item>
+                <v-divider class="mb-2"></v-divider>
+                <v-list-item>
+                    <v-list-item-title class="d-flex align-center" @click.stop="handleExportJSON">
+                        <v-icon icon="mdi-code-json" class="mr-3" color="primary"></v-icon>
+                        Export JSON
+                    </v-list-item-title>
+                </v-list-item>
+                <v-list-item>
+                    <v-list-item-title class="d-flex align-center" @click.stop="handleImportJSON">
+                        <v-icon icon="mdi-upload" class="mr-3" color="primary"></v-icon>
+                        Import JSON
+                    </v-list-item-title>
+                </v-list-item>
+                <v-list-item>
+                    <v-list-item-title class="d-flex align-center" @click.stop="handleDownloadPDF">
+                        <v-icon icon="mdi-file-pdf-box" class="mr-3" color="primary"></v-icon>
+                        Download PDF
+                    </v-list-item-title>
+                </v-list-item>
+                <v-list-item>
+                    <v-list-item-title class="d-flex align-center" @click.stop="handleDownloadHTML">
+                        <v-icon icon="mdi-file-code" class="mr-3" color="primary"></v-icon>
+                        Download HTML
+                    </v-list-item-title>
+                </v-list-item>
+            </v-list>
+        </v-navigation-drawer>
 
         <v-main>
             <v-container fluid class="pa-0 fill-height">
                 <v-row no-gutters class="fill-height">
-                    <v-col cols="12" md="5" lg="4" class="editor-col">
+                    <v-col cols="12" md="5" lg="4" class="editor-col"
+                        :class="{ 'mobile-editor': $vuetify.display.smAndDown }">
                         <ResumeEditor v-model:resume-data="resumeData" v-model:style="styleData"
                             @update:style="updateStyle">
                             <template #style-extensions>
@@ -32,7 +70,8 @@
             </v-container>
         </v-main>
 
-        <div class="download-buttons">
+        <!-- Desktop download buttons -->
+        <div class="download-buttons" v-if="!$vuetify.display.smAndDown">
             <v-tooltip text="Export JSON" location="top">
                 <template v-slot:activator="{ props }">
                     <v-btn v-bind="props" icon="mdi-code-json" color="primary" @click="exportJSON"
@@ -160,6 +199,9 @@ const styleData = ref({
 })
 
 const fileInput = ref(null)
+
+// Add drawer ref for mobile menu
+const drawer = ref(false)
 
 const getFilename = (extension) => {
     // Get name and position from resume data
@@ -347,12 +389,58 @@ const handleFileUpload = (event) => {
     // Reset the input so the same file can be selected again
     event.target.value = ''
 }
+
+const toggleDrawer = () => {
+    drawer.value = !drawer.value
+}
+
+const handleExportJSON = () => {
+    drawer.value = false
+    exportJSON()
+}
+
+const handleImportJSON = () => {
+    drawer.value = false
+    importJSON()
+}
+
+const handleDownloadPDF = () => {
+    drawer.value = false
+    downloadPDF()
+}
+
+const handleDownloadHTML = () => {
+    drawer.value = false
+    downloadHTML()
+}
 </script>
 
 <style scoped>
 .editor-col {
     border-right: 1px solid rgba(0, 0, 0, 0.08);
     overflow-y: auto;
+    height: calc(100vh - 56px);
+    /* Subtract navbar height */
+    position: relative;
+}
+
+.mobile-editor {
+    border-right: none;
+    border-bottom: none;
+    height: auto;
+    max-height: 50vh;
+}
+
+.mobile-editor::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 8px;
+    background: linear-gradient(90deg, #0f2027 0%, #2c5364 100%);
+    z-index: 1;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .download-buttons {
@@ -409,6 +497,12 @@ const handleFileUpload = (event) => {
     height: 100%;
 }
 
+@media (max-width: 600px) {
+    .navbar-title {
+        font-size: 1.2rem;
+    }
+}
+
 :deep(.v-app-bar) {
     box-shadow: none !important;
     border-bottom: none !important;
@@ -422,6 +516,14 @@ const handleFileUpload = (event) => {
 .preview-container {
     height: 100%;
     background-color: #f8fafc;
+    overflow-y: auto;
+}
+
+@media (max-width: 960px) {
+    .preview-container {
+        height: calc(100vh - 56px - 50vh);
+        /* Subtract navbar and editor height */
+    }
 }
 
 .sidebar-toggle-row {
@@ -468,5 +570,70 @@ const handleFileUpload = (event) => {
         font-size: 0.9em;
         color: rgba(0, 0, 0, 0.6);
     }
+}
+
+/* Mobile optimizations */
+@media (max-width: 600px) {
+    .preview-wrapper {
+        padding: 8px;
+    }
+
+    .download-buttons {
+        bottom: 16px;
+        right: 16px;
+    }
+
+    .download-btn {
+        width: 40px;
+        height: 40px;
+    }
+}
+
+/* Mobile menu improvements */
+.mobile-menu-btn {
+    margin-left: auto;
+    opacity: 0.9;
+    transition: opacity 0.2s ease;
+}
+
+.mobile-menu-btn:hover {
+    opacity: 1;
+}
+
+.mobile-drawer {
+    :deep(.v-list) {
+        padding: 8px;
+    }
+}
+
+:deep(.v-navigation-drawer__content) {
+    overflow-y: auto;
+}
+
+:deep(.v-list-item) {
+    min-height: 48px;
+    border-radius: 8px;
+    margin: 2px 0;
+    transition: background-color 0.2s ease;
+}
+
+:deep(.v-list-item:hover) {
+    background-color: rgba(var(--v-theme-primary), 0.05);
+}
+
+:deep(.v-list-item-title) {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: rgba(0, 0, 0, 0.87);
+    cursor: pointer;
+    padding: 8px 0;
+}
+
+:deep(.v-icon) {
+    font-size: 1.25rem;
+}
+
+:deep(.v-divider) {
+    opacity: 0.1;
 }
 </style>

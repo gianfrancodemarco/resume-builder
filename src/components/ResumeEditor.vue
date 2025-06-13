@@ -562,4 +562,141 @@ export default {
   letter-spacing: 0.2px;
   font-weight: 500;
 }
+
+/* Mobile optimizations */
+@media (max-width: 600px) {
+  .editor-window {
+    padding: 20px 12px;
+  }
+
+  :deep(.v-field) {
+    margin-bottom: 16px;
+    width: 100%;
+  }
+
+  :deep(.v-text-field .v-field__input) {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    font-size: 0.85rem;
+    width: 100%;
+  }
+
+  :deep(.v-textarea .v-field__input) {
+    min-height: 60px;
+    font-size: 0.85rem;
+    width: 100%;
+  }
+
+  :deep(.v-field__label) {
+    font-size: 0.8rem;
+  }
+
+  :deep(.v-btn) {
+    height: 36px;
+    font-size: 0.85rem;
+  }
+
+  :deep(.v-btn--icon) {
+    width: 32px;
+    height: 32px;
+  }
+
+  :deep(.v-expansion-panel-text__wrapper) {
+    padding: 0 12px 20px;
+  }
+
+  .experience-card,
+  .education-card,
+  .detail-card {
+    padding: 20px 12px !important;
+    margin-bottom: 16px;
+  }
+
+  :deep(.panel-title) {
+    padding: 16px 12px;
+    font-size: 0.9rem;
+  }
+
+  :deep(.v-switch .v-label) {
+    font-size: 0.8rem;
+  }
+
+  :deep(.v-tab) {
+    font-size: 0.85rem;
+    padding: 0 12px;
+  }
+
+  :deep(.v-expansion-panel-text) {
+    font-size: 0.85rem;
+  }
+
+  :deep(.editor-panel) {
+    margin-bottom: 20px;
+  }
+
+  :deep(.v-expansion-panels) {
+    padding: 0;
+  }
+
+  :deep(.v-expansion-panel) {
+    margin-bottom: 16px;
+  }
+
+  :deep(.v-expansion-panel:last-child) {
+    margin-bottom: 0;
+  }
+
+  :deep(.v-field__outline) {
+    width: 100% !important;
+  }
+
+  :deep(.v-field__input) {
+    width: 100% !important;
+  }
+
+  :deep(.v-field__append-inner),
+  :deep(.v-field__prepend-inner) {
+    padding: 0 8px;
+  }
+}
+
+/* Tablet optimizations */
+@media (min-width: 601px) and (max-width: 960px) {
+  .editor-window {
+    padding: 16px;
+  }
+
+  :deep(.v-field) {
+    margin-bottom: 12px;
+  }
+
+  :deep(.v-text-field .v-field__input) {
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
+
+  :deep(.v-textarea .v-field__input) {
+    min-height: 70px;
+  }
+
+  :deep(.v-btn) {
+    height: 36px;
+  }
+
+  :deep(.v-btn--icon) {
+    width: 32px;
+    height: 32px;
+  }
+
+  :deep(.v-expansion-panel-text__wrapper) {
+    padding: 0 16px 16px;
+  }
+
+  .experience-card,
+  .education-card,
+  .detail-card {
+    padding: 16px !important;
+    margin-bottom: 12px;
+  }
+}
 </style>
