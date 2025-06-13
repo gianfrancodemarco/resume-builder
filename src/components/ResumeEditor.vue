@@ -248,13 +248,25 @@ const props = defineProps({
   }
 })
 
-// Watch for changes in form data
-watch(() => props.resumeData, () => {
+// Initialize local state with props
+const local = ref(JSON.parse(JSON.stringify(props.resumeData)))
+const styleData = ref(JSON.parse(JSON.stringify(props.style)))
+
+// Watch for changes in props to update local state
+watch(() => props.resumeData, (newVal) => {
+  local.value = JSON.parse(JSON.stringify(newVal))
+  emit('change')
+}, { deep: true })
+
+// Watch for changes in local state to emit updates
+watch(local, (newVal) => {
+  emit('update:resume-data', JSON.parse(JSON.stringify(newVal)))
   emit('change')
 }, { deep: true })
 
 // Watch for changes in style
-watch(() => props.style, () => {
+watch(() => props.style, (newVal) => {
+  styleData.value = JSON.parse(JSON.stringify(newVal))
   emit('change')
 }, { deep: true })
 
@@ -265,30 +277,6 @@ const handleSave = () => {
 }
 
 const activeTab = ref('info')
-const styleData = ref(JSON.parse(JSON.stringify(props.style)))
-const local = ref({
-  personal: {
-    name: '',
-    title: '',
-    visible: true,
-    detailsVisible: true,
-    linksVisible: true,
-    about: [''],
-    details: [
-      { value: '', isLink: false },
-      { value: '', isLink: true }
-    ],
-    links: []
-  },
-  skills: [],
-  skillsVisible: true,
-  languages: [],
-  languagesVisible: true,
-  experiences: [],
-  experiencesVisible: true,
-  education: [],
-  educationVisible: true
-})
 const link = ref('')
 const skill = ref('')
 const lang = ref({ name: '', proficiency: 100 })
