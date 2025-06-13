@@ -9,19 +9,27 @@
                 class="mobile-menu-btn" @click="toggleDrawer" />
         </v-app-bar>
 
+        <v-navigation-drawer v-model="drawer" app temporary>
+            <v-list>
+                <v-list-item to="/" prepend-icon="mdi-home" title="Home"></v-list-item>
+                <v-list-item to="/editor" prepend-icon="mdi-pencil" title="Editor"></v-list-item>
+                <v-list-item to="/preview" prepend-icon="mdi-eye" title="Preview"></v-list-item>
+            </v-list>
+        </v-navigation-drawer>
+
         <v-main>
             <div class="editor-content" :class="{ 'mobile-view': isMobile }">
                 <div class="editor-col"
                     :style="isMobile ? { height: `${editorHeight}%` } : { width: `${editorWidth}%` }">
-                    <ResumeEditor v-model:resume-data="resumeData" v-model:style="styleData" @change="handleFormChange"
-                        @save="handleFormSave" />
+                    <ResumeEditor v-model:resume-data="resumeData" v-model:style="resumeStyle"
+                        @change="handleFormChange" @save="handleFormSave" />
                 </div>
                 <div class="resize-handle" @mousedown.prevent="startResize" @touchstart.prevent="startResize"
                     @touchmove.prevent="handleResize" @touchend.prevent="stopResize">
                 </div>
                 <div class="preview-col"
                     :style="isMobile ? { height: `${100 - editorHeight}%` } : { width: `${100 - editorWidth}%` }">
-                    <ResumePreview :resume-data="resumeData" :style="styleData" />
+                    <ResumePreview :resume-data="resumeData" :style="resumeStyle" />
                 </div>
             </div>
         </v-main>
@@ -98,11 +106,13 @@ const resumeData = ref({
         'Git',
         'Docker'
     ],
+    skillsVisible: true,
     languages: [
         { name: 'Italian', proficiency: 100 },
         { name: 'English', proficiency: 90 },
         { name: 'Spanish', proficiency: 70 }
     ],
+    languagesVisible: true,
     experiences: [
         {
             title: 'Senior Software Engineer',
@@ -117,6 +127,7 @@ const resumeData = ref({
             description: 'Developed and maintained multiple web applications. Collaborated with UX designers to implement responsive interfaces and improve user experience.'
         }
     ],
+    experiencesVisible: true,
     education: [
         {
             degree: 'Master in Computer Science',
@@ -131,13 +142,10 @@ const resumeData = ref({
             thesis: 'Introduction to Modern Web Technologies'
         }
     ],
-    skillsVisible: true,
-    languagesVisible: true,
-    experiencesVisible: true,
     educationVisible: true
 })
 
-const styleData = ref({
+const resumeStyle = ref({
     colors: {
         primary: '#08294D',
         text: '#08294D',
@@ -345,11 +353,11 @@ const downloadHTML = async () => {
 }
 
 const updateStyle = (newStyle) => {
-    styleData.value = newStyle
+    resumeStyle.value = newStyle
 }
 
 const toggleSidebarPosition = () => {
-    styleData.value.spacing.sidebarLeft = !styleData.value.spacing.sidebarLeft
+    resumeStyle.value.spacing.sidebarLeft = !resumeStyle.value.spacing.sidebarLeft
 }
 
 // Add color picker tooltip formatter
@@ -365,7 +373,7 @@ const colorPreview = (color) => {
 const exportJSON = () => {
     const data = {
         resumeData: resumeData.value,
-        styleData: styleData.value
+        resumeStyle: resumeStyle.value
     }
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
     const url = window.URL.createObjectURL(blob)
@@ -389,9 +397,9 @@ const handleFileUpload = (event) => {
         reader.onload = (e) => {
             try {
                 const data = JSON.parse(e.target.result)
-                if (data.resumeData && data.styleData) {
+                if (data.resumeData && data.resumeStyle) {
                     resumeData.value = data.resumeData
-                    styleData.value = data.styleData
+                    resumeStyle.value = data.resumeStyle
                 } else {
                     alert('Invalid resume data format')
                 }
