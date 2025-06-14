@@ -12,9 +12,10 @@
     <v-window v-model="activeTab" class="editor-window">
       <v-window-item value="info">
         <div class="mb-4">
-          <v-text-field v-model="local.personal.name" label="Name" variant="outlined" density="comfortable"
-            class="mb-2" />
-          <v-text-field v-model="local.personal.title" label="Title" variant="outlined" density="comfortable" />
+          <v-text-field v-model="local.personal.name" label="Name" variant="outlined" density="comfortable" class="mb-2"
+            aria-label="Name" />
+          <v-text-field v-model="local.personal.title" label="Title" variant="outlined" density="comfortable"
+            aria-label="Title" />
         </div>
         <v-expansion-panels class="editor-panels" multiple>
           <v-expansion-panel class="editor-panel">
@@ -53,21 +54,22 @@
                     <div class="d-flex align-center mb-2">
                       <v-text-field v-model="local.experiences[index].title" label="Job title"
                         :disabled="!local.experiencesVisible || !local.experiences[index].visible" variant="outlined"
-                        density="comfortable" />
+                        density="comfortable" aria-label="Job title" />
                     </div>
                     <v-text-field v-model="local.experiences[index].company" label="Company (+ location)"
                       :disabled="!local.experiencesVisible || !local.experiences[index].visible" variant="outlined"
-                      density="comfortable" class="mb-2" />
+                      density="comfortable" class="mb-2" aria-label="Company" />
                     <v-text-field v-model="local.experiences[index].period" label="Period"
                       :disabled="!local.experiencesVisible || !local.experiences[index].visible" variant="outlined"
-                      density="comfortable" class="mb-2" />
+                      density="comfortable" class="mb-2" aria-label="Period" />
                     <v-textarea v-model="local.experiences[index].description" label="Description"
                       :disabled="!local.experiencesVisible || !local.experiences[index].visible" variant="outlined"
-                      density="comfortable" />
+                      density="comfortable" aria-label="Description" />
                   </v-expansion-panel-text>
                 </v-expansion-panel>
               </v-expansion-panels>
-              <v-btn color="primary" @click="addExp" :disabled="!local.experiencesVisible" prepend-icon="mdi-plus">Add
+              <v-btn color="primary" @click="addExp" aria-label="Add Experience" :disabled="!local.experiencesVisible"
+                prepend-icon="mdi-plus">Add
                 Experience</v-btn>
             </v-expansion-panel-text>
           </v-expansion-panel>
@@ -106,24 +108,24 @@
                   <v-expansion-panel-text>
                     <v-text-field v-model="local.education[index].degree" label="Degree"
                       :disabled="!local.educationVisible || !local.education[index].visible" variant="outlined"
-                      density="comfortable" />
+                      density="comfortable" aria-label="Degree" />
                     <v-text-field v-model="local.education[index].school" label="School"
                       :disabled="!local.educationVisible || !local.education[index].visible" variant="outlined"
-                      density="comfortable" class="mb-2" />
+                      density="comfortable" class="mb-2" aria-label="School" />
                     <v-text-field v-model="local.education[index].period" label="Period"
                       :disabled="!local.educationVisible || !local.education[index].visible" variant="outlined"
-                      density="comfortable" class="mb-2" />
+                      density="comfortable" class="mb-2" aria-label="Period" />
                     <v-text-field v-model="local.education[index].mark" label="Grade"
                       :disabled="!local.educationVisible || !local.education[index].visible" variant="outlined"
-                      density="comfortable" class="mb-2" />
+                      density="comfortable" class="mb-2" aria-label="Grade" />
                     <v-textarea v-model="local.education[index].thesis" label="Thesis / Notes"
                       :disabled="!local.educationVisible || !local.education[index].visible" variant="outlined"
-                      density="comfortable" />
+                      density="comfortable" aria-label="Thesis / Notes" />
                   </v-expansion-panel-text>
                 </v-expansion-panel>
               </v-expansion-panels>
-              <v-btn color="primary" @click="addEdu" :disabled="!local.educationVisible" prepend-icon="mdi-plus">Add
-                Education</v-btn>
+              <v-btn color="primary" @click="addEdu" aria-label="Add Education" :disabled="!local.educationVisible"
+                prepend-icon="mdi-plus">Add Education</v-btn>
             </v-expansion-panel-text>
           </v-expansion-panel>
 
@@ -164,12 +166,11 @@
               </v-expansion-panel-title>
               <v-expansion-panel-text>
                 <div class="d-flex align-center mb-2">
-
                   <v-select v-model="local.customSections[index].type" :items="sectionTypes" label="Type"
                     :disabled="!local.customSections[index].visible" variant="outlined" density="comfortable"
                     class="mr-2" style="max-width: 200px;"
                     @update:model-value="(val) => handleSectionTypeChange(local.customSections[index], val)"
-                    item-title="label" item-value="value" />
+                    item-title="label" item-value="value" aria-label="Type" />
                 </div>
 
                 <template v-if="section.type === 'languages'">
@@ -177,21 +178,22 @@
                     class="d-flex align-center mb-2">
                     <v-text-field v-model="local.customSections[index].items[itemIndex].name" label="Language"
                       :disabled="!local.customSections[index].visible" variant="outlined" density="comfortable"
-                      class="mr-2" />
+                      class="mr-2" aria-label="Language" />
                     <v-slider v-model="local.customSections[index].items[itemIndex].proficiency" label="Proficiency"
                       :disabled="!local.customSections[index].visible" min="0" max="100" step="5" class="mr-2" />
                     <v-btn icon="mdi-delete" color="error" variant="text"
                       @click="removeCustomSectionItem(index, itemIndex)"
-                      :disabled="!local.customSections[index].visible" />
+                      :disabled="!local.customSections[index].visible" aria-label="Delete language" />
                   </div>
                   <div class="d-flex align-center mb-2">
                     <v-text-field v-model="newCustomSectionItem.name" label="Language"
                       :disabled="!local.customSections[index].visible" variant="outlined" density="comfortable"
-                      class="mr-2" />
+                      class="mr-2" aria-label="Language" />
                     <v-slider v-model="newCustomSectionItem.proficiency" label="Proficiency"
                       :disabled="!local.customSections[index].visible" min="0" max="100" step="5" class="mr-2" />
                     <v-btn color="primary" @click="addCustomSectionItem(index)"
-                      :disabled="!local.customSections[index].visible" prepend-icon="mdi-plus">Add Language</v-btn>
+                      :disabled="!local.customSections[index].visible" prepend-icon="mdi-plus"
+                      aria-label="Add language">Add Language</v-btn>
                   </div>
                 </template>
 
@@ -200,17 +202,18 @@
                     class="d-flex align-center mb-2">
                     <v-text-field v-model="local.customSections[index].items[itemIndex]" label="Item"
                       :disabled="!local.customSections[index].visible" variant="outlined" density="comfortable"
-                      class="mr-2" />
+                      class="mr-2" aria-label="Item" />
                     <v-btn icon="mdi-delete" color="error" variant="text"
                       @click="removeCustomSectionItem(index, itemIndex)"
-                      :disabled="!local.customSections[index].visible" />
+                      :disabled="!local.customSections[index].visible" aria-label="Delete item" />
                   </div>
                   <div class="d-flex align-center mb-2">
                     <v-text-field v-model="newCustomSectionItem" label="Item"
                       :disabled="!local.customSections[index].visible" variant="outlined" density="comfortable"
-                      class="mr-2" />
+                      class="mr-2" aria-label="Item" />
                     <v-btn color="primary" @click="addCustomSectionItem(index)"
-                      :disabled="!local.customSections[index].visible" prepend-icon="mdi-plus">Add Item</v-btn>
+                      :disabled="!local.customSections[index].visible" prepend-icon="mdi-plus" aria-label="Add item">Add
+                      Item</v-btn>
                   </div>
                 </template>
 
@@ -220,7 +223,7 @@
                     <div class="d-flex align-center mb-2">
                       <v-textarea v-model="local.customSections[index].items[itemIndex].value" label="Item"
                         :disabled="!local.customSections[index].visible" variant="outlined" density="comfortable"
-                        class="flex-grow-1" />
+                        class="flex-grow-1" aria-label="Item" />
                     </div>
                     <div class="d-flex align-center justify-end">
                       <v-switch v-model="local.customSections[index].items[itemIndex].isLink" label="Link"
@@ -228,12 +231,12 @@
                         class="mr-2" />
                       <v-btn icon="mdi-delete" color="error" variant="text"
                         @click="removeCustomSectionItem(index, itemIndex)"
-                        :disabled="!local.customSections[index].visible" />
+                        :disabled="!local.customSections[index].visible" aria-label="Delete item" />
                     </div>
                     <div v-if="local.customSections[index].items[itemIndex].isLink" class="mt-2">
                       <v-text-field v-model="local.customSections[index].items[itemIndex].href" label="URL"
                         :disabled="!local.customSections[index].visible" variant="outlined" density="comfortable"
-                        placeholder="https://example.com" />
+                        placeholder="https://example.com" aria-label="URL" />
                     </div>
                   </div>
 
@@ -241,19 +244,20 @@
                     <div class="d-flex align-center mb-2">
                       <v-textarea v-model="newCustomSectionItem.value" label="New Item"
                         :disabled="!local.customSections[index].visible" variant="outlined" density="comfortable"
-                        class="flex-grow-1" />
+                        class="flex-grow-1" aria-label="New Item" />
                     </div>
                     <div class="d-flex align-center justify-end">
                       <v-switch v-model="newCustomSectionItem.isLink" label="Link"
                         :disabled="!local.customSections[index].visible" hide-details density="compact" color="primary"
                         class="mr-2" />
                       <v-btn color="primary" @click="addCustomSectionItem(index)"
-                        :disabled="!local.customSections[index].visible" prepend-icon="mdi-plus">Add Item</v-btn>
+                        :disabled="!local.customSections[index].visible" prepend-icon="mdi-plus"
+                        aria-label="Add item">Add Item</v-btn>
                     </div>
                     <div v-if="newCustomSectionItem.isLink" class="mt-2">
                       <v-text-field v-model="newCustomSectionItem.href" label="URL"
                         :disabled="!local.customSections[index].visible" variant="outlined" density="comfortable"
-                        placeholder="https://example.com" />
+                        placeholder="https://example.com" aria-label="URL" />
                     </div>
                   </div>
                 </template>
@@ -262,8 +266,8 @@
           </template>
         </v-expansion-panels>
         <div class="d-flex flex-column align-center">
-          <v-btn color="primary" @click="addCustomSection" prepend-icon="mdi-plus" class="mt-4 action-btn">Add Custom
-            Section</v-btn>
+          <v-btn color="primary" @click="addCustomSection" prepend-icon="mdi-plus" class="mt-4 action-btn"
+            aria-label="Add custom section">Add Custom Section</v-btn>
         </div>
       </v-window-item>
 
