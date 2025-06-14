@@ -547,11 +547,15 @@ const stopResize = () => {
     position: relative;
     overflow: hidden;
     background-color: #f5f5f5;
+    height: 100vh;
 }
 
 .editor-col {
     transition: all 0.2s ease;
     flex-shrink: 0;
+    height: 100%;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 .preview-col {
@@ -690,14 +694,21 @@ const stopResize = () => {
     .editor-content {
         flex-direction: column;
         height: 100vh;
+        overflow: hidden;
     }
 
     .editor-col {
         width: 100% !important;
+        height: 100%;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
     }
 
     .preview-col {
         width: 100% !important;
+        height: 100%;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
     }
 
     .resize-handle {
@@ -714,7 +725,14 @@ const stopResize = () => {
 
 @media (max-width: 600px) {
     .editor-content {
-        height: calc(100vh - 56px);
+        height: 100vh;
+        overflow: hidden;
+    }
+
+    .editor-col {
+        height: 100%;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
     }
 
     .navbar-title {
