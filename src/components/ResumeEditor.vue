@@ -207,7 +207,10 @@
             </v-expansion-panel>
           </template>
         </v-expansion-panels>
-        <v-btn color="primary" @click="addCustomSection" prepend-icon="mdi-plus" class="mt-4">Add Custom Section</v-btn>
+        <div class="d-flex flex-column align-center">
+          <v-btn color="primary" @click="addCustomSection" prepend-icon="mdi-plus" class="mt-4 action-btn">Add Custom
+            Section</v-btn>
+        </div>
       </v-window-item>
 
       <v-window-item value="style">
@@ -229,10 +232,14 @@ const props = defineProps({
   style: {
     type: Object,
     required: true
+  },
+  isMobile: {
+    type: Boolean,
+    required: true
   }
 })
 
-const emit = defineEmits(['update:resumeData', 'update:style', 'save', 'change'])
+const emit = defineEmits(['update:resumeData', 'update:style', 'save', 'change', 'preview'])
 
 const activeTab = ref('info')
 const styleData = ref(props.style)
@@ -807,5 +814,10 @@ const colorPreview = (color) => {
 
 :deep(.v-textarea .v-field__input) {
   min-height: 80px;
+}
+
+.action-btn {
+  width: 200px;
+  justify-content: center;
 }
 </style>
