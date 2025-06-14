@@ -245,7 +245,7 @@ onMounted(() => {
     }
 
     .website-link {
-        bottom: 1.5rem;
+        bottom: 2.5rem;
         flex-direction: column;
         gap: 4px;
     }
