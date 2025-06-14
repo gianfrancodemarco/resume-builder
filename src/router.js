@@ -1,6 +1,6 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
-import LandingPage from './components/LandingPage.vue'
-import EditorPage from './components/EditorPage.vue'
+import LandingPage from './views/LandingPage.vue'
+import EditorPage from './views/EditorPage.vue'
 
 const routes = [
     { path: '/', component: LandingPage },
