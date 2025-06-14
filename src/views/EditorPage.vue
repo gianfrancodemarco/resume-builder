@@ -68,8 +68,8 @@
 
 <script setup>
 import { ref, watch, onMounted, onBeforeUnmount, computed } from 'vue'
-import ResumeEditor from './ResumeEditor.vue'
-import ResumePreview from './ResumePreview.vue'
+import ResumeEditor from '../components/ResumeEditor.vue'
+import ResumePreview from '../components/ResumePreview.vue'
 import { useRouter } from 'vue-router'
 import { useDisplay } from 'vuetify'
 
