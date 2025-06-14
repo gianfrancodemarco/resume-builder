@@ -4,41 +4,9 @@
       <div class="preview-container">
         <div class="container" :class="{ 'sidebar-left': sidebarPosition === 'left' }">
           <div class="sidebar">
-            <template v-for="(section, index) in resumeData.customSections.filter(s => s && s.visible !== false)"
-              :key="index">
+            <template v-for="(section, index) in visibleCustomSections" :key="index">
               <h2>{{ section.title }}</h2>
-              <template v-if="section.type === 'list'">
-                <p class="skills-list"><span v-for="(item, itemIndex) in section.items" :key="itemIndex">{{ item
-                    }}<br /></span></p>
-              </template>
-              <template v-else-if="section.type === 'languages'">
-                <div class="language-proficiency" v-for="(item, itemIndex) in section.items" :key="itemIndex">
-                  <div class="language-proficiency-label">{{ item.name }}</div>
-                  <div class="language-proficiency-bar">
-                    <div class="language-proficiency-bar-fill" :style="{ width: item.proficiency + '%' }"></div>
-                  </div>
-                </div>
-              </template>
-              <template v-else-if="section.type === 'italic'">
-                <p v-for="(item, itemIndex) in section.items" :key="itemIndex" class="subsubtitle">
-                  <template v-if="item && item.isLink">
-                    <a :href="item.href" target="_blank">{{ item.value }}</a>
-                  </template>
-                  <template v-else>
-                    {{ item && item.value ? item.value : '' }}
-                  </template>
-                </p>
-              </template>
-              <template v-else>
-                <p v-for="(item, itemIndex) in section.items" :key="itemIndex">
-                  <template v-if="item && item.isLink">
-                    <a :href="item.href" target="_blank">{{ item.value }}</a>
-                  </template>
-                  <template v-else>
-                    {{ item && item.value ? item.value : '' }}
-                  </template>
-                </p>
-              </template>
+              <component :is="getSectionComponent(section.type)" :items="section.items" :type="section.type" />
             </template>
           </div>
           <div class="content">
@@ -71,7 +39,18 @@
 </template>
 
 <script>
+import SkillsList from './sections/SkillsList.vue'
+import LanguageProficiency from './sections/LanguageProficiency.vue'
+import ItalicText from './sections/ItalicText.vue'
+import DefaultText from './sections/DefaultText.vue'
+
 export default {
+  components: {
+    SkillsList,
+    LanguageProficiency,
+    ItalicText,
+    DefaultText
+  },
   props: {
     resumeData: {
       type: Object,
@@ -93,20 +72,35 @@ export default {
   },
   computed: {
     resumeStyle() {
+      const { colors, typography, spacing } = this.style
       return {
-        '--primary-color': this.style.colors.primary,
-        '--text-color': this.style.colors.text,
-        '--background-color': this.style.colors.background,
-        '--sidebar-color': this.style.colors.sidebar || this.style.colors.primary,
-        '--link-color': this.style.colors.link || this.style.colors.primary,
-        '--heading-font': this.style.typography.headingFont,
-        '--body-font': this.style.typography.bodyFont,
-        '--base-size': `${this.style.typography.baseSize}px`,
-        '--heading-size': `${this.style.typography.headingSize}px`,
-        '--section-spacing': `${this.style.spacing.section}px`,
-        '--content-spacing': `${this.style.spacing.content}px`,
-        '--sidebar-width': `${this.style.spacing.sidebarWidth || 280}px`
+        '--primary-color': colors.primary,
+        '--text-color': colors.text,
+        '--background-color': colors.background,
+        '--sidebar-color': colors.sidebar || colors.primary,
+        '--link-color': colors.link || colors.primary,
+        '--heading-font': typography.headingFont,
+        '--body-font': typography.bodyFont,
+        '--base-size': `${typography.baseSize}px`,
+        '--heading-size': `${typography.headingSize}px`,
+        '--section-spacing': `${spacing.section}px`,
+        '--content-spacing': `${spacing.content}px`,
+        '--sidebar-width': `${spacing.sidebarWidth || 280}px`
       }
+    },
+    visibleCustomSections() {
+      return this.resumeData.customSections.filter(s => s && s.visible !== false)
+    }
+  },
+  methods: {
+    getSectionComponent(type) {
+      const components = {
+        list: 'SkillsList',
+        languages: 'LanguageProficiency',
+        italic: 'ItalicText',
+        default: 'DefaultText'
+      }
+      return components[type] || components.default
     }
   }
 }
@@ -252,8 +246,9 @@ export default {
   background: var(--background-color);
   color: var(--text-color);
   overflow-wrap: break-word;
-  word-wrap: break-word;
-  word-break: break-word;
+  display: flex;
+  flex-direction: column;
+  gap: var(--content-spacing);
 }
 
 .content h1,
@@ -276,45 +271,43 @@ export default {
 }
 
 .content h1 {
-  font-family: var(--heading-font);
-  font-size: var(--heading-size);
   margin-bottom: 0;
   font-weight: 700;
   letter-spacing: 0.5px;
-  color: var(--primary-color);
 }
 
 .content .subtitle {
   font-size: calc(var(--base-size) * 0.75);
   color: #aaa;
+  margin-top: 4px;
 }
 
 .content h2 {
-  font-family: var(--heading-font);
   font-weight: 600;
   font-size: calc(var(--heading-size) * 0.56);
   letter-spacing: 2px;
-  margin: 6px 0 0;
+  margin: 0;
   text-transform: uppercase;
-  color: var(--primary-color);
 }
 
+/* Sections */
 .section {
-  margin-top: 24px;
+  margin-top: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--content-spacing);
 }
 
-.section h2 {
-  font-family: var(--heading-font);
-  font-size: var(--heading-size);
-  margin-bottom: 12px;
-  font-weight: 700;
-  letter-spacing: 0.5px;
+.section>div {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--content-spacing) * 0.5);
 }
 
 .job-title {
   font-family: var(--heading-font);
   font-weight: 700;
-  margin: 20px 0 0;
+  margin: 0;
   font-size: calc(var(--heading-size) * 0.5);
 }
 
@@ -322,12 +315,13 @@ export default {
   text-transform: uppercase;
   font-size: calc(var(--base-size) * 0.7);
   font-weight: 600;
-  margin-top: 0;
+  margin: 0;
   display: inline-block;
+  color: #aaa;
 }
 
 .job-desc {
-  margin-top: 0;
+  margin: 0;
 }
 
 p,
@@ -335,7 +329,7 @@ li {
   font-family: var(--body-font);
   font-size: calc(var(--base-size) * 0.75);
   line-height: 1.5;
-  margin-bottom: 6px;
+  margin: 0;
 }
 
 .language-proficiency {

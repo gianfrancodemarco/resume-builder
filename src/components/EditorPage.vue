@@ -1,12 +1,7 @@
 <template>
     <v-app>
-        <v-app-bar elevation="0" class="px-4 gradient-navbar custom-navbar">
-            <v-app-bar-title class="text-h5 font-weight-bold navbar-title">
-                <a href="/" class="text-decoration-none text-white">Resume Builder</a>
-            </v-app-bar-title>
-            <!-- Improved mobile menu button -->
-            <v-btn v-if="$vuetify.display.smAndDown" icon="mdi-menu" color="white" variant="text"
-                class="mobile-menu-btn" @click="toggleDrawer" />
+        <v-app-bar v-if="$vuetify.display.smAndDown" elevation="0" class="px-4 gradient-navbar custom-navbar">
+            <v-btn icon="mdi-menu" color="white" variant="text" class="mobile-menu-btn" @click="toggleDrawer" />
         </v-app-bar>
 
         <v-navigation-drawer v-model="drawer" app temporary>
@@ -21,7 +16,7 @@
         </v-navigation-drawer>
 
         <v-main>
-            <div class="editor-content" :class="{ 'mobile-view': isMobile }">
+            <div class="editor-content pa-4" :class="{ 'mobile-view': isMobile }">
                 <div class="editor-col"
                     :style="isMobile ? { height: `${editorHeight}%` } : { width: `${editorWidth}%` }">
                     <ResumeEditor v-model:resume-data="resumeData" v-model:style="resumeStyle" @save="handleFormSave"
@@ -508,9 +503,12 @@ const stopResize = () => {
 </script>
 
 <style scoped>
+.v-main {
+    background-color: #e2e8f0;
+}
+
 .editor-page {
     min-height: 100vh;
-    background-color: #f8fafc;
 }
 
 :deep(.v-navigation-drawer__scrim) {
@@ -522,7 +520,7 @@ const stopResize = () => {
     height: calc(100vh - 64px);
     position: relative;
     overflow: hidden;
-    background: #fff;
+
 }
 
 .editor-col {
@@ -537,7 +535,6 @@ const stopResize = () => {
 .preview-col {
     height: 100%;
     overflow-y: auto;
-    background: #f8fafc;
     transition: all 0.2s ease;
     flex-shrink: 0;
 }
