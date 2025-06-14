@@ -1,7 +1,7 @@
 <template>
     <v-app>
         <v-main>
-            <div class="editor-content" :class="{ 'mobile-view': isMobile, 'pa-4': !isMobile }">
+            <div class="editor-content" :class="{ 'mobile-view': isMobile }">
                 <div class="editor-col" :style="isMobile ? { width: '100%' } : { width: `${editorWidth}%` }">
                     <ResumeEditor v-model:resume-data="resumeData" v-model:style="resumeStyle" @save="handleFormSave"
                         @change="handleFormChange" :is-mobile="isMobile" @preview="toggleActions" />
@@ -11,39 +11,25 @@
                 </div>
                 <div class="preview-col" :class="{ 'hidden': isMobile }"
                     :style="!isMobile ? { width: `${100 - editorWidth}%` } : {}">
-                    <ResumePreview :resume-data="resumeData" :style="resumeStyle"
-                        :sidebar-position="resumeStyle.spacing.sidebarLeft ? 'left' : 'right'" />
+                    <div class="preview-container">
+                        <div class="preview-header">
+                            <div class="preview-actions">
+                                <v-btn color="primary" prepend-icon="mdi-code-json" class="action-btn"
+                                    @click="exportJSON">Export JSON</v-btn>
+                                <v-btn color="primary" prepend-icon="mdi-upload" class="action-btn"
+                                    @click="importJSON">Import JSON</v-btn>
+                                <v-btn color="primary" prepend-icon="mdi-file-pdf-box" class="action-btn"
+                                    @click="downloadPDF">Download PDF</v-btn>
+                                <v-btn color="primary" prepend-icon="mdi-file-code" class="action-btn"
+                                    @click="downloadHTML">Download HTML</v-btn>
+                            </div>
+                        </div>
+                        <ResumePreview :resume-data="resumeData" :style="resumeStyle"
+                            :sidebar-position="resumeStyle.spacing.sidebarLeft ? 'left' : 'right'" />
+                    </div>
                 </div>
             </div>
         </v-main>
-
-        <!-- Desktop action buttons -->
-        <div v-if="!isMobile" class="desktop-actions">
-            <v-tooltip text="Export JSON" location="top">
-                <template v-slot:activator="{ props }">
-                    <v-btn v-bind="props" icon="mdi-code-json" color="primary" class="mr-2 action-btn" elevation="2"
-                        @click="exportJSON" />
-                </template>
-            </v-tooltip>
-            <v-tooltip text="Import JSON" location="top">
-                <template v-slot:activator="{ props }">
-                    <v-btn v-bind="props" icon="mdi-upload" color="primary" class="mr-2 action-btn" elevation="2"
-                        @click="importJSON" />
-                </template>
-            </v-tooltip>
-            <v-tooltip text="Download as PDF" location="top">
-                <template v-slot:activator="{ props }">
-                    <v-btn v-bind="props" icon="mdi-file-pdf-box" color="primary" class="mr-2 action-btn" elevation="2"
-                        @click="downloadPDF" />
-                </template>
-            </v-tooltip>
-            <v-tooltip text="Download as HTML" location="top">
-                <template v-slot:activator="{ props }">
-                    <v-btn v-bind="props" icon="mdi-file-code" color="primary" class="action-btn" elevation="2"
-                        @click="downloadHTML" />
-                </template>
-            </v-tooltip>
-        </div>
 
         <!-- Mobile action buttons -->
         <div v-if="isMobile" class="mobile-actions">
@@ -102,13 +88,15 @@ const resumeData = ref({
             title: 'Senior Software Engineer',
             company: 'Tech Solutions Inc. - Milan',
             period: '2020 - Present',
-            description: 'Led the development of enterprise-level web applications using Vue.js and Node.js. Implemented CI/CD pipelines and improved application performance by 40%.'
+            description: 'Led the development of enterprise-level web applications using Vue.js and Node.js. Implemented CI/CD pipelines and improved application performance by 40%.',
+            visible: true
         },
         {
             title: 'Full Stack Developer',
             company: 'Digital Innovations - Rome',
             period: '2018 - 2020',
-            description: 'Developed and maintained multiple web applications. Collaborated with UX designers to implement responsive interfaces and improve user experience.'
+            description: 'Developed and maintained multiple web applications. Collaborated with UX designers to implement responsive interfaces and improve user experience.',
+            visible: true
         }
     ],
     experiencesVisible: true,
@@ -118,14 +106,16 @@ const resumeData = ref({
             school: 'University of Milan',
             period: '2016 - 2018',
             mark: '110/110',
-            thesis: 'Advanced Web Development Techniques and Best Practices'
+            thesis: 'Advanced Web Development Techniques and Best Practices',
+            visible: true
         },
         {
             degree: 'Bachelor in Computer Engineering',
             school: 'University of Rome',
             period: '2013 - 2016',
             mark: '108/110',
-            thesis: 'Introduction to Modern Web Technologies'
+            thesis: 'Introduction to Modern Web Technologies',
+            visible: true
         }
     ],
     educationVisible: true,
@@ -544,12 +534,6 @@ const stopResize = () => {
 </script>
 
 <style scoped>
-@media (min-width: 960px) {
-    .v-main {
-        background-color: #e2e8f0;
-    }
-}
-
 .editor-page {
     min-height: 100vh;
 }
@@ -560,23 +544,21 @@ const stopResize = () => {
 
 .editor-content {
     display: flex;
-    height: calc(100vh - 64px);
     position: relative;
     overflow: hidden;
+    background-color: #f5f5f5;
 }
 
 .editor-col {
-    height: 100%;
-    background: #fff;
     transition: all 0.2s ease;
     flex-shrink: 0;
-    border-right: 1px solid rgba(0, 0, 0, 0.06);
 }
 
 .preview-col {
+    position: relative;
     height: 100%;
-    transition: all 0.2s ease;
-    flex-shrink: 0;
+    overflow: auto;
+    transition: width 0.2s ease;
 }
 
 .preview-col.hidden {
@@ -613,7 +595,7 @@ const stopResize = () => {
     width: 2px;
     height: 24px;
     background: rgba(0, 0, 0, 0.1);
-    border-radius: 1px;
+
 }
 
 .download-buttons {
@@ -826,5 +808,39 @@ const stopResize = () => {
     bottom: 0;
     background-color: rgba(0, 0, 0, 0.9);
     z-index: 99;
+}
+
+.preview-container {
+    position: relative;
+    height: 100%;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.preview-header {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 24px;
+}
+
+.preview-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.preview-actions .action-btn {
+    width: auto;
+    min-width: 150px;
+    justify-content: center;
+    text-transform: none;
+    letter-spacing: 0.2px;
+    font-weight: 500;
+    font-size: 0.8rem;
+    height: 36px;
 }
 </style>

@@ -13,24 +13,30 @@
             <h1>{{ resumeData.personal.name || 'Your Name' }}</h1>
             <h2 class="subtitle">{{ resumeData.personal.title }}</h2>
 
-            <div class="section" v-if="resumeData.experiencesVisible && resumeData.experiences.length">
+            <div class="section"
+              v-if="resumeData.experiencesVisible && resumeData.experiences && resumeData.experiences.filter(e => e?.visible).length">
               <h2>Employment History</h2>
               <div v-for="(e, i) in resumeData.experiences" :key="i">
-                <p class="job-title">{{ e.title }} - {{ e.company }}</p>
-                <p class="date">{{ e.period }}</p>
-                <p class="job-desc" v-html="e.description"></p>
+                <template v-if="e?.visible">
+                  <p class="job-title">{{ e.title }} - {{ e.company }}</p>
+                  <p class="date">{{ e.period }}</p>
+                  <p class="job-desc" v-html="e.description"></p>
+                </template>
               </div>
             </div>
 
-            <div class="section" v-if="resumeData.educationVisible && resumeData.education.length">
+            <div class="section"
+              v-if="resumeData.educationVisible && resumeData.education && resumeData.education.filter(e => e?.visible).length">
               <h2>Education</h2>
               <div v-for="(ed, i) in resumeData.education" :key="i">
-                <p class="job-title">{{ ed.degree }} - {{ ed.school }}</p>
-                <div>
-                  <p class="date">{{ ed.period }}</p>
-                  <p class="graduation-mark">{{ ed.mark }}</p>
-                </div>
-                <p class="thesis">{{ ed.thesis }}</p>
+                <template v-if="ed?.visible">
+                  <p class="job-title">{{ ed.degree }} - {{ ed.school }}</p>
+                  <div>
+                    <p class="date">{{ ed.period }}</p>
+                    <p class="graduation-mark">{{ ed.mark }}</p>
+                  </div>
+                  <p class="thesis">{{ ed.thesis }}</p>
+                </template>
               </div>
             </div>
           </div>
