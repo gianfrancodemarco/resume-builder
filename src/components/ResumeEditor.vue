@@ -323,15 +323,15 @@ const local = ref({
 
 // Form data for new items
 const exp = ref({
-  title: '',
-  company: '',
+  title: 'Experience',
+  company: 'Company',
   period: '',
   description: ''
 })
 
 const edu = ref({
-  degree: '',
-  school: '',
+  degree: 'Degree',
+  school: 'Cool School',
   period: '',
   mark: '',
   thesis: ''
@@ -419,17 +419,15 @@ const updateStyle = (newStyle) => {
 
 // Experience methods
 const addExp = () => {
-  if (exp.value.title) {
-    local.value.experiences.push({
-      ...exp.value,
-      visible: true
-    })
-    exp.value = {
-      title: '',
-      company: '',
-      period: '',
-      description: ''
-    }
+  local.value.experiences.push({
+    ...exp.value,
+    visible: true
+  })
+  exp.value = {
+    title: 'Experience',
+    company: 'Company',
+    period: '',
+    description: ''
   }
 }
 
@@ -446,18 +444,16 @@ const removeExp = (index) => {
 
 // Education methods
 const addEdu = () => {
-  if (edu.value.degree) {
-    local.value.education.push({
-      ...edu.value,
-      visible: true
-    })
-    edu.value = {
-      degree: '',
-      school: '',
-      period: '',
-      mark: '',
-      thesis: ''
-    }
+  local.value.education.push({
+    ...edu.value,
+    visible: true
+  })
+  edu.value = {
+    degree: 'Degree',
+    school: 'Cool School',
+    period: '',
+    mark: '',
+    thesis: ''
   }
 }
 
