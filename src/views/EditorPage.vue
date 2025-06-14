@@ -15,13 +15,13 @@
                         <div class="preview-header">
                             <div class="preview-actions">
                                 <v-btn color="primary" prepend-icon="mdi-code-json" class="action-btn"
-                                    @click="exportJSON">Export JSON</v-btn>
+                                    @click="handleExportJSON">Export JSON</v-btn>
                                 <v-btn color="primary" prepend-icon="mdi-upload" class="action-btn"
-                                    @click="importJSON">Import JSON</v-btn>
+                                    @click="handleImportJSON">Import JSON</v-btn>
                                 <v-btn color="primary" prepend-icon="mdi-file-pdf-box" class="action-btn"
-                                    @click="downloadPDF">Download PDF</v-btn>
+                                    @click="handleDownloadPDF">Download PDF</v-btn>
                                 <v-btn color="primary" prepend-icon="mdi-file-code" class="action-btn"
-                                    @click="downloadHTML">Download HTML</v-btn>
+                                    @click="handleDownloadHTML">Download HTML</v-btn>
                             </div>
                         </div>
                         <ResumePreview :resume-data="resumeData" :style="resumeStyle"
@@ -40,20 +40,22 @@
                 </div>
                 <div class="action-item">
                     <span class="action-label">Export JSON</span>
-                    <v-btn icon="mdi-code-json" color="primary" @click="exportJSON" class="action-btn" elevation="2" />
+                    <v-btn icon="mdi-code-json" color="primary" @click="handleExportJSON" class="action-btn"
+                        elevation="2" />
                 </div>
                 <div class="action-item">
                     <span class="action-label">Import JSON</span>
-                    <v-btn icon="mdi-upload" color="primary" @click="importJSON" class="action-btn" elevation="2" />
+                    <v-btn icon="mdi-upload" color="primary" @click="handleImportJSON" class="action-btn"
+                        elevation="2" />
                 </div>
                 <div class="action-item">
                     <span class="action-label">Download PDF</span>
-                    <v-btn icon="mdi-file-pdf-box" color="primary" @click="downloadPDF" class="action-btn"
+                    <v-btn icon="mdi-file-pdf-box" color="primary" @click="handleDownloadPDF" class="action-btn"
                         elevation="2" />
                 </div>
                 <div class="action-item">
                     <span class="action-label">Download HTML</span>
-                    <v-btn icon="mdi-file-code" color="primary" @click="downloadHTML" class="action-btn"
+                    <v-btn icon="mdi-file-code" color="primary" @click="handleDownloadHTML" class="action-btn"
                         elevation="2" />
                 </div>
             </div>
@@ -469,21 +471,33 @@ const toggleActions = () => {
 
 const handleExportJSON = () => {
     drawer.value = false
+    if (window.sa_event) {
+        window.sa_event('export_json')
+    }
     exportJSON()
 }
 
 const handleImportJSON = () => {
     drawer.value = false
+    if (window.sa_event) {
+        window.sa_event('import_json')
+    }
     importJSON()
 }
 
 const handleDownloadPDF = () => {
     drawer.value = false
+    if (window.sa_event) {
+        window.sa_event('download_pdf')
+    }
     downloadPDF()
 }
 
 const handleDownloadHTML = () => {
     drawer.value = false
+    if (window.sa_event) {
+        window.sa_event('download_html')
+    }
     downloadHTML()
 }
 
