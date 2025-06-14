@@ -26,8 +26,10 @@
               <h2>Education</h2>
               <div v-for="(ed, i) in resumeData.education" :key="i">
                 <p class="job-title">{{ ed.degree }} - {{ ed.school }}</p>
-                <p class="date">{{ ed.period }}</p>
-                <p class="graduation-mark">{{ ed.mark }}</p>
+                <div>
+                  <p class="date">{{ ed.period }}</p>
+                  <p class="graduation-mark">{{ ed.mark }}</p>
+                </div>
                 <p class="thesis">{{ ed.thesis }}</p>
               </div>
             </div>
@@ -110,7 +112,6 @@ export default {
 #printable-area {
   margin: auto;
   width: 210mm;
-  min-height: 297mm;
   padding: 0;
   background-color: black !important;
 }
@@ -258,6 +259,18 @@ export default {
 .content strong,
 .content span {
   color: var(--text-color);
+}
+
+.content h1,
+.content h2 {
+  font-family: var(--heading-font);
+  color: var(--primary-color);
+}
+
+.content p,
+.content .job-desc,
+.content strong,
+.content span {
   font-family: var(--body-font);
 }
 

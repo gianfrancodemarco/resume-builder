@@ -1,65 +1,81 @@
 <template>
     <v-app>
-        <v-app-bar v-if="$vuetify.display.smAndDown" elevation="0" class="px-4 gradient-navbar custom-navbar">
-            <v-btn icon="mdi-menu" color="white" variant="text" class="mobile-menu-btn" @click="toggleDrawer" />
-        </v-app-bar>
-
-        <v-navigation-drawer v-model="drawer" app temporary>
-            <v-list>
-                <v-list-item @click="handleExportJSON" prepend-icon="mdi-code-json" title="Export JSON"></v-list-item>
-                <v-list-item @click="handleImportJSON" prepend-icon="mdi-upload" title="Import JSON"></v-list-item>
-                <v-list-item @click="handleDownloadPDF" prepend-icon="mdi-file-pdf-box"
-                    title="Download PDF"></v-list-item>
-                <v-list-item @click="handleDownloadHTML" prepend-icon="mdi-file-code"
-                    title="Download HTML"></v-list-item>
-            </v-list>
-        </v-navigation-drawer>
-
         <v-main>
-            <div class="editor-content pa-4" :class="{ 'mobile-view': isMobile }">
-                <div class="editor-col"
-                    :style="isMobile ? { height: `${editorHeight}%` } : { width: `${editorWidth}%` }">
+            <div class="editor-content" :class="{ 'mobile-view': isMobile, 'pa-4': !isMobile }">
+                <div class="editor-col" :style="isMobile ? { width: '100%' } : { width: `${editorWidth}%` }">
                     <ResumeEditor v-model:resume-data="resumeData" v-model:style="resumeStyle" @save="handleFormSave"
-                        @change="handleFormChange" />
+                        @change="handleFormChange" :is-mobile="isMobile" @preview="toggleActions" />
                 </div>
-                <div class="resize-handle" @mousedown.prevent="startResize" @touchstart.prevent="startResize"
-                    @touchmove.prevent="handleResize" @touchend.prevent="stopResize">
+                <div v-if="!isMobile" class="resize-handle" @mousedown.prevent="startResize"
+                    @touchstart.prevent="startResize" @touchmove.prevent="handleResize" @touchend.prevent="stopResize">
                 </div>
-                <div class="preview-col"
-                    :style="isMobile ? { height: `${100 - editorHeight}%` } : { width: `${100 - editorWidth}%` }">
+                <div class="preview-col" :class="{ 'hidden': isMobile }"
+                    :style="!isMobile ? { width: `${100 - editorWidth}%` } : {}">
                     <ResumePreview :resume-data="resumeData" :style="resumeStyle"
                         :sidebar-position="resumeStyle.spacing.sidebarLeft ? 'left' : 'right'" />
                 </div>
             </div>
         </v-main>
 
-        <!-- Desktop download buttons -->
-        <div class="download-buttons" v-if="!$vuetify.display.smAndDown">
+        <!-- Desktop action buttons -->
+        <div v-if="!isMobile" class="desktop-actions">
             <v-tooltip text="Export JSON" location="top">
                 <template v-slot:activator="{ props }">
-                    <v-btn v-bind="props" icon="mdi-code-json" color="white" @click="exportJSON"
-                        class="mr-2 download-btn" elevation="2" />
+                    <v-btn v-bind="props" icon="mdi-code-json" color="primary" class="mr-2 action-btn" elevation="2"
+                        @click="exportJSON" />
                 </template>
             </v-tooltip>
             <v-tooltip text="Import JSON" location="top">
                 <template v-slot:activator="{ props }">
-                    <v-btn v-bind="props" icon="mdi-upload" color="white" @click="importJSON" class="mr-2 download-btn"
-                        elevation="2" />
+                    <v-btn v-bind="props" icon="mdi-upload" color="primary" class="mr-2 action-btn" elevation="2"
+                        @click="importJSON" />
                 </template>
             </v-tooltip>
             <v-tooltip text="Download as PDF" location="top">
                 <template v-slot:activator="{ props }">
-                    <v-btn v-bind="props" icon="mdi-file-pdf-box" color="white" @click="downloadPDF"
-                        class="mr-2 download-btn" elevation="2" />
+                    <v-btn v-bind="props" icon="mdi-file-pdf-box" color="primary" class="mr-2 action-btn" elevation="2"
+                        @click="downloadPDF" />
                 </template>
             </v-tooltip>
             <v-tooltip text="Download as HTML" location="top">
                 <template v-slot:activator="{ props }">
-                    <v-btn v-bind="props" icon="mdi-file-code" color="white" @click="downloadHTML" class="download-btn"
-                        elevation="2" />
+                    <v-btn v-bind="props" icon="mdi-file-code" color="primary" class="action-btn" elevation="2"
+                        @click="downloadHTML" />
                 </template>
             </v-tooltip>
         </div>
+
+        <!-- Mobile action buttons -->
+        <div v-if="isMobile" class="mobile-actions">
+            <div v-if="showActions" class="action-buttons">
+                <div class="action-item">
+                    <span class="action-label">Close this menu</span>
+                    <v-btn icon="mdi-close" color="white" class="action-btn" elevation="2" @click="toggleActions" />
+                </div>
+                <div class="action-item">
+                    <span class="action-label">Export JSON</span>
+                    <v-btn icon="mdi-code-json" color="primary" @click="exportJSON" class="action-btn" elevation="2" />
+                </div>
+                <div class="action-item">
+                    <span class="action-label">Import JSON</span>
+                    <v-btn icon="mdi-upload" color="primary" @click="importJSON" class="action-btn" elevation="2" />
+                </div>
+                <div class="action-item">
+                    <span class="action-label">Download PDF</span>
+                    <v-btn icon="mdi-file-pdf-box" color="primary" @click="downloadPDF" class="action-btn"
+                        elevation="2" />
+                </div>
+                <div class="action-item">
+                    <span class="action-label">Download HTML</span>
+                    <v-btn icon="mdi-file-code" color="primary" @click="downloadHTML" class="action-btn"
+                        elevation="2" />
+                </div>
+            </div>
+            <v-btn icon="mdi-lightning-bolt" color="primary" class="action-btn" elevation="2" @click="toggleActions" />
+        </div>
+
+        <!-- Mobile overlay -->
+        <div v-if="isMobile && showActions" class="mobile-overlay" @click="toggleActions"></div>
 
         <!-- Hidden file input for JSON import -->
         <input type="file" ref="fileInput" style="display: none" accept=".json" @change="handleFileUpload" />
@@ -197,7 +213,7 @@ const fileInput = ref(null)
 // Add drawer ref for mobile menu
 const drawer = ref(false)
 
-const showMobileMenu = ref(false)
+const showActions = ref(false)
 const hasUnsavedChanges = ref(false)
 const editorWidth = ref(35)
 const editorHeight = ref(50)
@@ -212,6 +228,14 @@ onMounted(() => {
     window.addEventListener('touchmove', handleResize)
     window.addEventListener('mouseup', stopResize)
     window.addEventListener('touchend', stopResize)
+
+    // Set initial scale to 75%
+    const printableArea = document.getElementById('printable-area')
+    if (printableArea) {
+        printableArea.style.transform = 'scale(0.75)'
+        printableArea.style.transformOrigin = 'center top'
+        printableArea.style.margin = '0 auto'
+    }
 })
 
 // Remove event listener when component is destroyed
@@ -268,6 +292,11 @@ const downloadPDF = async () => {
     const srcEl = document.getElementById('printable-area').cloneNode(true)
     if (!srcEl) return
 
+    // Remove any scaling and centering styles
+    srcEl.style.transform = 'none'
+    srcEl.style.transformOrigin = 'initial'
+    srcEl.style.margin = '0'
+
     const filename = getFilename('pdf')
     var printWindow = window.open('', filename)
     printWindow.document.title = filename
@@ -294,7 +323,6 @@ const downloadPDF = async () => {
             //printWindow.close()
         }, 0) // Safari needs time to render layout
     })
-
 }
 
 const downloadHTML = async () => {
@@ -440,8 +468,8 @@ const handleFileUpload = (event) => {
     event.target.value = ''
 }
 
-const toggleDrawer = () => {
-    drawer.value = !drawer.value
+const toggleActions = () => {
+    showActions.value = !showActions.value
 }
 
 const handleExportJSON = () => {
@@ -476,6 +504,14 @@ const handleResize = (e) => {
     const container = document.querySelector('.editor-content')
     if (!container) return
 
+    // Calculate scale based on editor width - inverse relationship
+    const printableArea = document.getElementById('printable-area')
+    if (printableArea) {
+        const scale = 0.75 * (1 - (editorWidth.value - 35) / 100) // Decrease scale as editor width increases
+        printableArea.style.transform = `scale(${Math.max(0.35, scale)})`
+        printableArea.style.transformOrigin = 'center top'
+    }
+
     if (isMobile.value) {
         // Handle vertical resize for mobile
         const containerRect = container.getBoundingClientRect()
@@ -492,7 +528,7 @@ const handleResize = (e) => {
 
         if (clientX) {
             const newWidth = ((clientX - containerRect.left) / containerRect.width) * 100
-            editorWidth.value = Math.min(Math.max(newWidth, 20), 80) // Limit between 20% and 80%
+            editorWidth.value = Math.max(35, Math.min(newWidth, 60)) // Minimum 35%, maximum 80%
         }
     }
 }
@@ -503,8 +539,10 @@ const stopResize = () => {
 </script>
 
 <style scoped>
-.v-main {
-    background-color: #e2e8f0;
+@media (min-width: 960px) {
+    .v-main {
+        background-color: #e2e8f0;
+    }
 }
 
 .editor-page {
@@ -520,12 +558,10 @@ const stopResize = () => {
     height: calc(100vh - 64px);
     position: relative;
     overflow: hidden;
-
 }
 
 .editor-col {
     height: 100%;
-    overflow-y: auto;
     background: #fff;
     transition: all 0.2s ease;
     flex-shrink: 0;
@@ -534,9 +570,17 @@ const stopResize = () => {
 
 .preview-col {
     height: 100%;
-    overflow-y: auto;
     transition: all 0.2s ease;
     flex-shrink: 0;
+}
+
+.preview-col.hidden {
+    position: absolute;
+    visibility: hidden;
+    pointer-events: none;
+    width: 0;
+    height: 0;
+    overflow: hidden;
 }
 
 .resize-handle {
@@ -699,5 +743,83 @@ const stopResize = () => {
         width: 40px;
         height: 40px;
     }
+}
+
+.desktop-actions {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    display: flex;
+    gap: 8px;
+    z-index: 100;
+}
+
+.desktop-btn {
+    background: linear-gradient(135deg, #0f2027 0%, #2c5364 100%) !important;
+    color: white !important;
+}
+
+.desktop-btn:hover {
+    background: linear-gradient(135deg, #1a2c35 0%, #3c6374 100%) !important;
+    transform: translateY(-2px);
+}
+
+.mobile-actions {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 12px;
+    z-index: 100;
+}
+
+.action-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-end;
+}
+
+.action-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.action-label {
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 14px;
+    white-space: nowrap;
+}
+
+.action-btn {
+    width: 48px !important;
+    height: 48px !important;
+    transition: all 0.2s ease;
+}
+
+.action-btn:hover {
+    transform: translateY(-2px);
+}
+
+.actions-btn {
+    font-size: 1rem;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+}
+
+.mobile-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.9);
+    z-index: 99;
 }
 </style>
