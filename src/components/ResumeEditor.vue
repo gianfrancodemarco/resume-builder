@@ -1,12 +1,10 @@
 <template>
-  <div class="editor-card">
+  <div class="editor-card pt-8">
     <v-tabs v-model="activeTab" color="primary" class="editor-tabs">
       <v-tab value="info">
-        <v-icon icon="mdi-account" class="mr-2" />
         Info
       </v-tab>
       <v-tab value="style">
-        <v-icon icon="mdi-palette" class="mr-2" />
         Style
       </v-tab>
     </v-tabs>
@@ -21,38 +19,54 @@
         <v-expansion-panels class="editor-panels" multiple>
           <v-expansion-panel class="editor-panel">
             <v-expansion-panel-title class="panel-title">
-              <v-icon icon="mdi-briefcase" class="mr-2" />
-              Experience
+              <div class="d-flex align-center w-100">
+                <span class="section-title">
+                  Experience
+                  <v-icon :icon="local.experiencesVisible ? 'mdi-eye' : 'mdi-eye-off'" size="small"
+                    class="visibility-icon" @click.stop="local.experiencesVisible = !local.experiencesVisible" />
+                </span>
+              </div>
             </v-expansion-panel-title>
             <v-expansion-panel-text>
-              <div class="d-flex justify-end mb-4">
-                <v-switch v-model="local.experiencesVisible" label="Show section" hide-details density="compact"
-                  color="primary" />
-              </div>
-
               <v-expansion-panels>
-                <v-expansion-panel v-for="(exp, index) in local.experiences" :key="index"
-                  class="mb-4 experience-card pa-3">
+                <v-expansion-panel v-for="(exp, index) in local.experiences" :key="index" class="mb-4 experience-card">
                   <v-expansion-panel-title>
-                    {{ exp.title }} - {{ exp.company }}
-                    <v-btn icon="mdi-delete" color="error" variant="text" @click="removeExp(index)" class="ml-2"
-                      :disabled="!local.experiencesVisible" />
+                    <div class="d-flex align-center w-100">
+                      <span class="section-title">
+                        {{ exp.title }} - {{ exp.company }}
+                        <v-icon :icon="local.experiences[index].visible ? 'mdi-eye' : 'mdi-eye-off'" size="small"
+                          class="visibility-icon"
+                          @click.stop="local.experiences[index].visible = !local.experiences[index].visible" />
+                        <v-tooltip location="top">
+                          <template v-slot:activator="{ props }">
+                            <v-icon v-bind="props"
+                              :icon="deleteConfirmState[`exp-${index}`] ? 'mdi-check' : 'mdi-delete'" size="small"
+                              class="delete-icon" @click.stop="removeExp(index)"
+                              :disabled="!local.experiencesVisible" />
+                          </template>
+                          {{ deleteConfirmState[`exp-${index}`] ? 'Confirm delete' : 'Delete experience' }}
+                        </v-tooltip>
+                      </span>
+                    </div>
                   </v-expansion-panel-title>
                   <v-expansion-panel-text>
                     <div class="d-flex align-center mb-2">
                       <v-text-field v-model="local.experiences[index].title" label="Job title"
-                        :disabled="!local.experiencesVisible" variant="outlined" density="comfortable" />
+                        :disabled="!local.experiencesVisible || !local.experiences[index].visible" variant="outlined"
+                        density="comfortable" />
                     </div>
                     <v-text-field v-model="local.experiences[index].company" label="Company (+ location)"
-                      :disabled="!local.experiencesVisible" variant="outlined" density="comfortable" class="mb-2" />
+                      :disabled="!local.experiencesVisible || !local.experiences[index].visible" variant="outlined"
+                      density="comfortable" class="mb-2" />
                     <v-text-field v-model="local.experiences[index].period" label="Period"
-                      :disabled="!local.experiencesVisible" variant="outlined" density="comfortable" class="mb-2" />
+                      :disabled="!local.experiencesVisible || !local.experiences[index].visible" variant="outlined"
+                      density="comfortable" class="mb-2" />
                     <v-textarea v-model="local.experiences[index].description" label="Description"
-                      :disabled="!local.experiencesVisible" variant="outlined" density="comfortable" />
+                      :disabled="!local.experiencesVisible || !local.experiences[index].visible" variant="outlined"
+                      density="comfortable" />
                   </v-expansion-panel-text>
                 </v-expansion-panel>
               </v-expansion-panels>
-
               <v-btn color="primary" @click="addExp" :disabled="!local.experiencesVisible" prepend-icon="mdi-plus">Add
                 Experience</v-btn>
             </v-expansion-panel-text>
@@ -60,37 +74,54 @@
 
           <v-expansion-panel class="editor-panel">
             <v-expansion-panel-title class="panel-title">
-              <v-icon icon="mdi-school" class="mr-2" />
-              Education
+              <div class="d-flex align-center w-100">
+                <span class="section-title">
+                  Education
+                  <v-icon :icon="local.educationVisible ? 'mdi-eye' : 'mdi-eye-off'" size="small"
+                    class="visibility-icon" @click.stop="local.educationVisible = !local.educationVisible" />
+                </span>
+              </div>
             </v-expansion-panel-title>
             <v-expansion-panel-text>
-              <div class="d-flex justify-end mb-4">
-                <v-switch v-model="local.educationVisible" label="Show section" hide-details density="compact"
-                  color="primary" />
-              </div>
               <v-expansion-panels>
-                <v-expansion-panel v-for="(edu, index) in local.education" :key="index"
-                  class="mb-4 education-card pa-3">
+                <v-expansion-panel v-for="(edu, index) in local.education" :key="index" class="mb-4 education-card">
                   <v-expansion-panel-title>
-                    {{ edu.degree }} - {{ edu.school }}
-                    <v-btn icon="mdi-delete" color="error" variant="text" @click="removeEdu(index)" class="ml-2"
-                      :disabled="!local.educationVisible" />
+                    <div class="d-flex align-center w-100">
+                      <span class="section-title">
+                        {{ edu.degree }} - {{ edu.school }}
+                        <v-icon :icon="local.education[index].visible ? 'mdi-eye' : 'mdi-eye-off'" size="small"
+                          class="visibility-icon"
+                          @click.stop="local.education[index].visible = !local.education[index].visible" />
+                        <v-tooltip location="top">
+                          <template v-slot:activator="{ props }">
+                            <v-icon v-bind="props"
+                              :icon="deleteConfirmState[`edu-${index}`] ? 'mdi-check' : 'mdi-delete'" size="small"
+                              class="delete-icon" @click.stop="removeEdu(index)" :disabled="!local.educationVisible" />
+                          </template>
+                          {{ deleteConfirmState[`edu-${index}`] ? 'Confirm delete' : 'Delete education' }}
+                        </v-tooltip>
+                      </span>
+                    </div>
                   </v-expansion-panel-title>
                   <v-expansion-panel-text>
                     <v-text-field v-model="local.education[index].degree" label="Degree"
-                      :disabled="!local.educationVisible" variant="outlined" density="comfortable" />
+                      :disabled="!local.educationVisible || !local.education[index].visible" variant="outlined"
+                      density="comfortable" />
                     <v-text-field v-model="local.education[index].school" label="School"
-                      :disabled="!local.educationVisible" variant="outlined" density="comfortable" class="mb-2" />
+                      :disabled="!local.educationVisible || !local.education[index].visible" variant="outlined"
+                      density="comfortable" class="mb-2" />
                     <v-text-field v-model="local.education[index].period" label="Period"
-                      :disabled="!local.educationVisible" variant="outlined" density="comfortable" class="mb-2" />
+                      :disabled="!local.educationVisible || !local.education[index].visible" variant="outlined"
+                      density="comfortable" class="mb-2" />
                     <v-text-field v-model="local.education[index].mark" label="Grade"
-                      :disabled="!local.educationVisible" variant="outlined" density="comfortable" class="mb-2" />
+                      :disabled="!local.educationVisible || !local.education[index].visible" variant="outlined"
+                      density="comfortable" class="mb-2" />
                     <v-textarea v-model="local.education[index].thesis" label="Thesis / Notes"
-                      :disabled="!local.educationVisible" variant="outlined" density="comfortable" />
+                      :disabled="!local.educationVisible || !local.education[index].visible" variant="outlined"
+                      density="comfortable" />
                   </v-expansion-panel-text>
                 </v-expansion-panel>
               </v-expansion-panels>
-
               <v-btn color="primary" @click="addEdu" :disabled="!local.educationVisible" prepend-icon="mdi-plus">Add
                 Education</v-btn>
             </v-expansion-panel-text>
@@ -99,23 +130,46 @@
           <template v-for="(section, index) in local.customSections" :key="index">
             <v-expansion-panel class="editor-panel">
               <v-expansion-panel-title class="panel-title">
-                <v-icon icon="mdi-plus-circle" class="mr-2" />
-                {{ section.title }}
+                <div class="d-flex align-center w-100">
+                  <span v-if="!editingSectionTitle[index]" class="section-title">
+                    {{ section.title }}
+                    <v-tooltip location="top">
+                      <template v-slot:activator="{ props }">
+                        <v-icon v-bind="props" icon="mdi-pencil" size="small" class="edit-icon"
+                          @click.stop="startEditingTitle(index)" />
+                      </template>
+                      Edit section title
+                    </v-tooltip>
+                    <v-tooltip location="top">
+                      <template v-slot:activator="{ props }">
+                        <v-icon v-bind="props" :icon="local.customSections[index].visible ? 'mdi-eye' : 'mdi-eye-off'"
+                          size="small" class="visibility-icon"
+                          @click.stop="local.customSections[index].visible = !local.customSections[index].visible" />
+                      </template>
+                      {{ local.customSections[index].visible ? 'Hide section' : 'Show section' }}
+                    </v-tooltip>
+                    <v-tooltip location="top">
+                      <template v-slot:activator="{ props }">
+                        <v-icon v-bind="props" :icon="deleteConfirmState[index] ? 'mdi-check' : 'mdi-delete'"
+                          size="small" class="delete-icon" @click.stop="removeCustomSection(index)"
+                          :disabled="!local.customSections[index].visible" />
+                      </template>
+                      {{ deleteConfirmState[index] ? 'Confirm delete' : 'Delete section' }}
+                    </v-tooltip>
+                  </span>
+                  <v-text-field v-else v-model="local.customSections[index].title" variant="plain" density="compact"
+                    hide-details class="title-edit-field" @blur="stopEditingTitle(index)"
+                    @keyup.enter="stopEditingTitle(index)" @keyup.esc="cancelEditingTitle(index)" ref="titleField" />
+                </div>
               </v-expansion-panel-title>
               <v-expansion-panel-text>
                 <div class="d-flex align-center mb-2">
-                  <v-text-field v-model="local.customSections[index].title" label="Section Title"
-                    :disabled="!local.customSections[index].visible" variant="outlined" density="comfortable"
-                    class="mr-2" />
+
                   <v-select v-model="local.customSections[index].type" :items="sectionTypes" label="Type"
                     :disabled="!local.customSections[index].visible" variant="outlined" density="comfortable"
                     class="mr-2" style="max-width: 200px;"
                     @update:model-value="(val) => handleSectionTypeChange(local.customSections[index], val)"
                     item-title="label" item-value="value" />
-                  <v-switch v-model="local.customSections[index].visible" label="Show section" hide-details
-                    density="compact" color="primary" class="mr-2" />
-                  <v-btn icon="mdi-delete" color="error" variant="text" @click="removeCustomSection(index)" class="ml-2"
-                    :disabled="!local.customSections[index].visible" />
                 </div>
 
                 <template v-if="section.type === 'languages'">
@@ -221,7 +275,7 @@
 </template>
 
 <script setup>
-import { ref, watch, computed } from 'vue'
+import { ref, watch, computed, nextTick, onMounted, onUnmounted } from 'vue'
 import ResumeStyle from './ResumeStyle.vue'
 
 const props = defineProps({
@@ -250,15 +304,21 @@ const local = ref({
     title: props.resumeData.personal.title || '',
     visible: props.resumeData.personal.visible || true
   },
-  experiences: props.resumeData.experiences || [],
-  experiencesVisible: props.resumeData.experiencesVisible || true,
-  education: props.resumeData.education || [],
-  educationVisible: props.resumeData.educationVisible || true,
+  experiences: (props.resumeData.experiences || []).map(exp => ({
+    ...exp,
+    visible: exp.visible === undefined ? true : exp.visible
+  })),
+  experiencesVisible: props.resumeData.experiencesVisible !== false,
+  education: (props.resumeData.education || []).map(edu => ({
+    ...edu,
+    visible: edu.visible === undefined ? true : edu.visible
+  })),
+  educationVisible: props.resumeData.educationVisible !== false,
   customSections: (props.resumeData.customSections || []).map(section => ({
     ...section,
-    visible: section.visible !== undefined ? section.visible : true
+    visible: section.visible === undefined ? true : section.visible
   })),
-  customSectionsVisible: props.resumeData.customSectionsVisible || true
+  customSectionsVisible: props.resumeData.customSectionsVisible !== false
 })
 
 // Form data for new items
@@ -303,12 +363,45 @@ const fonts = [
   'Source Sans Pro'
 ]
 
+const editingSectionTitle = ref({})
+
+// Add new ref for tracking delete confirmation state
+const deleteConfirmState = ref({})
+
+// Add click outside handler
+const handleClickOutside = (event) => {
+  // Reset all confirmation states
+  Object.keys(deleteConfirmState.value).forEach(key => {
+    deleteConfirmState.value[key] = false
+  })
+}
+
+// Add mounted and unmounted hooks
+onMounted(() => {
+  document.addEventListener('click', handleClickOutside)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('click', handleClickOutside)
+})
+
 // Watch for changes and emit updates
 watch(local, (newValue) => {
-  emit('update:resumeData', {
+  const updatedData = {
     ...newValue,
-    customSectionsVisible: newValue.customSectionsVisible
-  })
+    experiences: newValue.experiences.map(exp => ({
+      ...exp,
+      visible: exp.visible === undefined ? true : exp.visible
+    })),
+    education: newValue.education.map(edu => ({
+      ...edu,
+      visible: edu.visible === undefined ? true : edu.visible
+    })),
+    experiencesVisible: newValue.experiencesVisible !== false,
+    educationVisible: newValue.educationVisible !== false,
+    customSectionsVisible: newValue.customSectionsVisible !== false
+  }
+  emit('update:resumeData', updatedData)
   emit('change')
 }, { deep: true })
 
@@ -327,7 +420,10 @@ const updateStyle = (newStyle) => {
 // Experience methods
 const addExp = () => {
   if (exp.value.title) {
-    local.value.experiences.push({ ...exp.value })
+    local.value.experiences.push({
+      ...exp.value,
+      visible: true
+    })
     exp.value = {
       title: '',
       company: '',
@@ -338,13 +434,23 @@ const addExp = () => {
 }
 
 const removeExp = (index) => {
+  if (!deleteConfirmState.value[`exp-${index}`]) {
+    // First click - show confirmation
+    deleteConfirmState.value[`exp-${index}`] = true
+    return
+  }
+  // Second click - actually delete
   local.value.experiences.splice(index, 1)
+  deleteConfirmState.value[`exp-${index}`] = false
 }
 
 // Education methods
 const addEdu = () => {
   if (edu.value.degree) {
-    local.value.education.push({ ...edu.value })
+    local.value.education.push({
+      ...edu.value,
+      visible: true
+    })
     edu.value = {
       degree: '',
       school: '',
@@ -356,7 +462,14 @@ const addEdu = () => {
 }
 
 const removeEdu = (index) => {
+  if (!deleteConfirmState.value[`edu-${index}`]) {
+    // First click - show confirmation
+    deleteConfirmState.value[`edu-${index}`] = true
+    return
+  }
+  // Second click - actually delete
   local.value.education.splice(index, 1)
+  deleteConfirmState.value[`edu-${index}`] = false
 }
 
 // Custom section methods
@@ -370,7 +483,14 @@ const addCustomSection = () => {
 }
 
 const removeCustomSection = (index) => {
+  if (!deleteConfirmState.value[index]) {
+    // First click - show confirmation
+    deleteConfirmState.value[index] = true
+    return
+  }
+  // Second click - actually delete
   local.value.customSections.splice(index, 1)
+  deleteConfirmState.value[index] = false
 }
 
 const handleSectionTypeChange = (section, newType) => {
@@ -468,25 +588,45 @@ const colorTooltip = (color) => {
 const colorPreview = (color) => {
   return color.toUpperCase()
 }
+
+const startEditingTitle = (index) => {
+  editingSectionTitle.value[index] = true
+  // Wait for the next tick to focus the input
+  nextTick(() => {
+    const input = document.querySelector(`.title-edit-field input`)
+    if (input) {
+      input.focus()
+      input.select()
+    }
+  })
+}
+
+const stopEditingTitle = (index) => {
+  editingSectionTitle.value[index] = false
+}
+
+const cancelEditingTitle = (index) => {
+  // Restore the original title
+  local.value.customSections[index].title = props.resumeData.customSections[index].title
+  editingSectionTitle.value[index] = false
+}
 </script>
 
 <style scoped>
 .editor-card {
-  height: 100%;
   background-color: white;
+  height: 100%;
   display: flex;
   flex-direction: column;
-  border-radius: 12px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  box-shadow: 3px 3px 3px 3px rgba(0, 0, 0, 0.2);
 }
 
 .editor-tabs {
-  margin: 0 12px;
+  margin: 10px 20px;
   position: sticky;
   top: 0;
   z-index: 2;
-  background-color: white;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  border-bottom: 2px solid rgba(0, 0, 0, 0.06);
   padding: 4px 0;
 }
 
@@ -515,10 +655,17 @@ const colorPreview = (color) => {
 }
 
 :deep(.panel-title) {
-  font-weight: 500;
+  font-family: 'Roboto';
+  font-weight: 600;
   color: rgba(0, 0, 0, 0.87);
-  padding: 12px 16px;
-  font-size: 0.95rem;
+  padding: 16px 20px;
+  font-size: 1.2rem;
+  letter-spacing: 0.3px;
+}
+
+:deep(.panel-title .section-title) {
+  font-size: 1.2rem;
+  font-weight: 600;
 }
 
 :deep(.v-expansion-panel-text__wrapper) {
@@ -527,17 +674,10 @@ const colorPreview = (color) => {
 
 .experience-card,
 .education-card {
-  background-color: #f8fafc;
   border-radius: 6px;
   border: 1px solid rgba(0, 0, 0, 0.06);
   transition: all 0.2s ease;
   margin-bottom: 8px;
-  padding: 12px !important;
-}
-
-.experience-card:hover,
-.education-card:hover {
-  background-color: #f1f5f9;
 }
 
 :deep(.v-field) {
@@ -556,11 +696,12 @@ const colorPreview = (color) => {
 
 :deep(.v-btn) {
   border-radius: 6px;
-  font-weight: 500;
+  font-weight: 600;
   text-transform: none;
-  letter-spacing: 0.2px;
+  letter-spacing: 0.3px;
   transition: all 0.2s ease;
-  height: 36px;
+  height: 40px;
+  font-size: 1rem;
 }
 
 :deep(.v-btn--icon) {
@@ -577,9 +718,9 @@ const colorPreview = (color) => {
 
 :deep(.v-tab) {
   text-transform: none;
-  font-weight: 500;
-  letter-spacing: 0.2px;
-  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  font-size: 1.1rem;
 }
 
 :deep(.v-tab--selected) {
@@ -595,18 +736,19 @@ const colorPreview = (color) => {
 }
 
 :deep(.v-text-field .v-field__input) {
-  padding-top: 8px;
-  padding-bottom: 8px;
-  font-size: 0.9rem;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  font-size: 1rem;
 }
 
 :deep(.v-textarea .v-field__input) {
-  min-height: 80px;
-  font-size: 0.9rem;
+  min-height: 100px;
+  font-size: 1rem;
 }
 
 :deep(.v-field__label) {
-  font-size: 0.85rem;
+  font-size: 0.95rem;
+  font-weight: 500;
 }
 
 :deep(.v-field--variant-outlined .v-field__outline) {
@@ -614,7 +756,7 @@ const colorPreview = (color) => {
 }
 
 :deep(.v-expansion-panel-text) {
-  font-size: 0.9rem;
+  font-size: 1rem;
 }
 
 .detail-card {
@@ -819,5 +961,84 @@ const colorPreview = (color) => {
 .action-btn {
   width: 200px;
   justify-content: center;
+}
+
+.section-title {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  font-weight: 600;
+}
+
+.edit-icon,
+.visibility-icon,
+.delete-icon {
+  opacity: 0;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  color: rgba(0, 0, 0, 0.4);
+  margin-left: 8px;
+}
+
+/* Desktop styles */
+@media (min-width: 601px) {
+
+  .section-title .edit-icon,
+  .section-title .visibility-icon,
+  .section-title .delete-icon {
+    opacity: 0;
+  }
+
+  .editor-panel:hover .section-title .edit-icon,
+  .editor-panel:hover .section-title .visibility-icon,
+  .editor-panel:hover .section-title .delete-icon {
+    opacity: 0.6;
+  }
+}
+
+/* Mobile styles */
+@media (max-width: 600px) {
+
+  .section-title .edit-icon,
+  .section-title .visibility-icon,
+  .section-title .delete-icon {
+    opacity: 0.6;
+  }
+}
+
+.section-title .edit-icon:hover,
+.section-title .visibility-icon:hover {
+  opacity: 1;
+  color: rgb(var(--v-theme-primary));
+}
+
+.section-title .delete-icon:hover {
+  opacity: 1;
+  color: rgb(var(--v-theme-error));
+}
+
+.section-title .delete-icon[disabled] {
+  opacity: 0.2;
+  cursor: not-allowed;
+}
+
+.title-edit-field {
+  margin: -8px 0;
+}
+
+:deep(.title-edit-field .v-field__input) {
+  padding: 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.87);
+}
+
+:deep(.title-edit-field .v-field__outline) {
+  display: none;
+}
+
+/* Add styles for confirmation state */
+.delete-icon[data-confirm="true"] {
+  color: rgb(var(--v-theme-error));
 }
 </style>
