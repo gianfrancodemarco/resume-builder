@@ -314,13 +314,18 @@ const downloadPDF = async () => {
             background: white !important;
             box-sizing: border-box;
         }
+
+        * {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
     `
     printWindow.document.head.appendChild(style)
     printWindow.document.body.innerHTML = srcEl.outerHTML
     printWindow.document.fonts.ready.then(() => {
         setTimeout(() => {
             printWindow.print()
-            //printWindow.close()
+            //printWindow.close() // On Android it seems to cause an error to close the window
         }, 0) // Safari needs time to render layout
     })
 }
