@@ -298,13 +298,14 @@ export default {
 }
 
 .content {
-  padding: 16px 48px 64px;
+  width: calc(100% - var(--sidebar-width));
   background: var(--background-color);
   color: var(--text-color);
+  gap: var(--content-spacing);
   overflow-wrap: break-word;
   display: flex;
   flex-direction: column;
-  gap: var(--content-spacing);
+  padding: 16px 48px 64px;
 }
 
 .content h1,

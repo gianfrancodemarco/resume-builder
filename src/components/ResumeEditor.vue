@@ -655,7 +655,6 @@ const cancelEditingTitle = (index) => {
 }
 
 :deep(.panel-title) {
-  font-family: 'Roboto';
   font-weight: 600;
   color: rgba(0, 0, 0, 0.87);
   padding: 16px 20px;
