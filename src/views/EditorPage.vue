@@ -78,6 +78,7 @@ import { useRouter } from 'vue-router'
 import { useDisplay } from 'vuetify'
 import { ResumeDataV1 as ResumeData } from '../models/ResumeData/ResumeDataV1'
 import { ResumeStyle2ColumnsV1 as ResumeStyleClass } from '../models/ResumeStyle/ResumeStyle2ColumnsV1'
+import { ResumeService } from '../services/ResumeService'
 
 const router = useRouter()
 const { mobile } = useDisplay()
@@ -85,8 +86,8 @@ const { mobile } = useDisplay()
 // Replace the resumeData ref with the ResumeData factory
 const resumeData = ref(ResumeData.createDefault())
 
-// Initialize the style with the class's default values
-const resumeStyle = ref(ResumeStyleClass.createDefault().toJSON())
+// Initialize the style with the class instance
+const resumeStyle = ref(ResumeStyleClass.createDefault())
 
 const fileInput = ref(null)
 
@@ -147,14 +148,7 @@ const handleFormSave = () => {
 }
 
 const getFilename = (extension) => {
-    // Get name and position from resume data
-    const name = resumeData.value.personal.name?.trim()
-    const position = resumeData.value.personal.title?.trim()
-
-    // Create filename: "Name_Position.extension" or "resume.extension" if no name/position
-    return (name && position)
-        ? `${name}_${position}.${extension}`
-        : (name || position || 'resume') + `.${extension}`
+    return ResumeService.getFilename(resumeData.value, extension)
 }
 
 const downloadPDF = async () => {
@@ -281,15 +275,11 @@ const downloadHTML = async () => {
 }
 
 const exportJSON = () => {
-    const data = {
-        resumeData: resumeData.value.toJSON(),
-        resumeStyle: resumeStyle.value
-    }
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
+    const blob = ResumeService.exportToJSON(resumeData.value, resumeStyle.value)
     const url = window.URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = getFilename('json')
+    a.download = ResumeService.getFilename(resumeData.value, 'json')
     document.body.appendChild(a)
     a.click()
     window.URL.revokeObjectURL(url)
@@ -300,24 +290,16 @@ const importJSON = () => {
     fileInput.value.click()
 }
 
-const handleFileUpload = (event) => {
+const handleFileUpload = async (event) => {
     const file = event.target.files[0]
     if (file) {
-        const reader = new FileReader()
-        reader.onload = (e) => {
-            try {
-                const data = JSON.parse(e.target.result)
-                if (data.resumeData && data.resumeStyle) {
-                    resumeData.value = ResumeData.fromJSON(data.resumeData)
-                    resumeStyle.value = ResumeStyleClass.fromJSON(data.resumeStyle)
-                } else {
-                    alert('Invalid resume data format')
-                }
-            } catch (error) {
-                alert('Error loading file: ' + error.message)
-            }
+        try {
+            const { resumeData: newResumeData, resumeStyle: newResumeStyle } = await ResumeService.loadFromFile(file)
+            resumeData.value = newResumeData
+            resumeStyle.value = newResumeStyle
+        } catch (error) {
+            alert(error.message)
         }
-        reader.readAsText(file)
     }
     // Reset the input so the same file can be selected again
     event.target.value = ''
