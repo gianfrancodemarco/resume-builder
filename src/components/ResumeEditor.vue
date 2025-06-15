@@ -292,7 +292,7 @@
       </v-window-item>
 
       <v-window-item value="style">
-        <ResumeStyle v-model:style-data="styleData" @update:style-data="updateStyle" />
+        <ResumeStyle v-model:style-data="props.style" @update:style-data="updateStyle" />
       </v-window-item>
     </v-window>
   </div>
@@ -322,7 +322,6 @@ const props = defineProps({
 const emit = defineEmits(['update:resumeData', 'update:style', 'save', 'change', 'preview'])
 
 const activeTab = ref('info')
-const styleData = ref(props.style)
 
 const newCustomSectionItem = ref(ResumeData.getNewCustomSectionItem())
 const sectionTypes = ResumeStyleClass.SECTION_TYPES
@@ -354,13 +353,12 @@ watch(() => props.resumeData, (newValue) => {
 }, { deep: true })
 
 // Watch for style changes
-watch(styleData, (newValue) => {
+watch(() => props.style, (newValue) => {
   emit('update:style', newValue)
   emit('change')
 }, { deep: true })
 
 const updateStyle = (newStyle) => {
-  styleData.value = newStyle
   emit('update:style', newStyle)
   emit('change')
 }

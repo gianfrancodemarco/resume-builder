@@ -22,20 +22,20 @@
                         <div class="d-flex align-center justify-space-between mb-2">
                             <span class="text-subtitle-2">{{ color.label }}</span>
                             <div class="d-flex align-center">
-                                <span class="color-hex mr-2">{{ local.colors[key].toUpperCase() }}</span>
+                                <span class="color-hex mr-2">{{ styleData.colors[key].toUpperCase() }}</span>
                                 <v-menu location="bottom end" :close-on-content-click="false">
                                     <template v-slot:activator="{ props }">
                                         <div class="color-preview" v-bind="props"
-                                            :style="{ backgroundColor: local.colors[key] }">
+                                            :style="{ backgroundColor: styleData.colors[key] }">
                                             <v-icon icon="mdi-pencil" size="small" class="edit-icon"></v-icon>
                                         </div>
                                     </template>
                                     <v-card class="color-picker-card">
-                                        <v-color-picker v-model="local.colors[key]" mode="hex"
+                                        <v-color-picker v-model="styleData.colors[key]" mode="hex"
                                             hide-inputs></v-color-picker>
                                         <v-divider></v-divider>
                                         <div class="pa-2">
-                                            <v-text-field v-model="local.colors[key]" class="color-input"
+                                            <v-text-field v-model="styleData.colors[key]" class="color-input"
                                                 density="compact" hide-details variant="outlined"
                                                 @input="validateHex(key)" placeholder="#000000"></v-text-field>
                                         </div>
@@ -51,20 +51,20 @@
                 <div class="d-flex flex-column gap-4 pa-4">
                     <div>
                         <div class="text-subtitle-2 mb-2">Heading Font</div>
-                        <v-select v-model="local.typography.headingFont" :items="fontOptions" variant="outlined"
+                        <v-select v-model="styleData.typography.headingFont" :items="fontOptions" variant="outlined"
                             density="comfortable"></v-select>
                     </div>
                     <div>
                         <div class="text-subtitle-2 mb-2">Body Font</div>
-                        <v-select v-model="local.typography.bodyFont" :items="fontOptions" variant="outlined"
+                        <v-select v-model="styleData.typography.bodyFont" :items="fontOptions" variant="outlined"
                             density="comfortable"></v-select>
                     </div>
                     <div>
                         <div class="text-subtitle-2 mb-2">Font Sizes</div>
-                        <v-slider v-model="local.typography.baseSize" label="Base Size" min="12" max="20" step="1"
+                        <v-slider v-model="styleData.typography.baseSize" label="Base Size" min="12" max="20" step="1"
                             thumb-label class="style-slider"></v-slider>
-                        <v-slider v-model="local.typography.headingSize" label="Heading Size" min="16" max="32" step="1"
-                            thumb-label class="style-slider"></v-slider>
+                        <v-slider v-model="styleData.typography.headingSize" label="Heading Size" min="16" max="32"
+                            step="1" thumb-label class="style-slider"></v-slider>
                     </div>
                 </div>
             </v-window-item>
@@ -73,21 +73,21 @@
                 <div class="d-flex flex-column gap-4 pa-4">
                     <div>
                         <div class="text-subtitle-2 mb-2">Section Spacing</div>
-                        <v-slider v-model="local.spacing.section" label="Section Gap" min="12" max="48" step="4"
+                        <v-slider v-model="styleData.spacing.section" label="Section Gap" min="12" max="48" step="4"
                             thumb-label class="style-slider"></v-slider>
                     </div>
                     <div>
                         <div class="text-subtitle-2 mb-2">Content Spacing</div>
-                        <v-slider v-model="local.spacing.content" label="Content Gap" min="0" max="24" step="2"
+                        <v-slider v-model="styleData.spacing.content" label="Content Gap" min="0" max="24" step="2"
                             thumb-label class="style-slider"></v-slider>
                     </div>
                     <div>
                         <div class="text-subtitle-2 mb-2">Sidebar Width</div>
-                        <v-slider v-model="local.spacing.sidebarWidth" label="Width" min="200" max="400" step="10"
+                        <v-slider v-model="styleData.spacing.sidebarWidth" label="Width" min="200" max="400" step="10"
                             thumb-label class="style-slider"></v-slider>
                     </div>
                     <div>
-                        <v-switch v-model="local.spacing.sidebarLeft" label="Sidebar on Left" hide-details
+                        <v-switch v-model="styleData.spacing.sidebarLeft" label="Sidebar on Left" hide-details
                             density="compact" color="primary"></v-switch>
                     </div>
                 </div>
@@ -109,27 +109,6 @@ const props = defineProps({
 const emit = defineEmits(['update:style-data', 'change'])
 
 const activeTab = ref('colors')
-const local = ref({
-    colors: {
-        primary: props.styleData.colors?.primary || '#08294D',
-        text: props.styleData.colors?.text || '#08294D',
-        background: props.styleData.colors?.background || '#ffffff',
-        sidebar: props.styleData.colors?.sidebar || '#08294D',
-        link: props.styleData.colors?.link || '#ffffff'
-    },
-    typography: {
-        headingFont: props.styleData.typography?.headingFont || 'Oswald',
-        bodyFont: props.styleData.typography?.bodyFont || 'Lato',
-        baseSize: props.styleData.typography?.baseSize || 16,
-        headingSize: props.styleData.typography?.headingSize || 26
-    },
-    spacing: {
-        section: props.styleData.spacing?.section || 24,
-        content: props.styleData.spacing?.content || 12,
-        sidebarLeft: props.styleData.spacing?.sidebarLeft || false,
-        sidebarWidth: props.styleData.spacing?.sidebarWidth || 280
-    }
-})
 
 const fontOptions = [
     'Roboto',
@@ -152,13 +131,13 @@ const colorFields = {
     link: { label: 'Link Color' }
 }
 
-watch(local, (newVal) => {
-    emit('update:style-data', JSON.parse(JSON.stringify(newVal)))
+watch(() => props.styleData, (newVal) => {
+    emit('update:style-data', newVal)
     emit('change')
 }, { deep: true })
 
 const validateHex = (key) => {
-    const value = local.value.colors[key]
+    const value = props.styleData.colors[key]
     // Remove any non-hex characters
     let cleanValue = value.replace(/[^0-9A-Fa-f]/g, '')
 
@@ -173,7 +152,7 @@ const validateHex = (key) => {
     }
 
     // Update the value
-    local.value.colors[key] = cleanValue
+    props.styleData.colors[key] = cleanValue
     emit('change')
 }
 </script>
