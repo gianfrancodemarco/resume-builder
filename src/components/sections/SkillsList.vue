@@ -9,6 +9,10 @@
 <script>
 export default {
     props: {
+        type: {
+            type: String,
+            required: true
+        },
         items: {
             type: Array,
             required: true
