@@ -170,17 +170,18 @@ const downloadPDF = async () => {
             margin: 0;
         }
 
-        html, body {
-            margin: 0 !important;
-            padding: 0 !important;
-            width: 100% !important;
-            background: white !important;
-            box-sizing: border-box;
-        }
-
         * {
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
+        }
+
+        /* We inject the background color variable into the html tag so that we can use them in the html tag */
+        html {
+            --background-color: ${resumeStyle.value.colors.background};
+        }
+
+        html {
+            background-color: var(--background-color) !important;
         }
     `
     printWindow.document.head.appendChild(style)
