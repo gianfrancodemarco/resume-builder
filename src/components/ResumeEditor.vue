@@ -282,6 +282,7 @@
 import { ref, watch, nextTick, onMounted, onUnmounted } from 'vue'
 import ResumeStyle from './ResumeStyle.vue'
 import { ResumeDataV1 as ResumeData } from '../models/ResumeData/ResumeDataV1'
+import { ResumeStyle2ColumnsV1 as ResumeStyleClass } from '../models/ResumeStyle/ResumeStyle2ColumnsV1'
 
 const props = defineProps({
   resumeData: {
@@ -344,21 +345,7 @@ onUnmounted(() => {
 
 // Watch for changes and emit updates
 watch(local, (newValue) => {
-  const updatedData = {
-    ...newValue,
-    experiences: newValue.experiences.map(exp => ({
-      ...exp,
-      visible: exp.visible === undefined ? true : exp.visible
-    })),
-    education: newValue.education.map(edu => ({
-      ...edu,
-      visible: edu.visible === undefined ? true : edu.visible
-    })),
-    experiencesVisible: newValue.experiencesVisible !== false,
-    educationVisible: newValue.educationVisible !== false,
-    customSectionsVisible: newValue.customSectionsVisible !== false
-  }
-  emit('update:resumeData', updatedData)
+  emit('update:resumeData', newValue)
   emit('change')
 }, { deep: true })
 

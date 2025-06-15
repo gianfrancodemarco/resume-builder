@@ -37,26 +37,26 @@
         <div class="download-buttons" v-if="!$vuetify.display.smAndDown">
             <v-tooltip text="Export JSON" location="top">
                 <template v-slot:activator="{ props }">
-                    <v-btn v-bind="props" icon="mdi-code-json" color="white" @click="exportJSON"
+                    <v-btn v-bind="props" icon="mdi-code-json" color="white" @click="handleExportJSON"
                         class="mr-2 download-btn" elevation="2" />
                 </template>
             </v-tooltip>
             <v-tooltip text="Import JSON" location="top">
                 <template v-slot:activator="{ props }">
-                    <v-btn v-bind="props" icon="mdi-upload" color="white" @click="importJSON" class="mr-2 download-btn"
-                        elevation="2" />
+                    <v-btn v-bind="props" icon="mdi-upload" color="white" @click="handleImportJSON"
+                        class="mr-2 download-btn" elevation="2" />
                 </template>
             </v-tooltip>
             <v-tooltip text="Download as PDF" location="top">
                 <template v-slot:activator="{ props }">
-                    <v-btn v-bind="props" icon="mdi-file-pdf-box" color="white" @click="downloadPDF"
+                    <v-btn v-bind="props" icon="mdi-file-pdf-box" color="white" @click="handleDownloadPDF"
                         class="mr-2 download-btn" elevation="2" />
                 </template>
             </v-tooltip>
             <v-tooltip text="Download as HTML" location="top">
                 <template v-slot:activator="{ props }">
-                    <v-btn v-bind="props" icon="mdi-file-code" color="white" @click="downloadHTML" class="download-btn"
-                        elevation="2" />
+                    <v-btn v-bind="props" icon="mdi-file-code" color="white" @click="handleDownloadHTML"
+                        class="download-btn" elevation="2" />
                 </template>
             </v-tooltip>
         </div>
@@ -378,24 +378,6 @@ const downloadHTML = async () => {
     }, 0)
 }
 
-const updateStyle = (newStyle) => {
-    resumeStyle.value = newStyle
-}
-
-const toggleSidebarPosition = () => {
-    resumeStyle.value.spacing.sidebarLeft = !resumeStyle.value.spacing.sidebarLeft
-}
-
-// Add color picker tooltip formatter
-const colorTooltip = (color) => {
-    return `Color: ${color.toUpperCase()}`
-}
-
-// Add color preview formatter
-const colorPreview = (color) => {
-    return color.toUpperCase()
-}
-
 const exportJSON = () => {
     const data = {
         version: 1,
@@ -418,6 +400,7 @@ const importJSON = () => {
 }
 
 const handleFileUpload = (event) => {
+    debugger
     const file = event.target.files[0]
     if (file) {
         const reader = new FileReader()

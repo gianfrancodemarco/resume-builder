@@ -77,6 +77,7 @@ import ResumePreview from '../components/ResumePreview.vue'
 import { useRouter } from 'vue-router'
 import { useDisplay } from 'vuetify'
 import { ResumeDataV1 as ResumeData } from '../models/ResumeData/ResumeDataV1'
+import { ResumeStyle2ColumnsV1 as ResumeStyleClass } from '../models/ResumeStyle/ResumeStyle2ColumnsV1'
 
 const router = useRouter()
 const { mobile } = useDisplay()
@@ -84,27 +85,8 @@ const { mobile } = useDisplay()
 // Replace the resumeData ref with the ResumeData factory
 const resumeData = ref(ResumeData.createDefault())
 
-const resumeStyle = ref({
-    colors: {
-        primary: '#08294D',
-        text: '#08294D',
-        background: '#ffffff',
-        sidebar: '#08294D',
-        link: '#ffffff'
-    },
-    typography: {
-        headingFont: 'Oswald',
-        bodyFont: 'Lato',
-        baseSize: 16,
-        headingSize: 26
-    },
-    spacing: {
-        section: 24,
-        content: 12,
-        sidebarLeft: false,
-        sidebarWidth: 280
-    }
-})
+// Initialize the style with the class's default values
+const resumeStyle = ref(ResumeStyleClass.createDefault().toJSON())
 
 const fileInput = ref(null)
 
@@ -327,7 +309,7 @@ const handleFileUpload = (event) => {
                 const data = JSON.parse(e.target.result)
                 if (data.resumeData && data.resumeStyle) {
                     resumeData.value = ResumeData.fromJSON(data.resumeData)
-                    resumeStyle.value = data.resumeStyle
+                    resumeStyle.value = ResumeStyleClass.fromJSON(data.resumeStyle)
                 } else {
                     alert('Invalid resume data format')
                 }
