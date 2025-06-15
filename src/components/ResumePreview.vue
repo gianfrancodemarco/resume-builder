@@ -115,11 +115,62 @@ export default {
 </script>
 
 <style>
-#printable-area {
-  margin: auto;
-  width: 210mm;
-  padding: 0;
-  background-color: black !important;
+@media screen {
+  #printable-area {
+    margin: auto;
+    width: 210mm;
+    padding-bottom: 20px;
+    background-color: #f5f5f5;
+  }
+}
+
+@media print {
+  @page {
+    size: A4;
+    margin: 0;
+  }
+
+  body {
+    margin: 0;
+    padding: 0;
+  }
+
+  #printable-area {
+    margin: 0;
+    padding: 0;
+    width: 210mm;
+    background-color: var(--sidebar-color) !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .sidebar {
+    position: relative;
+    background-color: var(--sidebar-color) !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .sidebar::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: var(--sidebar-width);
+    background-color: var(--sidebar-color);
+    z-index: -1;
+  }
+
+  .container.sidebar-left .sidebar::before {
+    right: auto;
+    left: 0;
+  }
+
+  .content {
+    position: relative;
+    z-index: 1;
+  }
 }
 
 .resume-preview {
@@ -129,7 +180,6 @@ export default {
   font-size: var(--base-size);
   line-height: 1.6;
   padding: 0;
-  overflow: hidden;
 }
 
 .resume-preview h1,
@@ -165,8 +215,7 @@ export default {
   width: 100%;
   margin: 0;
   padding: 0;
-  background: #fff;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+  background: var(--sidebar-color);
   overflow: hidden;
 }
 
@@ -189,6 +238,7 @@ export default {
   overflow-wrap: break-word;
   word-wrap: break-word;
   word-break: break-word;
+  position: relative;
 }
 
 .sidebar h1,
@@ -248,7 +298,6 @@ export default {
 }
 
 .content {
-  width: 72%;
   padding: 16px 48px 64px;
   background: var(--background-color);
   color: var(--text-color);
