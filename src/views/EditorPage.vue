@@ -71,112 +71,18 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted, onBeforeUnmount, computed } from 'vue'
+import { ref, onMounted, onBeforeUnmount, computed } from 'vue'
 import ResumeEditor from '../components/ResumeEditor.vue'
 import ResumePreview from '../components/ResumePreview.vue'
 import { useRouter } from 'vue-router'
 import { useDisplay } from 'vuetify'
+import { ResumeDataV1 as ResumeData } from '../models/ResumeData/ResumeDataV1'
 
 const router = useRouter()
 const { mobile } = useDisplay()
-const resumeData = ref({
-    personal: {
-        name: 'John Doe',
-        title: 'Software Engineer',
-        visible: true
-    },
-    experiences: [
-        {
-            title: 'Senior Software Engineer',
-            company: 'Tech Solutions Inc. - Milan',
-            period: '2020 - Present',
-            description: 'Led the development of enterprise-level web applications using Vue.js and Node.js. Implemented CI/CD pipelines and improved application performance by 40%.',
-            visible: true
-        },
-        {
-            title: 'Full Stack Developer',
-            company: 'Digital Innovations - Rome',
-            period: '2018 - 2020',
-            description: 'Developed and maintained multiple web applications. Collaborated with UX designers to implement responsive interfaces and improve user experience.',
-            visible: true
-        }
-    ],
-    experiencesVisible: true,
-    education: [
-        {
-            degree: 'Master in Computer Science',
-            school: 'University of Milan',
-            period: '2016 - 2018',
-            mark: '110/110',
-            thesis: 'Advanced Web Development Techniques and Best Practices',
-            visible: true
-        },
-        {
-            degree: 'Bachelor in Computer Engineering',
-            school: 'University of Rome',
-            period: '2013 - 2016',
-            mark: '108/110',
-            thesis: 'Introduction to Modern Web Technologies',
-            visible: true
-        }
-    ],
-    educationVisible: true,
-    customSections: [
-        {
-            title: 'About Me',
-            type: 'italic',
-            visible: true,
-            items: [
-                { value: 'Passionate software engineer with a strong focus on web development and user experience. Experienced in building modern, responsive applications using Vue.js and other cutting-edge technologies.', isLink: false, href: '' },
-                { value: 'Skilled in both frontend and backend development, with a particular emphasis on creating intuitive user interfaces and robust server-side solutions.', isLink: false, href: '' }
-            ]
-        },
-        {
-            title: 'Contact Details',
-            type: 'text',
-            visible: true,
-            items: [
-                { value: 'New York, USA', isLink: false, href: '' },
-                { value: 'john.doe@example.com', isLink: true, href: 'mailto:john.doe@example.com' }
-            ]
-        },
-        {
-            title: 'Professional Links',
-            type: 'text',
-            visible: true,
-            items: [
-                { value: 'GitHub Profile', isLink: true, href: 'https://github.com/johndoetest1999' },
-                { value: 'LinkedIn Profile', isLink: true, href: 'https://linkedin.com/in/johndoe' }
-            ]
-        },
-        {
-            title: 'Technical Skills',
-            type: 'list',
-            visible: true,
-            items: [
-                'Vue.js',
-                'JavaScript',
-                'TypeScript',
-                'HTML/CSS',
-                'Node.js',
-                'Python',
-                'Git',
-                'Docker'
-            ]
-        },
-        {
-            title: 'Languages',
-            type: 'languages',
-            visible: true,
-            items: [
-                { name: 'Italian', proficiency: 100 },
-                { name: 'English', proficiency: 90 },
-                { name: 'Spanish', proficiency: 70 }
-            ]
-        }
-    ],
-    customSectionsVisible: true
-})
+
+// Replace the resumeData ref with the ResumeData factory
+const resumeData = ref(ResumeData.createDefault())
 
 const resumeStyle = ref({
     colors: {
@@ -256,17 +162,6 @@ const handleFormChange = () => {
 // Handle form save
 const handleFormSave = () => {
     hasUnsavedChanges.value = false
-}
-
-// Handle navigation
-const handleNavigation = (to) => {
-    if (hasUnsavedChanges.value) {
-        if (confirm('You have unsaved changes. Are you sure you want to leave?')) {
-            router.push(to)
-        }
-    } else {
-        router.push(to)
-    }
 }
 
 const getFilename = (extension) => {
@@ -403,28 +298,9 @@ const downloadHTML = async () => {
     }, 0)
 }
 
-const updateStyle = (newStyle) => {
-    resumeStyle.value = newStyle
-}
-
-const toggleSidebarPosition = () => {
-    resumeStyle.value.spacing.sidebarLeft = !resumeStyle.value.spacing.sidebarLeft
-}
-
-// Add color picker tooltip formatter
-const colorTooltip = (color) => {
-    return `Color: ${color.toUpperCase()}`
-}
-
-// Add color preview formatter
-const colorPreview = (color) => {
-    return color.toUpperCase()
-}
-
 const exportJSON = () => {
     const data = {
-        version: 1,
-        resumeData: resumeData.value,
+        resumeData: resumeData.value.toJSON(),
         resumeStyle: resumeStyle.value
     }
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
@@ -450,7 +326,7 @@ const handleFileUpload = (event) => {
             try {
                 const data = JSON.parse(e.target.result)
                 if (data.resumeData && data.resumeStyle) {
-                    resumeData.value = data.resumeData
+                    resumeData.value = ResumeData.fromJSON(data.resumeData)
                     resumeStyle.value = data.resumeStyle
                 } else {
                     alert('Invalid resume data format')

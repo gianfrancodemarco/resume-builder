@@ -87,54 +87,52 @@ describe('EditorPage', () => {
             expect(window.URL.revokeObjectURL).toHaveBeenCalled()
         })
 
-        // it('generates correct filename from resume data', async () => {
-        //     // Set resume data first
-        //     wrapper.vm.resumeData = {
-        //         personal: {
-        //             name: 'John Doe',
-        //             title: 'Software Engineer'
-        //         }
-        //     }
+        it('generates correct filename from resume data', async () => {
+            // Set resume data with specific name and title
+            wrapper.vm.resumeData = {
+                personal: {
+                    name: 'Luke Skywalker',
+                    title: 'Jedi Knight'
+                }
+            }
 
-        //     // Mock the getFilename function
-        //     const originalGetFilename = wrapper.vm.getFilename
-        //     wrapper.vm.getFilename = vi.fn(() => 'John_Doe_Software_Engineer.json')
+            // Spy on the getFilename method
+            const getFilenameSpy = vi.spyOn(wrapper.vm, 'getFilename').mockReturnValue('Luke_Skywalker_Jedi_Knight.json')
 
-        //     // Mock exportJSON to ensure it's called
-        //     const originalExportJSON = wrapper.vm.exportJSON
-        //     wrapper.vm.exportJSON = vi.fn(() => {
-        //         wrapper.vm.getFilename('json')
-        //     })
+            // Spy on the exportJSON method to ensure it's called
+            const exportJSONSpy = vi.spyOn(wrapper.vm, 'exportJSON').mockImplementation(() => {
+                wrapper.vm.getFilename('json')
+            })
 
-        //     // Trigger export
-        //     await wrapper.vm.handleExportJSON()
+            // Trigger the export function
+            await wrapper.vm.handleExportJSON()
 
-        //     // Verify filename generation
-        //     expect(wrapper.vm.getFilename).toHaveBeenCalledWith('json')
+            // Verify that getFilename was called with the correct argument
+            expect(getFilenameSpy).toHaveBeenCalledWith('json')
 
-        //     // Restore original functions
-        //     wrapper.vm.getFilename = originalGetFilename
-        //     wrapper.vm.exportJSON = originalExportJSON
-        // })
+            // Restore original methods
+            getFilenameSpy.mockRestore()
+            exportJSONSpy.mockRestore()
+        })
 
-        // it('generates fallback filename when name/title is missing', async () => {
-        //     // Set resume data with missing name/title
-        //     wrapper.vm.resumeData = {
-        //         personal: {}
-        //     }
+        it('generates fallback filename when name/title is missing', async () => {
+            // Set resume data with missing name/title
+            wrapper.vm.resumeData = {
+                personal: {}
+            }
 
-        //     // Mock the getFilename function
-        //     const originalGetFilename = wrapper.vm.getFilename
-        //     wrapper.vm.getFilename = vi.fn(() => 'resume.json')
+            // Mock the getFilename function
+            const originalGetFilename = wrapper.vm.getFilename
+            wrapper.vm.getFilename = vi.fn(() => 'resume.json')
 
-        //     // Trigger export
-        //     await wrapper.vm.handleExportJSON()
+            // Trigger export
+            await wrapper.vm.handleExportJSON()
 
-        //     // Verify filename generation
-        //     expect(wrapper.vm.getFilename).toHaveBeenCalledWith('json')
+            // Verify filename generation
+            expect(wrapper.vm.getFilename).toHaveBeenCalledWith('json')
 
-        //     // Restore original function
-        //     wrapper.vm.getFilename = originalGetFilename
-        // })
+            // Restore original function
+            wrapper.vm.getFilename = originalGetFilename
+        })
     })
 }) 

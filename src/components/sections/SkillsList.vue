@@ -1,7 +1,7 @@
 <template>
     <p class="skills-list">
         <span v-for="(item, itemIndex) in items" :key="itemIndex">
-            {{ item }}<br />
+            {{ item.value }}<br />
         </span>
     </p>
 </template>

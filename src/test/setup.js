@@ -5,6 +5,7 @@ import * as directives from 'vuetify/directives'
 import { aliases, mdi } from 'vuetify/iconsets/mdi'
 import '@mdi/font/css/materialdesignicons.css'
 import 'vuetify/styles'
+import { vi } from 'vitest'
 
 // Mock ResizeObserver
 class ResizeObserverMock {
@@ -46,5 +47,16 @@ const vuetify = createVuetify({
 
 // Make Vuetify available globally
 config.global.plugins = [vuetify]
+
+// Mock window.location for navigation
+const originalLocation = window.location;
+delete window.location;
+window.location = {
+    ...originalLocation,
+    href: '',
+    assign: vi.fn(),
+    replace: vi.fn(),
+    reload: vi.fn()
+};
 
 export { vuetify } 

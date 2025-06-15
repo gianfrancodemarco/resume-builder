@@ -200,7 +200,7 @@
                 <template v-else-if="section.type === 'list'">
                   <div v-for="(item, itemIndex) in local.customSections[index].items" :key="itemIndex"
                     class="d-flex align-center mb-2">
-                    <v-text-field v-model="local.customSections[index].items[itemIndex]" label="Item"
+                    <v-text-field v-model="local.customSections[index].items[itemIndex].value" label="Item"
                       :disabled="!local.customSections[index].visible" variant="outlined" density="comfortable"
                       class="mr-2" aria-label="Item" />
                     <v-btn icon="mdi-delete" color="error" variant="text"
@@ -208,7 +208,7 @@
                       :disabled="!local.customSections[index].visible" aria-label="Delete item" />
                   </div>
                   <div class="d-flex align-center mb-2">
-                    <v-text-field v-model="newCustomSectionItem" label="Item"
+                    <v-text-field v-model="newCustomSectionItem.value" label="Item"
                       :disabled="!local.customSections[index].visible" variant="outlined" density="comfortable"
                       class="mr-2" aria-label="Item" />
                     <v-btn color="primary" @click="addCustomSectionItem(index)"
@@ -279,8 +279,9 @@
 </template>
 
 <script setup>
-import { ref, watch, computed, nextTick, onMounted, onUnmounted } from 'vue'
+import { ref, watch, nextTick, onMounted, onUnmounted } from 'vue'
 import ResumeStyle from './ResumeStyle.vue'
+import { ResumeDataV1 as ResumeData } from '../models/ResumeData/ResumeDataV1'
 
 const props = defineProps({
   resumeData: {
@@ -302,53 +303,18 @@ const emit = defineEmits(['update:resumeData', 'update:style', 'save', 'change',
 const activeTab = ref('info')
 const styleData = ref(props.style)
 
-const local = ref({
-  personal: {
-    name: props.resumeData.personal.name || '',
-    title: props.resumeData.personal.title || '',
-    visible: props.resumeData.personal.visible || true
-  },
-  experiences: (props.resumeData.experiences || []).map(exp => ({
-    ...exp,
-    visible: exp.visible === undefined ? true : exp.visible
-  })),
-  experiencesVisible: props.resumeData.experiencesVisible !== false,
-  education: (props.resumeData.education || []).map(edu => ({
-    ...edu,
-    visible: edu.visible === undefined ? true : edu.visible
-  })),
-  educationVisible: props.resumeData.educationVisible !== false,
-  customSections: (props.resumeData.customSections || []).map(section => ({
-    ...section,
-    visible: section.visible === undefined ? true : section.visible
-  })),
-  customSectionsVisible: props.resumeData.customSectionsVisible !== false
-})
+const local = ref(new ResumeData(props.resumeData))
 
-// Form data for new items
-const exp = ref({
-  title: 'Experience',
-  company: 'Company',
-  period: '',
-  description: ''
-})
-
-const edu = ref({
-  degree: 'Degree',
-  school: 'Cool School',
-  period: '',
-  mark: '',
-  thesis: ''
-})
-
+// TODO this should be moved inside the ResumeDataV1 class
 const newCustomSectionItem = ref({
   value: '',
   isLink: false,
   href: '',
   name: '',
-  proficiency: 50
+  proficiency: 0
 })
 
+// TODO this should be moved inside the ResumeDataV1 class
 const sectionTypes = [
   { label: 'Text', value: 'text' },
   { label: 'List', value: 'list' },
@@ -356,20 +322,7 @@ const sectionTypes = [
   { label: 'Italic Text', value: 'italic' }
 ]
 
-const fonts = [
-  'Oswald',
-  'Lato',
-  'Roboto',
-  'Open Sans',
-  'Montserrat',
-  'Raleway',
-  'Poppins',
-  'Source Sans Pro'
-]
-
 const editingSectionTitle = ref({})
-
-// Add new ref for tracking delete confirmation state
 const deleteConfirmState = ref({})
 
 // Add click outside handler
@@ -423,16 +376,7 @@ const updateStyle = (newStyle) => {
 
 // Experience methods
 const addExp = () => {
-  local.value.experiences.push({
-    ...exp.value,
-    visible: true
-  })
-  exp.value = {
-    title: 'Experience',
-    company: 'Company',
-    period: '',
-    description: ''
-  }
+  local.value.experiences.push(ResumeData.getNewExperience())
 }
 
 const removeExp = (index) => {
@@ -448,17 +392,7 @@ const removeExp = (index) => {
 
 // Education methods
 const addEdu = () => {
-  local.value.education.push({
-    ...edu.value,
-    visible: true
-  })
-  edu.value = {
-    degree: 'Degree',
-    school: 'Cool School',
-    period: '',
-    mark: '',
-    thesis: ''
-  }
+  local.value.education.push(ResumeData.getNewEducation())
 }
 
 const removeEdu = (index) => {
@@ -474,12 +408,7 @@ const removeEdu = (index) => {
 
 // Custom section methods
 const addCustomSection = () => {
-  local.value.customSections.push({
-    title: 'New Section',
-    type: 'text',
-    items: [],
-    visible: true
-  })
+  local.value.customSections.push(ResumeData.getNewCustomSection())
 }
 
 const removeCustomSection = (index) => {
@@ -533,7 +462,11 @@ const handleSectionTypeChange = (section, newType) => {
         proficiency: 50
       }
     } else if (newType === 'list') {
-      newCustomSectionItem.value = ''
+      newCustomSectionItem.value = {
+        value: '',
+        isLink: false,
+        href: ''
+      }
     } else {
       newCustomSectionItem.value = {
         value: '',
@@ -555,9 +488,17 @@ const addCustomSectionItem = (sectionIndex) => {
       }
     }
   } else if (section.type === 'list') {
-    if (newCustomSectionItem.value) {
-      section.items.push(newCustomSectionItem.value)
-      newCustomSectionItem.value = ''
+    if (newCustomSectionItem.value.value) {
+      section.items.push({
+        value: newCustomSectionItem.value.value,
+        isLink: false,
+        href: ''
+      })
+      newCustomSectionItem.value = {
+        value: '',
+        isLink: false,
+        href: ''
+      }
     }
   } else {
     // Handle both text and italic types
@@ -578,15 +519,6 @@ const addCustomSectionItem = (sectionIndex) => {
 
 const removeCustomSectionItem = (sectionIndex, itemIndex) => {
   local.value.customSections[sectionIndex].items.splice(itemIndex, 1)
-}
-
-// Style methods
-const colorTooltip = (color) => {
-  return `Color: ${color.toUpperCase()}`
-}
-
-const colorPreview = (color) => {
-  return color.toUpperCase()
 }
 
 const startEditingTitle = (index) => {
