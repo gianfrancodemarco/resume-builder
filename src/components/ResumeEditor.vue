@@ -152,6 +152,21 @@
                     </v-tooltip>
                     <v-tooltip location="top">
                       <template v-slot:activator="{ props }">
+                        <v-icon v-bind="props" icon="mdi-arrow-up" size="small" class="move-icon"
+                          @click.stop="moveCustomSection(index, 'up')" :disabled="index === 0" />
+                      </template>
+                      Move section up
+                    </v-tooltip>
+                    <v-tooltip location="top">
+                      <template v-slot:activator="{ props }">
+                        <v-icon v-bind="props" icon="mdi-arrow-down" size="small" class="move-icon"
+                          @click.stop="moveCustomSection(index, 'down')"
+                          :disabled="index === local.customSections.length - 1" />
+                      </template>
+                      Move section down
+                    </v-tooltip>
+                    <v-tooltip location="top">
+                      <template v-slot:activator="{ props }">
                         <v-icon v-bind="props" :icon="deleteConfirmState[index] ? 'mdi-check' : 'mdi-delete'"
                           size="small" class="delete-icon" @click.stop="removeCustomSection(index)"
                           :disabled="!local.customSections[index].visible" />
@@ -529,6 +544,17 @@ const cancelEditingTitle = (index) => {
   local.value.customSections[index].title = props.resumeData.customSections[index].title
   editingSectionTitle.value[index] = false
 }
+
+const moveCustomSection = (index, direction) => {
+  const sections = local.value.customSections
+  if (direction === 'up' && index > 0) {
+    // Swap with previous section
+    [sections[index], sections[index - 1]] = [sections[index - 1], sections[index]]
+  } else if (direction === 'down' && index < sections.length - 1) {
+    // Swap with next section
+    [sections[index], sections[index + 1]] = [sections[index + 1], sections[index]]
+  }
+}
 </script>
 
 <style scoped>
@@ -559,18 +585,74 @@ const cancelEditingTitle = (index) => {
   background: transparent;
 }
 
+.editor-panel {
+  margin-bottom: 8px;
+}
+
+/* Desktop styles */
+@media (min-width: 601px) {
+
+  .editor-panel .section-title .visibility-icon,
+  .editor-panel .section-title .edit-icon,
+  .editor-panel .section-title .delete-icon,
+  .editor-panel .section-title .move-icon {
+    opacity: 0;
+    transition: opacity 0.2s;
+    cursor: pointer;
+  }
+
+  .editor-panel:hover .section-title .visibility-icon,
+  .editor-panel:hover .section-title .edit-icon,
+  .editor-panel:hover .section-title .delete-icon,
+  .editor-panel:hover .section-title .move-icon {
+    opacity: 0.7;
+  }
+
+  .editor-panel .section-title .visibility-icon:hover,
+  .editor-panel .section-title .edit-icon:hover,
+  .editor-panel .section-title .delete-icon:hover,
+  .editor-panel .section-title .move-icon:hover {
+    opacity: 1;
+  }
+
+  .editor-panel .section-title .move-icon.v-icon--disabled {
+    opacity: 0;
+    cursor: not-allowed;
+  }
+
+  .editor-panel:hover .section-title .move-icon.v-icon--disabled {
+    opacity: 0.3;
+  }
+}
+
+/* Mobile styles */
+@media (max-width: 600px) {
+
+  .editor-panel .section-title .visibility-icon,
+  .editor-panel .section-title .edit-icon,
+  .editor-panel .section-title .delete-icon,
+  .editor-panel .section-title .move-icon {
+    opacity: 0.7;
+    cursor: pointer;
+  }
+
+  .editor-panel .section-title .move-icon.v-icon--disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+}
+
+.editor-panel:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
 :deep(.editor-panel) {
   background-color: white;
   border: 1px solid rgba(0, 0, 0, 0.06) !important;
   border-radius: 8px !important;
-  margin-bottom: 12px;
   overflow: hidden;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.02);
   transition: all 0.2s ease;
-}
-
-:deep(.editor-panel:hover) {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
 :deep(.panel-title) {
@@ -882,81 +964,12 @@ const cancelEditingTitle = (index) => {
 }
 
 .section-title {
-  position: relative;
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  font-weight: 600;
-}
-
-.edit-icon,
-.visibility-icon,
-.delete-icon {
-  opacity: 0;
-  transition: all 0.2s ease;
-  cursor: pointer;
-  color: rgba(0, 0, 0, 0.4);
-  margin-left: 8px;
-}
-
-/* Desktop styles */
-@media (min-width: 601px) {
-
-  .section-title .edit-icon,
-  .section-title .visibility-icon,
-  .section-title .delete-icon {
-    opacity: 0;
-  }
-
-  .editor-panel:hover .section-title .edit-icon,
-  .editor-panel:hover .section-title .visibility-icon,
-  .editor-panel:hover .section-title .delete-icon {
-    opacity: 0.6;
-  }
-}
-
-/* Mobile styles */
-@media (max-width: 600px) {
-
-  .section-title .edit-icon,
-  .section-title .visibility-icon,
-  .section-title .delete-icon {
-    opacity: 0.6;
-  }
-}
-
-.section-title .edit-icon:hover,
-.section-title .visibility-icon:hover {
-  opacity: 1;
-  color: rgb(var(--v-theme-primary));
-}
-
-.section-title .delete-icon:hover {
-  opacity: 1;
-  color: rgb(var(--v-theme-error));
-}
-
-.section-title .delete-icon[disabled] {
-  opacity: 0.2;
-  cursor: not-allowed;
+  gap: 8px;
 }
 
 .title-edit-field {
-  margin: -8px 0;
-}
-
-:deep(.title-edit-field .v-field__input) {
-  padding: 0;
-  font-size: 1.2rem;
-  font-weight: 600;
-  color: rgba(0, 0, 0, 0.87);
-}
-
-:deep(.title-edit-field .v-field__outline) {
-  display: none;
-}
-
-/* Add styles for confirmation state */
-.delete-icon[data-confirm="true"] {
-  color: rgb(var(--v-theme-error));
+  width: 100%;
 }
 </style>
