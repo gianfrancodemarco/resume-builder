@@ -99,8 +99,8 @@ describe('ResumeEditor', () => {
             await titleInput.setValue('Frontend Developer')
             await wrapper.vm.$nextTick()
 
-            expect(wrapper.vm.local.personal.name).toBe('Jane Smith')
-            expect(wrapper.vm.local.personal.title).toBe('Frontend Developer')
+            expect(wrapper.vm.resumeData.personal.name).toBe('Jane Smith')
+            expect(wrapper.vm.resumeData.personal.title).toBe('Frontend Developer')
         })
     })
 
@@ -131,7 +131,7 @@ describe('ResumeEditor', () => {
             await descriptionInput.setValue('Developed web applications')
             await wrapper.vm.$nextTick()
 
-            expect(wrapper.vm.local.experiences).toContainEqual(expect.objectContaining({
+            expect(wrapper.vm.resumeData.experiences).toContainEqual(expect.objectContaining({
                 title: 'Full Stack Developer',
                 company: 'Tech Corp',
                 period: '2019 - 2020',
@@ -152,7 +152,7 @@ describe('ResumeEditor', () => {
         //     await deleteButton.trigger('click') // Confirm deletion
         //     await wrapper.vm.$nextTick()
 
-        //     expect(wrapper.vm.local.experiences).toHaveLength(0)
+        //     expect(wrapper.vm.resumeData.experiences).toHaveLength(0)
         // })
 
         // it('toggles experience visibility', async () => {
@@ -165,7 +165,7 @@ describe('ResumeEditor', () => {
         //     await visibilityIcon.trigger('click')
         //     await wrapper.vm.$nextTick()
 
-        //     expect(wrapper.vm.local.experiencesVisible).toBe(false)
+        //     expect(wrapper.vm.resumeData.experiencesVisible).toBe(false)
         // })
     })
 
@@ -198,7 +198,7 @@ describe('ResumeEditor', () => {
             await thesisInput.setValue('Web Development Basics')
             await wrapper.vm.$nextTick()
 
-            expect(wrapper.vm.local.education).toContainEqual(expect.objectContaining({
+            expect(wrapper.vm.resumeData.education).toContainEqual(expect.objectContaining({
                 degree: 'Bachelor in Computer Science',
                 school: 'University of Rome',
                 period: '2013 - 2016',
@@ -220,7 +220,7 @@ describe('ResumeEditor', () => {
         //     await deleteButton.trigger('click') // Confirm deletion
         //     await wrapper.vm.$nextTick()
 
-        //     expect(wrapper.vm.local.education).toHaveLength(0)
+        //     expect(wrapper.vm.resumeData.education).toHaveLength(0)
         // })
 
         // it('toggles education visibility', async () => {
@@ -233,7 +233,7 @@ describe('ResumeEditor', () => {
         //     await visibilityIcon.trigger('click')
         //     await wrapper.vm.$nextTick()
 
-        //     expect(wrapper.vm.local.educationVisible).toBe(false)
+        //     expect(wrapper.vm.resumeData.educationVisible).toBe(false)
         // })
     })
 
@@ -243,7 +243,7 @@ describe('ResumeEditor', () => {
             await addButton.trigger('click')
             await wrapper.vm.$nextTick()
 
-            expect(wrapper.vm.local.customSections).toContainEqual(expect.objectContaining({
+            expect(wrapper.vm.resumeData.customSections).toContainEqual(expect.objectContaining({
                 title: 'New Section',
                 type: 'text',
                 items: [],
@@ -265,7 +265,7 @@ describe('ResumeEditor', () => {
         //     await languageOption.trigger('click')
         //     await wrapper.vm.$nextTick()
 
-        //     expect(wrapper.vm.local.customSections[0].type).toBe('languages')
+        //     expect(wrapper.vm.resumeData.customSections[0].type).toBe('languages')
         // })
 
         // it('adds items to list section', async () => {
@@ -281,7 +281,7 @@ describe('ResumeEditor', () => {
         //     await addButton.trigger('click')
         //     await wrapper.vm.$nextTick()
 
-        //     expect(wrapper.vm.local.customSections[0].items).toContain('React')
+        //     expect(wrapper.vm.resumeData.customSections[0].items).toContain('React')
         // })
 
         // it('removes custom section', async () => {
@@ -296,7 +296,7 @@ describe('ResumeEditor', () => {
         //     await deleteButton.trigger('click') // Confirm deletion
         //     await wrapper.vm.$nextTick()
 
-        //     expect(wrapper.vm.local.customSections).toHaveLength(0)
+        //     expect(wrapper.vm.resumeData.customSections).toHaveLength(0)
         // })
     })
 
