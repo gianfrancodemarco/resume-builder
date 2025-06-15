@@ -537,7 +537,7 @@ const handleResize = (e) => {
 
         if (clientX) {
             const newWidth = ((clientX - containerRect.left) / containerRect.width) * 100
-            editorWidth.value = Math.max(35, Math.min(newWidth, 60)) // Minimum 35%, maximum 80%
+            editorWidth.value = Math.max(35, Math.min(newWidth, 50)) // Minimum 35%, maximum 60%
         }
     }
 }
