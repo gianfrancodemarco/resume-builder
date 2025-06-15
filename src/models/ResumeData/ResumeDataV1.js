@@ -228,6 +228,16 @@ export class ResumeDataV1 {
         };
     }
 
+    static getNewCustomSectionItem() {
+        return {
+            value: '',
+            isLink: false,
+            href: '',
+            name: '',
+            proficiency: 0
+        };
+    }
+
     // Method to convert the class instance to a plain object
     toJSON() {
         return {

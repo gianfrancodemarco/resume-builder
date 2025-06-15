@@ -7,6 +7,13 @@ export class ResumeStyle2ColumnsV1 {
         RIGHT: 'right'
     };
 
+    static SECTION_TYPES = [
+        { label: 'Text', value: 'text' },
+        { label: 'List', value: 'list' },
+        { label: 'Languages', value: 'languages' },
+        { label: 'Italic Text', value: 'italic' }
+    ]
+
     constructor(data = {}) {
         this.version = data.version || ResumeStyle2ColumnsV1.VERSION;
         this.templateName = data.templateName || ResumeStyle2ColumnsV1.TEMPLATE_NAME;
