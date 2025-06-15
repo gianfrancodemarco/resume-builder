@@ -348,14 +348,10 @@ onUnmounted(() => {
 
 // Watch for changes and emit updates
 watch(() => props.resumeData, (newValue) => {
-  emit('update:resumeData', newValue)
-  emit('change')
-}, { deep: true })
-
-// Watch for style changes
-watch(() => props.style, (newValue) => {
-  emit('update:style', newValue)
-  emit('change')
+  if (newValue !== props.resumeData) {
+    emit('update:resumeData', newValue)
+    emit('change')
+  }
 }, { deep: true })
 
 const updateStyle = (newStyle) => {
