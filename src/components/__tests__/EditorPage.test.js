@@ -1,8 +1,11 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
-import EditorPage from '../../views/EditorPage.vue'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { createRouter, createWebHistory } from 'vue-router'
+import { ResumeDataV1 } from '../../models/ResumeData/ResumeDataV1'
+import { ResumeService } from '../../services/ResumeService'
+import { ExporterService } from '../../services/ExporterService'
 import { vuetify } from '../../test/setup'
+import EditorPage from '../../views/EditorPage.vue'
 
 describe('EditorPage', () => {
     let wrapper
@@ -34,6 +37,10 @@ describe('EditorPage', () => {
         // Mock window.sa_event
         window.sa_event = vi.fn()
 
+        // Mock ResumeService methods
+        vi.spyOn(ResumeService, 'exportToJSON').mockImplementation(() => new Blob(['test']))
+        vi.spyOn(ExporterService, 'getFilename').mockImplementation(() => 'test.json')
+
         // Create a fresh Vuetify instance for each test
         const testVuetify = vuetify
 
@@ -58,83 +65,66 @@ describe('EditorPage', () => {
 
     describe('Export JSON', () => {
         it('exports resume data as JSON file', async () => {
+            // Set resume data
+            wrapper.vm.resumeData = new ResumeDataV1({
+                personal: {
+                    name: 'Luke Skywalker',
+                    title: 'Jedi Knight'
+                }
+            })
+
             // Trigger export
             await wrapper.vm.handleExportJSON()
 
-            // Verify createObjectURL was called with correct data
+            // Verify ResumeService was called
+            expect(ResumeService.exportToJSON).toHaveBeenCalledWith(
+                wrapper.vm.resumeData,
+                wrapper.vm.resumeStyle
+            )
+
+            // Verify createObjectURL was called
             expect(window.URL.createObjectURL).toHaveBeenCalled()
-            const blob = window.URL.createObjectURL.mock.calls[0][0]
-            expect(blob.type).toBe('application/json')
 
-            // Verify the JSON content
-            const jsonContent = JSON.parse(await blob.text())
-            expect(jsonContent).toHaveProperty('version', 1)
-            expect(jsonContent).toHaveProperty('resumeData')
-            expect(jsonContent).toHaveProperty('resumeStyle')
-
-            // Verify the resume data structure
-            expect(jsonContent.resumeData).toHaveProperty('personal')
-            expect(jsonContent.resumeData).toHaveProperty('experiences')
-            expect(jsonContent.resumeData).toHaveProperty('education')
-            expect(jsonContent.resumeData).toHaveProperty('customSections')
-
-            // Verify the style data structure
-            expect(jsonContent.resumeStyle).toHaveProperty('colors')
-            expect(jsonContent.resumeStyle).toHaveProperty('typography')
-            expect(jsonContent.resumeStyle).toHaveProperty('spacing')
+            // Verify sa_event was called
+            expect(window.sa_event).toHaveBeenCalledWith('export_json')
 
             // Verify cleanup
             expect(window.URL.revokeObjectURL).toHaveBeenCalled()
         })
 
-        // it('generates correct filename from resume data', async () => {
-        //     // Set resume data first
-        //     wrapper.vm.resumeData = {
-        //         personal: {
-        //             name: 'John Doe',
-        //             title: 'Software Engineer'
-        //         }
-        //     }
+        it('generates correct filename from resume data', async () => {
+            // Set resume data
+            wrapper.vm.resumeData = new ResumeDataV1({
+                personal: {
+                    name: 'Luke Skywalker',
+                    title: 'Jedi Knight'
+                }
+            })
 
-        //     // Mock the getFilename function
-        //     const originalGetFilename = wrapper.vm.getFilename
-        //     wrapper.vm.getFilename = vi.fn(() => 'John_Doe_Software_Engineer.json')
+            // Trigger export
+            await wrapper.vm.handleExportJSON()
 
-        //     // Mock exportJSON to ensure it's called
-        //     const originalExportJSON = wrapper.vm.exportJSON
-        //     wrapper.vm.exportJSON = vi.fn(() => {
-        //         wrapper.vm.getFilename('json')
-        //     })
+            // Verify ExporterService.getFilename was called
+            expect(ExporterService.getFilename).toHaveBeenCalledWith(
+                wrapper.vm.resumeData,
+                'json'
+            )
+        })
 
-        //     // Trigger export
-        //     await wrapper.vm.handleExportJSON()
+        it('generates fallback filename when name/title is missing', async () => {
+            // Set resume data with missing name/title
+            wrapper.vm.resumeData = new ResumeDataV1({
+                personal: {}
+            })
 
-        //     // Verify filename generation
-        //     expect(wrapper.vm.getFilename).toHaveBeenCalledWith('json')
+            // Trigger export
+            await wrapper.vm.handleExportJSON()
 
-        //     // Restore original functions
-        //     wrapper.vm.getFilename = originalGetFilename
-        //     wrapper.vm.exportJSON = originalExportJSON
-        // })
-
-        // it('generates fallback filename when name/title is missing', async () => {
-        //     // Set resume data with missing name/title
-        //     wrapper.vm.resumeData = {
-        //         personal: {}
-        //     }
-
-        //     // Mock the getFilename function
-        //     const originalGetFilename = wrapper.vm.getFilename
-        //     wrapper.vm.getFilename = vi.fn(() => 'resume.json')
-
-        //     // Trigger export
-        //     await wrapper.vm.handleExportJSON()
-
-        //     // Verify filename generation
-        //     expect(wrapper.vm.getFilename).toHaveBeenCalledWith('json')
-
-        //     // Restore original function
-        //     wrapper.vm.getFilename = originalGetFilename
-        // })
+            // Verify ExporterService.getFilename was called
+            expect(ExporterService.getFilename).toHaveBeenCalledWith(
+                wrapper.vm.resumeData,
+                'json'
+            )
+        })
     })
 }) 

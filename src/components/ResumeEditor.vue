@@ -12,9 +12,9 @@
     <v-window v-model="activeTab" class="editor-window">
       <v-window-item value="info">
         <div class="mb-4">
-          <v-text-field v-model="local.personal.name" label="Name" variant="outlined" density="comfortable" class="mb-2"
-            aria-label="Name" />
-          <v-text-field v-model="local.personal.title" label="Title" variant="outlined" density="comfortable"
+          <v-text-field v-model="resumeData.personal.name" label="Name" variant="outlined" density="comfortable"
+            class="mb-2" aria-label="Name" />
+          <v-text-field v-model="resumeData.personal.title" label="Title" variant="outlined" density="comfortable"
             aria-label="Title" />
         </div>
         <v-expansion-panels class="editor-panels" multiple>
@@ -23,27 +23,29 @@
               <div class="d-flex align-center w-100">
                 <span class="section-title">
                   Experience
-                  <v-icon :icon="local.experiencesVisible ? 'mdi-eye' : 'mdi-eye-off'" size="small"
-                    class="visibility-icon" @click.stop="local.experiencesVisible = !local.experiencesVisible" />
+                  <v-icon :icon="resumeData.experiencesVisible ? 'mdi-eye' : 'mdi-eye-off'" size="small"
+                    class="visibility-icon"
+                    @click.stop="resumeData.experiencesVisible = !resumeData.experiencesVisible" />
                 </span>
               </div>
             </v-expansion-panel-title>
             <v-expansion-panel-text>
               <v-expansion-panels>
-                <v-expansion-panel v-for="(exp, index) in local.experiences" :key="index" class="mb-4 experience-card">
+                <v-expansion-panel v-for="(exp, index) in resumeData.experiences" :key="index"
+                  class="mb-4 experience-card">
                   <v-expansion-panel-title>
                     <div class="d-flex align-center w-100">
                       <span class="section-title">
                         {{ exp.title }} - {{ exp.company }}
-                        <v-icon :icon="local.experiences[index].visible ? 'mdi-eye' : 'mdi-eye-off'" size="small"
+                        <v-icon :icon="resumeData.experiences[index].visible ? 'mdi-eye' : 'mdi-eye-off'" size="small"
                           class="visibility-icon"
-                          @click.stop="local.experiences[index].visible = !local.experiences[index].visible" />
+                          @click.stop="resumeData.experiences[index].visible = !resumeData.experiences[index].visible" />
                         <v-tooltip location="top">
                           <template v-slot:activator="{ props }">
                             <v-icon v-bind="props"
                               :icon="deleteConfirmState[`exp-${index}`] ? 'mdi-check' : 'mdi-delete'" size="small"
                               class="delete-icon" @click.stop="removeExp(index)"
-                              :disabled="!local.experiencesVisible" />
+                              :disabled="!resumeData.experiencesVisible" />
                           </template>
                           {{ deleteConfirmState[`exp-${index}`] ? 'Confirm delete' : 'Delete experience' }}
                         </v-tooltip>
@@ -52,24 +54,24 @@
                   </v-expansion-panel-title>
                   <v-expansion-panel-text>
                     <div class="d-flex align-center mb-2">
-                      <v-text-field v-model="local.experiences[index].title" label="Job title"
-                        :disabled="!local.experiencesVisible || !local.experiences[index].visible" variant="outlined"
-                        density="comfortable" aria-label="Job title" />
+                      <v-text-field v-model="resumeData.experiences[index].title" label="Job title"
+                        :disabled="!resumeData.experiencesVisible || !resumeData.experiences[index].visible"
+                        variant="outlined" density="comfortable" aria-label="Job title" />
                     </div>
-                    <v-text-field v-model="local.experiences[index].company" label="Company (+ location)"
-                      :disabled="!local.experiencesVisible || !local.experiences[index].visible" variant="outlined"
-                      density="comfortable" class="mb-2" aria-label="Company" />
-                    <v-text-field v-model="local.experiences[index].period" label="Period"
-                      :disabled="!local.experiencesVisible || !local.experiences[index].visible" variant="outlined"
-                      density="comfortable" class="mb-2" aria-label="Period" />
-                    <v-textarea v-model="local.experiences[index].description" label="Description"
-                      :disabled="!local.experiencesVisible || !local.experiences[index].visible" variant="outlined"
-                      density="comfortable" aria-label="Description" />
+                    <v-text-field v-model="resumeData.experiences[index].company" label="Company (+ location)"
+                      :disabled="!resumeData.experiencesVisible || !resumeData.experiences[index].visible"
+                      variant="outlined" density="comfortable" class="mb-2" aria-label="Company" />
+                    <v-text-field v-model="resumeData.experiences[index].period" label="Period"
+                      :disabled="!resumeData.experiencesVisible || !resumeData.experiences[index].visible"
+                      variant="outlined" density="comfortable" class="mb-2" aria-label="Period" />
+                    <v-textarea v-model="resumeData.experiences[index].description" label="Description"
+                      :disabled="!resumeData.experiencesVisible || !resumeData.experiences[index].visible"
+                      variant="outlined" density="comfortable" aria-label="Description" />
                   </v-expansion-panel-text>
                 </v-expansion-panel>
               </v-expansion-panels>
-              <v-btn color="primary" @click="addExp" aria-label="Add Experience" :disabled="!local.experiencesVisible"
-                prepend-icon="mdi-plus">Add
+              <v-btn color="primary" @click="addExp" aria-label="Add Experience"
+                :disabled="!resumeData.experiencesVisible" prepend-icon="mdi-plus">Add
                 Experience</v-btn>
             </v-expansion-panel-text>
           </v-expansion-panel>
@@ -79,26 +81,28 @@
               <div class="d-flex align-center w-100">
                 <span class="section-title">
                   Education
-                  <v-icon :icon="local.educationVisible ? 'mdi-eye' : 'mdi-eye-off'" size="small"
-                    class="visibility-icon" @click.stop="local.educationVisible = !local.educationVisible" />
+                  <v-icon :icon="resumeData.educationVisible ? 'mdi-eye' : 'mdi-eye-off'" size="small"
+                    class="visibility-icon" @click.stop="resumeData.educationVisible = !resumeData.educationVisible" />
                 </span>
               </div>
             </v-expansion-panel-title>
             <v-expansion-panel-text>
               <v-expansion-panels>
-                <v-expansion-panel v-for="(edu, index) in local.education" :key="index" class="mb-4 education-card">
+                <v-expansion-panel v-for="(edu, index) in resumeData.education" :key="index"
+                  class="mb-4 education-card">
                   <v-expansion-panel-title>
                     <div class="d-flex align-center w-100">
                       <span class="section-title">
                         {{ edu.degree }} - {{ edu.school }}
-                        <v-icon :icon="local.education[index].visible ? 'mdi-eye' : 'mdi-eye-off'" size="small"
+                        <v-icon :icon="resumeData.education[index].visible ? 'mdi-eye' : 'mdi-eye-off'" size="small"
                           class="visibility-icon"
-                          @click.stop="local.education[index].visible = !local.education[index].visible" />
+                          @click.stop="resumeData.education[index].visible = !resumeData.education[index].visible" />
                         <v-tooltip location="top">
                           <template v-slot:activator="{ props }">
                             <v-icon v-bind="props"
                               :icon="deleteConfirmState[`edu-${index}`] ? 'mdi-check' : 'mdi-delete'" size="small"
-                              class="delete-icon" @click.stop="removeEdu(index)" :disabled="!local.educationVisible" />
+                              class="delete-icon" @click.stop="removeEdu(index)"
+                              :disabled="!resumeData.educationVisible" />
                           </template>
                           {{ deleteConfirmState[`edu-${index}`] ? 'Confirm delete' : 'Delete education' }}
                         </v-tooltip>
@@ -106,30 +110,30 @@
                     </div>
                   </v-expansion-panel-title>
                   <v-expansion-panel-text>
-                    <v-text-field v-model="local.education[index].degree" label="Degree"
-                      :disabled="!local.educationVisible || !local.education[index].visible" variant="outlined"
-                      density="comfortable" aria-label="Degree" />
-                    <v-text-field v-model="local.education[index].school" label="School"
-                      :disabled="!local.educationVisible || !local.education[index].visible" variant="outlined"
-                      density="comfortable" class="mb-2" aria-label="School" />
-                    <v-text-field v-model="local.education[index].period" label="Period"
-                      :disabled="!local.educationVisible || !local.education[index].visible" variant="outlined"
-                      density="comfortable" class="mb-2" aria-label="Period" />
-                    <v-text-field v-model="local.education[index].mark" label="Grade"
-                      :disabled="!local.educationVisible || !local.education[index].visible" variant="outlined"
-                      density="comfortable" class="mb-2" aria-label="Grade" />
-                    <v-textarea v-model="local.education[index].thesis" label="Thesis / Notes"
-                      :disabled="!local.educationVisible || !local.education[index].visible" variant="outlined"
-                      density="comfortable" aria-label="Thesis / Notes" />
+                    <v-text-field v-model="resumeData.education[index].degree" label="Degree"
+                      :disabled="!resumeData.educationVisible || !resumeData.education[index].visible"
+                      variant="outlined" density="comfortable" aria-label="Degree" />
+                    <v-text-field v-model="resumeData.education[index].school" label="School"
+                      :disabled="!resumeData.educationVisible || !resumeData.education[index].visible"
+                      variant="outlined" density="comfortable" class="mb-2" aria-label="School" />
+                    <v-text-field v-model="resumeData.education[index].period" label="Period"
+                      :disabled="!resumeData.educationVisible || !resumeData.education[index].visible"
+                      variant="outlined" density="comfortable" class="mb-2" aria-label="Period" />
+                    <v-text-field v-model="resumeData.education[index].mark" label="Grade"
+                      :disabled="!resumeData.educationVisible || !resumeData.education[index].visible"
+                      variant="outlined" density="comfortable" class="mb-2" aria-label="Grade" />
+                    <v-textarea v-model="resumeData.education[index].thesis" label="Thesis / Notes"
+                      :disabled="!resumeData.educationVisible || !resumeData.education[index].visible"
+                      variant="outlined" density="comfortable" aria-label="Thesis / Notes" />
                   </v-expansion-panel-text>
                 </v-expansion-panel>
               </v-expansion-panels>
-              <v-btn color="primary" @click="addEdu" aria-label="Add Education" :disabled="!local.educationVisible"
+              <v-btn color="primary" @click="addEdu" aria-label="Add Education" :disabled="!resumeData.educationVisible"
                 prepend-icon="mdi-plus">Add Education</v-btn>
             </v-expansion-panel-text>
           </v-expansion-panel>
 
-          <template v-for="(section, index) in local.customSections" :key="index">
+          <template v-for="(section, index) in resumeData.customSections" :key="index">
             <v-expansion-panel class="editor-panel">
               <v-expansion-panel-title class="panel-title">
                 <div class="d-flex align-center w-100">
@@ -144,98 +148,114 @@
                     </v-tooltip>
                     <v-tooltip location="top">
                       <template v-slot:activator="{ props }">
-                        <v-icon v-bind="props" :icon="local.customSections[index].visible ? 'mdi-eye' : 'mdi-eye-off'"
-                          size="small" class="visibility-icon"
-                          @click.stop="local.customSections[index].visible = !local.customSections[index].visible" />
+                        <v-icon v-bind="props"
+                          :icon="resumeData.customSections[index].visible ? 'mdi-eye' : 'mdi-eye-off'" size="small"
+                          class="visibility-icon"
+                          @click.stop="resumeData.customSections[index].visible = !resumeData.customSections[index].visible" />
                       </template>
-                      {{ local.customSections[index].visible ? 'Hide section' : 'Show section' }}
+                      {{ resumeData.customSections[index].visible ? 'Hide section' : 'Show section' }}
+                    </v-tooltip>
+                    <v-tooltip location="top">
+                      <template v-slot:activator="{ props }">
+                        <v-icon v-bind="props" icon="mdi-arrow-up" size="small" class="move-icon"
+                          @click.stop="moveCustomSection(index, 'up')" :disabled="index === 0" />
+                      </template>
+                      Move section up
+                    </v-tooltip>
+                    <v-tooltip location="top">
+                      <template v-slot:activator="{ props }">
+                        <v-icon v-bind="props" icon="mdi-arrow-down" size="small" class="move-icon"
+                          @click.stop="moveCustomSection(index, 'down')"
+                          :disabled="index === resumeData.customSections.length - 1" />
+                      </template>
+                      Move section down
                     </v-tooltip>
                     <v-tooltip location="top">
                       <template v-slot:activator="{ props }">
                         <v-icon v-bind="props" :icon="deleteConfirmState[index] ? 'mdi-check' : 'mdi-delete'"
                           size="small" class="delete-icon" @click.stop="removeCustomSection(index)"
-                          :disabled="!local.customSections[index].visible" />
+                          :disabled="!resumeData.customSections[index].visible" />
                       </template>
                       {{ deleteConfirmState[index] ? 'Confirm delete' : 'Delete section' }}
                     </v-tooltip>
                   </span>
-                  <v-text-field v-else v-model="local.customSections[index].title" variant="plain" density="compact"
-                    hide-details class="title-edit-field" @blur="stopEditingTitle(index)"
+                  <v-text-field v-else v-model="resumeData.customSections[index].title" variant="plain"
+                    density="compact" hide-details class="title-edit-field" @blur="stopEditingTitle(index)"
                     @keyup.enter="stopEditingTitle(index)" @keyup.esc="cancelEditingTitle(index)" ref="titleField" />
                 </div>
               </v-expansion-panel-title>
               <v-expansion-panel-text>
                 <div class="d-flex align-center mb-2">
-                  <v-select v-model="local.customSections[index].type" :items="sectionTypes" label="Type"
-                    :disabled="!local.customSections[index].visible" variant="outlined" density="comfortable"
-                    class="mr-2" style="max-width: 200px;"
-                    @update:model-value="(val) => handleSectionTypeChange(local.customSections[index], val)"
-                    item-title="label" item-value="value" aria-label="Type" />
+                  <v-select v-model="resumeData.customSections[index].type" :items="sectionTypes" label="Type"
+                    :disabled="!resumeData.customSections[index].visible" variant="outlined" density="comfortable"
+                    class="mr-2" style="max-width: 200px;" item-title="label" item-value="value" aria-label="Type" />
                 </div>
 
                 <template v-if="section.type === 'languages'">
-                  <div v-for="(item, itemIndex) in local.customSections[index].items" :key="itemIndex"
+                  <div v-for="(item, itemIndex) in resumeData.customSections[index].items" :key="itemIndex"
                     class="d-flex align-center mb-2">
-                    <v-text-field v-model="local.customSections[index].items[itemIndex].name" label="Language"
-                      :disabled="!local.customSections[index].visible" variant="outlined" density="comfortable"
+                    <v-text-field v-model="resumeData.customSections[index].items[itemIndex].name" label="Language"
+                      :disabled="!resumeData.customSections[index].visible" variant="outlined" density="comfortable"
                       class="mr-2" aria-label="Language" />
-                    <v-slider v-model="local.customSections[index].items[itemIndex].proficiency" label="Proficiency"
-                      :disabled="!local.customSections[index].visible" min="0" max="100" step="5" class="mr-2" />
+                    <v-slider v-model="resumeData.customSections[index].items[itemIndex].proficiency"
+                      label="Proficiency" :disabled="!resumeData.customSections[index].visible" min="0" max="100"
+                      step="5" class="mr-2" />
                     <v-btn icon="mdi-delete" color="error" variant="text"
                       @click="removeCustomSectionItem(index, itemIndex)"
-                      :disabled="!local.customSections[index].visible" aria-label="Delete language" />
+                      :disabled="!resumeData.customSections[index].visible" aria-label="Delete language" />
                   </div>
                   <div class="d-flex align-center mb-2">
                     <v-text-field v-model="newCustomSectionItem.name" label="Language"
-                      :disabled="!local.customSections[index].visible" variant="outlined" density="comfortable"
+                      :disabled="!resumeData.customSections[index].visible" variant="outlined" density="comfortable"
                       class="mr-2" aria-label="Language" />
                     <v-slider v-model="newCustomSectionItem.proficiency" label="Proficiency"
-                      :disabled="!local.customSections[index].visible" min="0" max="100" step="5" class="mr-2" />
+                      :disabled="!resumeData.customSections[index].visible" min="0" max="100" step="5" class="mr-2" />
                     <v-btn color="primary" @click="addCustomSectionItem(index)"
-                      :disabled="!local.customSections[index].visible" prepend-icon="mdi-plus"
+                      :disabled="!resumeData.customSections[index].visible" prepend-icon="mdi-plus"
                       aria-label="Add language">Add Language</v-btn>
                   </div>
                 </template>
 
                 <template v-else-if="section.type === 'list'">
-                  <div v-for="(item, itemIndex) in local.customSections[index].items" :key="itemIndex"
+                  <div v-for="(item, itemIndex) in resumeData.customSections[index].items" :key="itemIndex"
                     class="d-flex align-center mb-2">
-                    <v-text-field v-model="local.customSections[index].items[itemIndex]" label="Item"
-                      :disabled="!local.customSections[index].visible" variant="outlined" density="comfortable"
+                    <v-text-field v-model="resumeData.customSections[index].items[itemIndex].value" label="Item"
+                      :disabled="!resumeData.customSections[index].visible" variant="outlined" density="comfortable"
                       class="mr-2" aria-label="Item" />
                     <v-btn icon="mdi-delete" color="error" variant="text"
                       @click="removeCustomSectionItem(index, itemIndex)"
-                      :disabled="!local.customSections[index].visible" aria-label="Delete item" />
+                      :disabled="!resumeData.customSections[index].visible" aria-label="Delete item" />
                   </div>
                   <div class="d-flex align-center mb-2">
-                    <v-text-field v-model="newCustomSectionItem" label="Item"
-                      :disabled="!local.customSections[index].visible" variant="outlined" density="comfortable"
+                    <v-text-field v-model="newCustomSectionItem.value" label="Item"
+                      :disabled="!resumeData.customSections[index].visible" variant="outlined" density="comfortable"
                       class="mr-2" aria-label="Item" />
                     <v-btn color="primary" @click="addCustomSectionItem(index)"
-                      :disabled="!local.customSections[index].visible" prepend-icon="mdi-plus" aria-label="Add item">Add
+                      :disabled="!resumeData.customSections[index].visible" prepend-icon="mdi-plus"
+                      aria-label="Add item">Add
                       Item</v-btn>
                   </div>
                 </template>
 
                 <template v-else>
-                  <div v-for="(item, itemIndex) in local.customSections[index].items" :key="itemIndex"
+                  <div v-for="(item, itemIndex) in resumeData.customSections[index].items" :key="itemIndex"
                     class="custom-section-item mb-4">
                     <div class="d-flex align-center mb-2">
-                      <v-textarea v-model="local.customSections[index].items[itemIndex].value" label="Item"
-                        :disabled="!local.customSections[index].visible" variant="outlined" density="comfortable"
+                      <v-textarea v-model="resumeData.customSections[index].items[itemIndex].value" label="Item"
+                        :disabled="!resumeData.customSections[index].visible" variant="outlined" density="comfortable"
                         class="flex-grow-1" aria-label="Item" />
                     </div>
                     <div class="d-flex align-center justify-end">
-                      <v-switch v-model="local.customSections[index].items[itemIndex].isLink" label="Link"
-                        :disabled="!local.customSections[index].visible" hide-details density="compact" color="primary"
-                        class="mr-2" />
+                      <v-switch v-model="resumeData.customSections[index].items[itemIndex].isLink" label="Link"
+                        :disabled="!resumeData.customSections[index].visible" hide-details density="compact"
+                        color="primary" class="mr-2" />
                       <v-btn icon="mdi-delete" color="error" variant="text"
                         @click="removeCustomSectionItem(index, itemIndex)"
-                        :disabled="!local.customSections[index].visible" aria-label="Delete item" />
+                        :disabled="!resumeData.customSections[index].visible" aria-label="Delete item" />
                     </div>
-                    <div v-if="local.customSections[index].items[itemIndex].isLink" class="mt-2">
-                      <v-text-field v-model="local.customSections[index].items[itemIndex].href" label="URL"
-                        :disabled="!local.customSections[index].visible" variant="outlined" density="comfortable"
+                    <div v-if="resumeData.customSections[index].items[itemIndex].isLink" class="mt-2">
+                      <v-text-field v-model="resumeData.customSections[index].items[itemIndex].href" label="URL"
+                        :disabled="!resumeData.customSections[index].visible" variant="outlined" density="comfortable"
                         placeholder="https://example.com" aria-label="URL" />
                     </div>
                   </div>
@@ -243,20 +263,20 @@
                   <div class="custom-section-item mb-4">
                     <div class="d-flex align-center mb-2">
                       <v-textarea v-model="newCustomSectionItem.value" label="New Item"
-                        :disabled="!local.customSections[index].visible" variant="outlined" density="comfortable"
+                        :disabled="!resumeData.customSections[index].visible" variant="outlined" density="comfortable"
                         class="flex-grow-1" aria-label="New Item" />
                     </div>
                     <div class="d-flex align-center justify-end">
                       <v-switch v-model="newCustomSectionItem.isLink" label="Link"
-                        :disabled="!local.customSections[index].visible" hide-details density="compact" color="primary"
-                        class="mr-2" />
+                        :disabled="!resumeData.customSections[index].visible" hide-details density="compact"
+                        color="primary" class="mr-2" />
                       <v-btn color="primary" @click="addCustomSectionItem(index)"
-                        :disabled="!local.customSections[index].visible" prepend-icon="mdi-plus"
+                        :disabled="!resumeData.customSections[index].visible" prepend-icon="mdi-plus"
                         aria-label="Add item">Add Item</v-btn>
                     </div>
                     <div v-if="newCustomSectionItem.isLink" class="mt-2">
                       <v-text-field v-model="newCustomSectionItem.href" label="URL"
-                        :disabled="!local.customSections[index].visible" variant="outlined" density="comfortable"
+                        :disabled="!resumeData.customSections[index].visible" variant="outlined" density="comfortable"
                         placeholder="https://example.com" aria-label="URL" />
                     </div>
                   </div>
@@ -272,15 +292,17 @@
       </v-window-item>
 
       <v-window-item value="style">
-        <ResumeStyle v-model:style-data="styleData" @update:style-data="updateStyle" />
+        <ResumeStyle v-model:style-data="props.style" @update:style-data="updateStyle" />
       </v-window-item>
     </v-window>
   </div>
 </template>
 
 <script setup>
-import { ref, watch, computed, nextTick, onMounted, onUnmounted } from 'vue'
+import { ref, watch, nextTick, onMounted, onUnmounted } from 'vue'
 import ResumeStyle from './ResumeStyle.vue'
+import { ResumeDataV1 as ResumeData } from '../models/ResumeData/ResumeDataV1'
+import { ResumeStyle2ColumnsV1 as ResumeStyleClass } from '../models/ResumeStyle/ResumeStyle2ColumnsV1'
 
 const props = defineProps({
   resumeData: {
@@ -300,76 +322,11 @@ const props = defineProps({
 const emit = defineEmits(['update:resumeData', 'update:style', 'save', 'change', 'preview'])
 
 const activeTab = ref('info')
-const styleData = ref(props.style)
 
-const local = ref({
-  personal: {
-    name: props.resumeData.personal.name || '',
-    title: props.resumeData.personal.title || '',
-    visible: props.resumeData.personal.visible || true
-  },
-  experiences: (props.resumeData.experiences || []).map(exp => ({
-    ...exp,
-    visible: exp.visible === undefined ? true : exp.visible
-  })),
-  experiencesVisible: props.resumeData.experiencesVisible !== false,
-  education: (props.resumeData.education || []).map(edu => ({
-    ...edu,
-    visible: edu.visible === undefined ? true : edu.visible
-  })),
-  educationVisible: props.resumeData.educationVisible !== false,
-  customSections: (props.resumeData.customSections || []).map(section => ({
-    ...section,
-    visible: section.visible === undefined ? true : section.visible
-  })),
-  customSectionsVisible: props.resumeData.customSectionsVisible !== false
-})
-
-// Form data for new items
-const exp = ref({
-  title: 'Experience',
-  company: 'Company',
-  period: '',
-  description: ''
-})
-
-const edu = ref({
-  degree: 'Degree',
-  school: 'Cool School',
-  period: '',
-  mark: '',
-  thesis: ''
-})
-
-const newCustomSectionItem = ref({
-  value: '',
-  isLink: false,
-  href: '',
-  name: '',
-  proficiency: 50
-})
-
-const sectionTypes = [
-  { label: 'Text', value: 'text' },
-  { label: 'List', value: 'list' },
-  { label: 'Languages', value: 'languages' },
-  { label: 'Italic Text', value: 'italic' }
-]
-
-const fonts = [
-  'Oswald',
-  'Lato',
-  'Roboto',
-  'Open Sans',
-  'Montserrat',
-  'Raleway',
-  'Poppins',
-  'Source Sans Pro'
-]
+const newCustomSectionItem = ref(ResumeData.getNewCustomSectionItem())
+const sectionTypes = ResumeStyleClass.SECTION_TYPES
 
 const editingSectionTitle = ref({})
-
-// Add new ref for tracking delete confirmation state
 const deleteConfirmState = ref({})
 
 // Add click outside handler
@@ -390,49 +347,21 @@ onUnmounted(() => {
 })
 
 // Watch for changes and emit updates
-watch(local, (newValue) => {
-  const updatedData = {
-    ...newValue,
-    experiences: newValue.experiences.map(exp => ({
-      ...exp,
-      visible: exp.visible === undefined ? true : exp.visible
-    })),
-    education: newValue.education.map(edu => ({
-      ...edu,
-      visible: edu.visible === undefined ? true : edu.visible
-    })),
-    experiencesVisible: newValue.experiencesVisible !== false,
-    educationVisible: newValue.educationVisible !== false,
-    customSectionsVisible: newValue.customSectionsVisible !== false
+watch(() => props.resumeData, (newValue) => {
+  if (newValue !== props.resumeData) {
+    emit('update:resumeData', newValue)
+    emit('change')
   }
-  emit('update:resumeData', updatedData)
-  emit('change')
-}, { deep: true })
-
-// Watch for style changes
-watch(styleData, (newValue) => {
-  emit('update:style', newValue)
-  emit('change')
 }, { deep: true })
 
 const updateStyle = (newStyle) => {
-  styleData.value = newStyle
   emit('update:style', newStyle)
   emit('change')
 }
 
 // Experience methods
 const addExp = () => {
-  local.value.experiences.push({
-    ...exp.value,
-    visible: true
-  })
-  exp.value = {
-    title: 'Experience',
-    company: 'Company',
-    period: '',
-    description: ''
-  }
+  props.resumeData.experiences.push(ResumeData.getNewExperience())
 }
 
 const removeExp = (index) => {
@@ -442,23 +371,13 @@ const removeExp = (index) => {
     return
   }
   // Second click - actually delete
-  local.value.experiences.splice(index, 1)
+  props.resumeData.experiences.splice(index, 1)
   deleteConfirmState.value[`exp-${index}`] = false
 }
 
 // Education methods
 const addEdu = () => {
-  local.value.education.push({
-    ...edu.value,
-    visible: true
-  })
-  edu.value = {
-    degree: 'Degree',
-    school: 'Cool School',
-    period: '',
-    mark: '',
-    thesis: ''
-  }
+  props.resumeData.education.push(ResumeData.getNewEducation())
 }
 
 const removeEdu = (index) => {
@@ -468,18 +387,13 @@ const removeEdu = (index) => {
     return
   }
   // Second click - actually delete
-  local.value.education.splice(index, 1)
+  props.resumeData.education.splice(index, 1)
   deleteConfirmState.value[`edu-${index}`] = false
 }
 
 // Custom section methods
 const addCustomSection = () => {
-  local.value.customSections.push({
-    title: 'New Section',
-    type: 'text',
-    items: [],
-    visible: true
-  })
+  props.resumeData.customSections.push(ResumeData.getNewCustomSection())
 }
 
 const removeCustomSection = (index) => {
@@ -489,104 +403,22 @@ const removeCustomSection = (index) => {
     return
   }
   // Second click - actually delete
-  local.value.customSections.splice(index, 1)
+  props.resumeData.customSections.splice(index, 1)
   deleteConfirmState.value[index] = false
 }
 
-const handleSectionTypeChange = (section, newType) => {
-  if (section.type === newType) {
+const addCustomSectionItem = (sectionIndex) => {
+  if (!newCustomSectionItem.value.name && !newCustomSectionItem.value.proficiency && !newCustomSectionItem.value.value) {
     return
   }
 
-  // Find the section index in the array
-  const sectionIndex = local.value.customSections.findIndex(s => s === section)
-  if (sectionIndex === -1) return
-
-  // If switching between text and italic, preserve the content
-  if ((section.type === 'text' && newType === 'italic') ||
-    (section.type === 'italic' && newType === 'text')) {
-    // Convert items to the new format if needed
-    const convertedItems = section.items.map(item => {
-      if (typeof item === 'string') {
-        return {
-          value: item,
-          isLink: false,
-          href: ''
-        }
-      }
-      return {
-        ...item,
-        href: item.href || ''
-      }
-    })
-    local.value.customSections[sectionIndex].type = newType
-    local.value.customSections[sectionIndex].items = convertedItems
-  } else {
-    // For other type changes, reset the items
-    local.value.customSections[sectionIndex].type = newType
-    local.value.customSections[sectionIndex].items = []
-
-    // Reset the new item template based on type
-    if (newType === 'languages') {
-      newCustomSectionItem.value = {
-        name: '',
-        proficiency: 50
-      }
-    } else if (newType === 'list') {
-      newCustomSectionItem.value = ''
-    } else {
-      newCustomSectionItem.value = {
-        value: '',
-        isLink: false,
-        href: ''
-      }
-    }
-  }
-}
-
-const addCustomSectionItem = (sectionIndex) => {
-  const section = local.value.customSections[sectionIndex]
-  if (section.type === 'languages') {
-    if (newCustomSectionItem.value.name) {
-      section.items.push({ ...newCustomSectionItem.value })
-      newCustomSectionItem.value = {
-        name: '',
-        proficiency: 50
-      }
-    }
-  } else if (section.type === 'list') {
-    if (newCustomSectionItem.value) {
-      section.items.push(newCustomSectionItem.value)
-      newCustomSectionItem.value = ''
-    }
-  } else {
-    // Handle both text and italic types
-    if (newCustomSectionItem.value.value) {
-      section.items.push({
-        value: newCustomSectionItem.value.value,
-        isLink: newCustomSectionItem.value.isLink || false,
-        href: newCustomSectionItem.value.href || ''
-      })
-      newCustomSectionItem.value = {
-        value: '',
-        isLink: false,
-        href: ''
-      }
-    }
-  }
+  const section = props.resumeData.customSections[sectionIndex]
+  section.items.push(newCustomSectionItem.value)
+  newCustomSectionItem.value = ResumeData.getNewCustomSectionItem()
 }
 
 const removeCustomSectionItem = (sectionIndex, itemIndex) => {
-  local.value.customSections[sectionIndex].items.splice(itemIndex, 1)
-}
-
-// Style methods
-const colorTooltip = (color) => {
-  return `Color: ${color.toUpperCase()}`
-}
-
-const colorPreview = (color) => {
-  return color.toUpperCase()
+  props.resumeData.customSections[sectionIndex].items.splice(itemIndex, 1)
 }
 
 const startEditingTitle = (index) => {
@@ -607,8 +439,19 @@ const stopEditingTitle = (index) => {
 
 const cancelEditingTitle = (index) => {
   // Restore the original title
-  local.value.customSections[index].title = props.resumeData.customSections[index].title
+  props.resumeData.customSections[index].title = props.resumeData.customSections[index].title
   editingSectionTitle.value[index] = false
+}
+
+const moveCustomSection = (index, direction) => {
+  const sections = props.resumeData.customSections
+  if (direction === 'up' && index > 0) {
+    // Swap with previous section
+    [sections[index], sections[index - 1]] = [sections[index - 1], sections[index]]
+  } else if (direction === 'down' && index < sections.length - 1) {
+    // Swap with next section
+    [sections[index], sections[index + 1]] = [sections[index + 1], sections[index]]
+  }
 }
 </script>
 
@@ -640,18 +483,74 @@ const cancelEditingTitle = (index) => {
   background: transparent;
 }
 
+.editor-panel {
+  margin-bottom: 8px;
+}
+
+/* Desktop styles */
+@media (min-width: 601px) {
+
+  .editor-panel .section-title .visibility-icon,
+  .editor-panel .section-title .edit-icon,
+  .editor-panel .section-title .delete-icon,
+  .editor-panel .section-title .move-icon {
+    opacity: 0;
+    transition: opacity 0.2s;
+    cursor: pointer;
+  }
+
+  .editor-panel:hover .section-title .visibility-icon,
+  .editor-panel:hover .section-title .edit-icon,
+  .editor-panel:hover .section-title .delete-icon,
+  .editor-panel:hover .section-title .move-icon {
+    opacity: 0.7;
+  }
+
+  .editor-panel .section-title .visibility-icon:hover,
+  .editor-panel .section-title .edit-icon:hover,
+  .editor-panel .section-title .delete-icon:hover,
+  .editor-panel .section-title .move-icon:hover {
+    opacity: 1;
+  }
+
+  .editor-panel .section-title .move-icon.v-icon--disabled {
+    opacity: 0;
+    cursor: not-allowed;
+  }
+
+  .editor-panel:hover .section-title .move-icon.v-icon--disabled {
+    opacity: 0.3;
+  }
+}
+
+/* Mobile styles */
+@media (max-width: 600px) {
+
+  .editor-panel .section-title .visibility-icon,
+  .editor-panel .section-title .edit-icon,
+  .editor-panel .section-title .delete-icon,
+  .editor-panel .section-title .move-icon {
+    opacity: 0.7;
+    cursor: pointer;
+  }
+
+  .editor-panel .section-title .move-icon.v-icon--disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+}
+
+.editor-panel:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
 :deep(.editor-panel) {
   background-color: white;
   border: 1px solid rgba(0, 0, 0, 0.06) !important;
   border-radius: 8px !important;
-  margin-bottom: 12px;
   overflow: hidden;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.02);
   transition: all 0.2s ease;
-}
-
-:deep(.editor-panel:hover) {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
 :deep(.panel-title) {
@@ -963,81 +862,12 @@ const cancelEditingTitle = (index) => {
 }
 
 .section-title {
-  position: relative;
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  font-weight: 600;
-}
-
-.edit-icon,
-.visibility-icon,
-.delete-icon {
-  opacity: 0;
-  transition: all 0.2s ease;
-  cursor: pointer;
-  color: rgba(0, 0, 0, 0.4);
-  margin-left: 8px;
-}
-
-/* Desktop styles */
-@media (min-width: 601px) {
-
-  .section-title .edit-icon,
-  .section-title .visibility-icon,
-  .section-title .delete-icon {
-    opacity: 0;
-  }
-
-  .editor-panel:hover .section-title .edit-icon,
-  .editor-panel:hover .section-title .visibility-icon,
-  .editor-panel:hover .section-title .delete-icon {
-    opacity: 0.6;
-  }
-}
-
-/* Mobile styles */
-@media (max-width: 600px) {
-
-  .section-title .edit-icon,
-  .section-title .visibility-icon,
-  .section-title .delete-icon {
-    opacity: 0.6;
-  }
-}
-
-.section-title .edit-icon:hover,
-.section-title .visibility-icon:hover {
-  opacity: 1;
-  color: rgb(var(--v-theme-primary));
-}
-
-.section-title .delete-icon:hover {
-  opacity: 1;
-  color: rgb(var(--v-theme-error));
-}
-
-.section-title .delete-icon[disabled] {
-  opacity: 0.2;
-  cursor: not-allowed;
+  gap: 8px;
 }
 
 .title-edit-field {
-  margin: -8px 0;
-}
-
-:deep(.title-edit-field .v-field__input) {
-  padding: 0;
-  font-size: 1.2rem;
-  font-weight: 600;
-  color: rgba(0, 0, 0, 0.87);
-}
-
-:deep(.title-edit-field .v-field__outline) {
-  display: none;
-}
-
-/* Add styles for confirmation state */
-.delete-icon[data-confirm="true"] {
-  color: rgb(var(--v-theme-error));
+  width: 100%;
 }
 </style>

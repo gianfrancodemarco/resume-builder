@@ -71,134 +71,22 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted, onBeforeUnmount, computed } from 'vue'
+import { ref, onMounted, onBeforeUnmount, computed } from 'vue'
 import ResumeEditor from '../components/ResumeEditor.vue'
 import ResumePreview from '../components/ResumePreview.vue'
 import { useRouter } from 'vue-router'
 import { useDisplay } from 'vuetify'
+import { ResumeService, ResumeData, ResumeStyleClass } from '../services/ResumeService'
+import { ExporterService } from '../services/ExporterService'
 
 const router = useRouter()
 const { mobile } = useDisplay()
-const resumeData = ref({
-    personal: {
-        name: 'John Doe',
-        title: 'Software Engineer',
-        visible: true
-    },
-    experiences: [
-        {
-            title: 'Senior Software Engineer',
-            company: 'Tech Solutions Inc. - Milan',
-            period: '2020 - Present',
-            description: 'Led the development of enterprise-level web applications using Vue.js and Node.js. Implemented CI/CD pipelines and improved application performance by 40%.',
-            visible: true
-        },
-        {
-            title: 'Full Stack Developer',
-            company: 'Digital Innovations - Rome',
-            period: '2018 - 2020',
-            description: 'Developed and maintained multiple web applications. Collaborated with UX designers to implement responsive interfaces and improve user experience.',
-            visible: true
-        }
-    ],
-    experiencesVisible: true,
-    education: [
-        {
-            degree: 'Master in Computer Science',
-            school: 'University of Milan',
-            period: '2016 - 2018',
-            mark: '110/110',
-            thesis: 'Advanced Web Development Techniques and Best Practices',
-            visible: true
-        },
-        {
-            degree: 'Bachelor in Computer Engineering',
-            school: 'University of Rome',
-            period: '2013 - 2016',
-            mark: '108/110',
-            thesis: 'Introduction to Modern Web Technologies',
-            visible: true
-        }
-    ],
-    educationVisible: true,
-    customSections: [
-        {
-            title: 'About Me',
-            type: 'italic',
-            visible: true,
-            items: [
-                { value: 'Passionate software engineer with a strong focus on web development and user experience. Experienced in building modern, responsive applications using Vue.js and other cutting-edge technologies.', isLink: false, href: '' },
-                { value: 'Skilled in both frontend and backend development, with a particular emphasis on creating intuitive user interfaces and robust server-side solutions.', isLink: false, href: '' }
-            ]
-        },
-        {
-            title: 'Contact Details',
-            type: 'text',
-            visible: true,
-            items: [
-                { value: 'New York, USA', isLink: false, href: '' },
-                { value: 'john.doe@example.com', isLink: true, href: 'mailto:john.doe@example.com' }
-            ]
-        },
-        {
-            title: 'Professional Links',
-            type: 'text',
-            visible: true,
-            items: [
-                { value: 'GitHub Profile', isLink: true, href: 'https://github.com/johndoetest1999' },
-                { value: 'LinkedIn Profile', isLink: true, href: 'https://linkedin.com/in/johndoe' }
-            ]
-        },
-        {
-            title: 'Technical Skills',
-            type: 'list',
-            visible: true,
-            items: [
-                'Vue.js',
-                'JavaScript',
-                'TypeScript',
-                'HTML/CSS',
-                'Node.js',
-                'Python',
-                'Git',
-                'Docker'
-            ]
-        },
-        {
-            title: 'Languages',
-            type: 'languages',
-            visible: true,
-            items: [
-                { name: 'Italian', proficiency: 100 },
-                { name: 'English', proficiency: 90 },
-                { name: 'Spanish', proficiency: 70 }
-            ]
-        }
-    ],
-    customSectionsVisible: true
-})
 
-const resumeStyle = ref({
-    colors: {
-        primary: '#08294D',
-        text: '#08294D',
-        background: '#ffffff',
-        sidebar: '#08294D',
-        link: '#ffffff'
-    },
-    typography: {
-        headingFont: 'Oswald',
-        bodyFont: 'Lato',
-        baseSize: 16,
-        headingSize: 26
-    },
-    spacing: {
-        section: 24,
-        content: 12,
-        sidebarLeft: false,
-        sidebarWidth: 280
-    }
-})
+// Replace the resumeData ref with the ResumeData factory
+const resumeData = ref(ResumeData.createDefault())
+
+// Initialize the style with the class instance
+const resumeStyle = ref(ResumeStyleClass.createDefault())
 
 const fileInput = ref(null)
 
@@ -258,180 +146,20 @@ const handleFormSave = () => {
     hasUnsavedChanges.value = false
 }
 
-// Handle navigation
-const handleNavigation = (to) => {
-    if (hasUnsavedChanges.value) {
-        if (confirm('You have unsaved changes. Are you sure you want to leave?')) {
-            router.push(to)
-        }
-    } else {
-        router.push(to)
-    }
-}
-
-const getFilename = (extension) => {
-    // Get name and position from resume data
-    const name = resumeData.value.personal.name?.trim()
-    const position = resumeData.value.personal.title?.trim()
-
-    // Create filename: "Name_Position.extension" or "resume.extension" if no name/position
-    return (name && position)
-        ? `${name}_${position}.${extension}`
-        : (name || position || 'resume') + `.${extension}`
-}
-
 const downloadPDF = async () => {
-    const srcEl = document.getElementById('printable-area').cloneNode(true)
-    if (!srcEl) return
-
-    // Remove any scaling and centering styles
-    srcEl.style.transform = 'none'
-    srcEl.style.transformOrigin = 'initial'
-    srcEl.style.margin = '0'
-
-    const filename = getFilename('pdf')
-    var printWindow = window.open('', filename)
-    printWindow.document.title = filename
-    printWindow.document.head.append(document.head.cloneNode(true))
-    const style = printWindow.document.createElement('style')
-    style.textContent = `
-        @page {
-            margin: 0;
-        }
-
-        html, body {
-            margin: 0 !important;
-            padding: 0 !important;
-            width: 100% !important;
-            background: white !important;
-            box-sizing: border-box;
-        }
-
-        * {
-            -webkit-print-color-adjust: exact !important;
-            print-color-adjust: exact !important;
-        }
-    `
-    printWindow.document.head.appendChild(style)
-    printWindow.document.body.innerHTML = srcEl.outerHTML
-    printWindow.document.fonts.ready.then(() => {
-        setTimeout(() => {
-            printWindow.print()
-            //printWindow.close() // On Android it seems to cause an error to close the window
-        }, 0) // Safari needs time to render layout
-    })
+    await ExporterService.exportToPDF(resumeData.value, resumeStyle.value)
 }
 
 const downloadHTML = async () => {
-    const srcEl = document.getElementById('printable-area')
-    if (!srcEl) return
-
-    const filename = getFilename('html')
-    const printWindow = window.open('', filename)
-    if (!printWindow) {
-        alert('Popup blocked. Please allow popups for this site.')
-        return
-    }
-
-    printWindow.document.title = filename
-
-    // Step 1: Collect local (non-CORS) styles from <style> and <link>
-    const localCSS = Array.from(document.styleSheets).map(sheet => {
-        try {
-            return Array.from(sheet.cssRules || []).map(rule => rule.cssText).join('\n')
-        } catch (e) {
-            return '' // Ignore cross-origin styles
-        }
-    }).join('\n')
-
-    // Step 2: Attempt to fetch CORS-allowed external stylesheets
-    const fetchExternalStyles = async () => {
-        const externalLinks = Array.from(document.querySelectorAll('link[rel="stylesheet"]'))
-        const fetched = await Promise.all(externalLinks.map(async link => {
-            try {
-                const res = await fetch(link.href)
-                if (!res.ok) throw new Error('fetch failed')
-                return await res.text()
-            } catch {
-                console.warn(`Could not fetch: ${link.href}`)
-                return ''
-            }
-        }))
-        return fetched.join('\n')
-    }
-
-    const externalCSS = await fetchExternalStyles()
-
-    // Step 3: Append combined CSS
-    const styleTag = document.createElement('style')
-    styleTag.textContent = `
-    @page {
-      margin: 0;
-    }
-
-    html, body {
-      margin: 0 !important;
-      padding: 0 !important;
-      width: 100% !important;
-      height: 100% !important;
-      background: white !important;
-      box-sizing: border-box;
-    }
-
-    ${localCSS}
-    ${externalCSS}
-  `
-    printWindow.document.head.appendChild(styleTag)
-
-    // Step 4: Clone content
-    const clone = srcEl.cloneNode(true)
-    printWindow.document.body.appendChild(clone)
-
-    // Step 5: Wait for fonts to load, then generate downloadable HTML
-    await printWindow.document.fonts.ready
-    setTimeout(() => {
-        const blob = new Blob([printWindow.document.documentElement.outerHTML], { type: 'text/html' })
-        const url = URL.createObjectURL(blob)
-        const a = document.createElement('a')
-        a.href = url
-        a.download = filename.replace(/\s+/g, '_')
-        document.body.appendChild(a)
-        a.click()
-        document.body.removeChild(a)
-        URL.revokeObjectURL(url)
-        printWindow.close()
-    }, 0)
-}
-
-const updateStyle = (newStyle) => {
-    resumeStyle.value = newStyle
-}
-
-const toggleSidebarPosition = () => {
-    resumeStyle.value.spacing.sidebarLeft = !resumeStyle.value.spacing.sidebarLeft
-}
-
-// Add color picker tooltip formatter
-const colorTooltip = (color) => {
-    return `Color: ${color.toUpperCase()}`
-}
-
-// Add color preview formatter
-const colorPreview = (color) => {
-    return color.toUpperCase()
+    await ExporterService.exportToHTML(resumeData.value)
 }
 
 const exportJSON = () => {
-    const data = {
-        version: 1,
-        resumeData: resumeData.value,
-        resumeStyle: resumeStyle.value
-    }
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
+    const blob = ResumeService.exportToJSON(resumeData.value, resumeStyle.value)
     const url = window.URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = getFilename('json')
+    a.download = ExporterService.getFilename(resumeData.value, 'json')
     document.body.appendChild(a)
     a.click()
     window.URL.revokeObjectURL(url)
@@ -442,24 +170,16 @@ const importJSON = () => {
     fileInput.value.click()
 }
 
-const handleFileUpload = (event) => {
+const handleFileUpload = async (event) => {
     const file = event.target.files[0]
     if (file) {
-        const reader = new FileReader()
-        reader.onload = (e) => {
-            try {
-                const data = JSON.parse(e.target.result)
-                if (data.resumeData && data.resumeStyle) {
-                    resumeData.value = data.resumeData
-                    resumeStyle.value = data.resumeStyle
-                } else {
-                    alert('Invalid resume data format')
-                }
-            } catch (error) {
-                alert('Error loading file: ' + error.message)
-            }
+        try {
+            const { resumeData: newResumeData, resumeStyle: newResumeStyle } = await ResumeService.loadFromFile(file)
+            resumeData.value = newResumeData
+            resumeStyle.value = newResumeStyle
+        } catch (error) {
+            alert(error.message)
         }
-        reader.readAsText(file)
     }
     // Reset the input so the same file can be selected again
     event.target.value = ''

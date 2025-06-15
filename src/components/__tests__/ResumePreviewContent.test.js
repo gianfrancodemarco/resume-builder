@@ -71,12 +71,15 @@ describe('ResumePreview Content', () => {
                 title: 'Technical Skills',
                 type: 'list',
                 visible: true,
-                items: [
-                    'Vue.js',
-                    'JavaScript',
-                    'TypeScript',
-                    'HTML/CSS',
-                    'Node.js'
+                items: [{
+                    value: 'Vue.js',
+                    isLink: false,
+                    href: ''
+                },
+                { value: 'JavaScript', isLink: false, href: '' },
+                { value: 'TypeScript', isLink: false, href: '' },
+                { value: 'HTML/CSS', isLink: false, href: '' },
+                { value: 'Node.js', isLink: false, href: '' }
                 ]
             },
             {

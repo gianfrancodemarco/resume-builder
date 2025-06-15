@@ -130,6 +130,14 @@ export default {
     margin: 0;
   }
 
+  html,
+  body {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    box-sizing: border-box;
+  }
+
   body {
     margin: 0;
     padding: 0;
@@ -139,7 +147,6 @@ export default {
     margin: 0;
     padding: 0;
     width: 210mm;
-    background-color: var(--sidebar-color) !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
