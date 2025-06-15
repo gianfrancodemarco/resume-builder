@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { createRouter, createWebHistory } from 'vue-router'
 import { ResumeDataV1 } from '../../models/ResumeData/ResumeDataV1'
 import { ResumeService } from '../../services/ResumeService'
+import { ExporterService } from '../../services/ExporterService'
 import { vuetify } from '../../test/setup'
 import EditorPage from '../../views/EditorPage.vue'
 
@@ -38,7 +39,7 @@ describe('EditorPage', () => {
 
         // Mock ResumeService methods
         vi.spyOn(ResumeService, 'exportToJSON').mockImplementation(() => new Blob(['test']))
-        vi.spyOn(ResumeService, 'getFilename').mockImplementation(() => 'test.json')
+        vi.spyOn(ExporterService, 'getFilename').mockImplementation(() => 'test.json')
 
         // Create a fresh Vuetify instance for each test
         const testVuetify = vuetify
@@ -103,8 +104,8 @@ describe('EditorPage', () => {
             // Trigger export
             await wrapper.vm.handleExportJSON()
 
-            // Verify ResumeService.getFilename was called
-            expect(ResumeService.getFilename).toHaveBeenCalledWith(
+            // Verify ExporterService.getFilename was called
+            expect(ExporterService.getFilename).toHaveBeenCalledWith(
                 wrapper.vm.resumeData,
                 'json'
             )
@@ -119,8 +120,8 @@ describe('EditorPage', () => {
             // Trigger export
             await wrapper.vm.handleExportJSON()
 
-            // Verify ResumeService.getFilename was called
-            expect(ResumeService.getFilename).toHaveBeenCalledWith(
+            // Verify ExporterService.getFilename was called
+            expect(ExporterService.getFilename).toHaveBeenCalledWith(
                 wrapper.vm.resumeData,
                 'json'
             )

@@ -1,7 +1,16 @@
 import { ResumeDataV1 as ResumeData } from '../models/ResumeData/ResumeDataV1'
 import { ResumeStyle2ColumnsV1 as ResumeStyleClass } from '../models/ResumeStyle/ResumeStyle2ColumnsV1'
 
+// Export the model classes
+// These always point to the latest version of the models
+// Other part of the app should only import from here
+export { ResumeData, ResumeStyleClass }
+
 export class ResumeService {
+    // Current versions of the models
+    static CURRENT_RESUME_DATA_VERSION = ResumeData.VERSION
+    static CURRENT_RESUME_STYLE_VERSION = ResumeStyleClass.VERSION
+
     /**
      * Loads resume data from a JSON file
      * @param {File} file - The JSON file to load
@@ -48,20 +57,5 @@ export class ResumeService {
             resumeStyle: resumeStyle.toJSON ? resumeStyle.toJSON() : resumeStyle
         }
         return new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
-    }
-
-    /**
-     * Gets a filename for the resume based on personal info
-     * @param {ResumeData} resumeData - The resume data containing personal info
-     * @param {string} extension - The file extension to use
-     * @returns {string} The generated filename
-     */
-    static getFilename(resumeData, extension) {
-        const name = resumeData.personal.name?.trim()
-        const position = resumeData.personal.title?.trim()
-
-        return (name && position)
-            ? `${name}_${position}.${extension}`
-            : (name || position || 'resume') + `.${extension}`
     }
 } 
