@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { ExporterService } from '../ExporterService'
-import { ResumeDataV1 } from '../../models/ResumeData/ResumeDataV1'
+import { ExporterService } from '@/services/ExporterService'
+import { ResumeDataV1 } from '@/models/ResumeData/ResumeDataV1'
 
 describe('ExporterService', () => {
     describe('getFilename', () => {
