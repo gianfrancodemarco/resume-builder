@@ -12,18 +12,7 @@
                 <div class="preview-col" :class="{ 'hidden': isMobile }"
                     :style="!isMobile ? { width: `${100 - editorWidth}%` } : {}">
                     <div class="preview-container">
-                        <div class="preview-header">
-                            <div class="preview-actions">
-                                <v-btn color="primary" prepend-icon="mdi-code-json" class="action-btn"
-                                    @click="handleExportJSON">Export JSON</v-btn>
-                                <v-btn color="primary" prepend-icon="mdi-upload" class="action-btn"
-                                    @click="handleImportJSON">Import JSON</v-btn>
-                                <v-btn color="primary" prepend-icon="mdi-file-pdf-box" class="action-btn"
-                                    @click="handleDownloadPDF">Download PDF</v-btn>
-                                <v-btn color="primary" prepend-icon="mdi-file-code" class="action-btn"
-                                    @click="handleDownloadHTML">Download HTML</v-btn>
-                            </div>
-                        </div>
+                        <div class="preview-header"></div>
                         <ResumePreview :resume-data="resumeData" :style="resumeStyle"
                             :sidebar-position="resumeStyle.spacing.sidebarLeft ? 'left' : 'right'" />
                     </div>
@@ -67,12 +56,17 @@
 
         <!-- Hidden file input for JSON import -->
         <input type="file" ref="fileInput" style="display: none" accept=".json" @change="handleFileUpload" />
+
+        <!-- Desktop Collapsible Menu -->
+        <CollapsibleMenu v-if="!isMobile" :handleExportJSON="handleExportJSON" :handleImportJSON="handleImportJSON"
+            :handleDownloadPDF="handleDownloadPDF" :handleDownloadHTML="handleDownloadHTML" />
     </v-app>
 </template>
 
 <script setup>
 import ResumeEditor from '@/components/EditorPage/ResumeEditor.vue'
 import ResumePreview from '@/components/EditorPage/ResumePreview.vue'
+import CollapsibleMenu from '@/components/EditorPage/CollapsibleMenu.vue'
 import { ExporterService } from '@/services/ExporterService'
 import { ResumeData, ResumeService, ResumeStyleClass } from '@/services/ResumeService'
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
