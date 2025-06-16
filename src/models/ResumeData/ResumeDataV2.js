@@ -35,6 +35,27 @@ export class ResumeDataV2 {
         }));
     }
 
+    static getNewExperience() {
+        return {
+            title: 'Experience',
+            company: 'Company',
+            period: '',
+            description: '',
+            visible: true
+        };
+    }
+
+    static getNewEducation() {
+        return {
+            degree: 'Degree',
+            school: 'Cool School',
+            period: '',
+            mark: '',
+            thesis: '',
+            visible: true
+        };
+    }
+    
     static getNewCustomSection() {
         return {
             title: 'New Section',
