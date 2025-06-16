@@ -15,9 +15,8 @@ body,
   padding: 0;
 }
 
-html {
+html:not(.resume-preview) {
   font-family: 'Lato', sans-serif !important;
-  color: #333 !important;
 }
 
 </style>
