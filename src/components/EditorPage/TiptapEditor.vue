@@ -32,8 +32,8 @@
             <button type="button" @click="toggleOrderedList" :class="{ active: isActive('orderedList') }"
                 title="Ordered List">1. List</button>
             <span class="toolbar-separator"></span>
-            <button type="button" @click="undo" title="Undo">⎌</button>
-            <button type="button" @click="redo" title="Redo">⎌⎌</button>
+            <button type="button" @click="undo" title="Undo">↺</button>
+            <button type="button" @click="redo" title="Redo">↻</button>
         </div>
         <EditorContent class="tiptap-editor-content" :editor="editor" />
     </div>
@@ -51,6 +51,7 @@ import FontFamily from '@tiptap/extension-font-family'
 import TextAlign from '@tiptap/extension-text-align'
 import FontSize from '@tiptap/extension-font-size'
 import { Node } from '@tiptap/core'
+import { ResumeStyle2ColumnsV1 } from '@/models/ResumeStyle/ResumeStyle2ColumnsV1'
 
 const LanguageProficiency = Node.create({
     name: 'languageProficiency',
@@ -101,36 +102,6 @@ const LanguageProficiency = Node.create({
             dom.setAttribute('data-type', 'language-proficiency')
             dom.textContent = `${node.attrs.name} [BAR:${node.attrs.proficiency}%]`
 
-            // Add click handler to edit
-            dom.addEventListener('click', () => {
-                const name = window.prompt('Enter language name:', node.attrs.name)
-                if (!name) return
-                const proficiency = window.prompt('Enter proficiency (0-100):', node.attrs.proficiency)
-                if (!proficiency) return
-
-                const proficiencyNum = Math.min(Math.max(parseInt(proficiency) || 50, 0), 100)
-
-                if (typeof getPos === 'function') {
-                    editor.value?.chain().focus().command(({ tr }) => {
-                        tr.setNodeAttribute(getPos(), 'name', name)
-                        tr.setNodeAttribute(getPos(), 'proficiency', proficiencyNum)
-                        return true
-                    }).run()
-                }
-            })
-
-            // Add delete button
-            const deleteBtn = document.createElement('button')
-            deleteBtn.textContent = '×'
-            deleteBtn.className = 'delete-language-btn'
-            deleteBtn.addEventListener('click', (e) => {
-                e.stopPropagation()
-                if (typeof getPos === 'function') {
-                    editor.value?.chain().focus().deleteNode('languageProficiency').run()
-                }
-            })
-            dom.appendChild(deleteBtn)
-
             return {
                 dom,
                 update: (newNode) => {
@@ -146,9 +117,7 @@ const LanguageProficiency = Node.create({
     }
 })
 
-const fonts = [
-    'Arial', 'Georgia', 'Impact', 'Tahoma', 'Times New Roman', 'Verdana', 'Courier New', 'Poppins', 'Montserrat', 'Roboto'
-]
+const fonts = ResumeStyle2ColumnsV1.FONT_OPTIONS
 const fontSizes = ['8px', '10px', '12px', '14px', '16px', '18px', '20px', '24px', '28px', '32px', '36px', '48px']
 const currentFont = ref(fonts[0])
 const currentColor = ref('#222222')

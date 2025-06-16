@@ -100,8 +100,6 @@
 }
 
 :deep(.panel-title) {
-    font-weight: 600;
-    color: rgba(0, 0, 0, 0.87);
     padding: 16px 20px;
     font-size: 1.2rem;
     letter-spacing: 0.3px;
@@ -165,14 +163,6 @@
     font-weight: 600;
     letter-spacing: 0.3px;
     font-size: 1.1rem;
-}
-
-:deep(.v-tab--selected) {
-    font-weight: 600;
-}
-
-:deep(.v-expansion-panel-title__overlay) {
-    opacity: 0;
 }
 
 :deep(.v-expansion-panel--active > .v-expansion-panel-title) {

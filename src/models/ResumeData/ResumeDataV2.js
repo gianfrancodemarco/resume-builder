@@ -87,7 +87,7 @@ export class ResumeDataV2 {
                     title: 'About Me',
                     content: '<p>Passionate software engineer with a strong focus on web development and user experience. Experienced in building modern, responsive applications using Vue.js and other cutting-edge technologies.</p><p>Skilled in both frontend and backend development, with a particular emphasis on creating intuitive user interfaces and robust server-side solutions.</p>',
                     visible: true,
-                    position: 'main'
+                    position: 'sidebar'
                 },
                 {
                     title: 'Contact Details',

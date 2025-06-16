@@ -14,4 +14,10 @@ body,
   margin: 0;
   padding: 0;
 }
+
+html {
+  font-family: 'Lato', sans-serif !important;
+  color: #333 !important;
+}
+
 </style>

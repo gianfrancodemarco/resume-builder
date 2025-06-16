@@ -366,7 +366,6 @@ const stopResize = () => {
 .custom-navbar {
     color: #fff !important;
     font-size: 1.1rem;
-    font-family: 'Oswald', sans-serif;
     letter-spacing: 0.5px;
 }
 

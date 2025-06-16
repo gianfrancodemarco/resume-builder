@@ -190,7 +190,7 @@ export default {
 .resume-preview {
   background-color: var(--background-color);
   color: var(--text-color);
-  font-family: var(--body-font);
+  font-family: var(--body-font) !important;
   font-size: var(--base-size);
   line-height: 1.6;
   padding: 0;
@@ -423,7 +423,7 @@ li {
 }
 
 .language-proficiency-label {
-  font-size: 0.75em;
+  font-size: calc(var(--base-size) * 0.75);
   line-height: 1.2;
 }
 
@@ -493,7 +493,7 @@ li {
 }
 
 .resume-preview .custom-section .language-proficiency-label {
-  font-size: var(--base-size);
+  font-size: calc(var(--base-size) * 0.75);
   line-height: 1.2;
   margin-bottom: 4px;
 }
