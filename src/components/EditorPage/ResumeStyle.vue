@@ -97,8 +97,7 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
-import { ResumeStyleClass } from '../services/ResumeService'
+import { ref } from 'vue'
 
 const props = defineProps({
     styleData: {

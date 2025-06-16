@@ -300,8 +300,8 @@
 
 <script setup>
 import { ref, nextTick, onMounted, onUnmounted } from 'vue'
-import { ResumeDataV1 as ResumeData } from '../models/ResumeData/ResumeDataV1'
-import { ResumeStyle2ColumnsV1 as ResumeStyleClass } from '../models/ResumeStyle/ResumeStyle2ColumnsV1'
+import { ResumeDataV1 as ResumeData } from '@/models/ResumeData/ResumeDataV1'
+import { ResumeStyle2ColumnsV1 as ResumeStyleClass } from '@/models/ResumeStyle/ResumeStyle2ColumnsV1'
 
 const props = defineProps({
     resumeData: {
