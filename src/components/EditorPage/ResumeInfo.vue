@@ -209,6 +209,14 @@
                                     </template>
                                     {{ deleteConfirmState[index] ? 'Confirm delete' : 'Delete section' }}
                                 </v-tooltip>
+                                <v-tooltip location="top">
+                                    <template v-slot:activator="{ props: iconProps }">
+                                        <v-icon v-bind="iconProps" icon="mdi-content-copy" size="small"
+                                            class="clone-icon" @click.stop="cloneCustomSection(index)"
+                                            :disabled="!props.resumeData.customSections[index].visible" />
+                                    </template>
+                                    Clone section
+                                </v-tooltip>
                             </span>
                             <v-text-field v-else v-model="props.resumeData.customSections[index].title" variant="plain"
                                 density="compact" hide-details class="title-edit-field" @blur="stopEditingTitle(index)"
@@ -352,6 +360,15 @@ const moveCustomSection = (index, direction) => {
 const toggleSectionPosition = (index) => {
     props.resumeData.customSections[index].position =
         props.resumeData.customSections[index].position === 'sidebar' ? 'main' : 'sidebar';
+}
+
+const cloneCustomSection = (index) => {
+    const sectionToClone = props.resumeData.customSections[index]
+    const clonedSection = {
+        ...JSON.parse(JSON.stringify(sectionToClone)),
+        title: `${sectionToClone.title} (Copy)`
+    }
+    props.resumeData.customSections.splice(index + 1, 0, clonedSection)
 }
 </script>
 
