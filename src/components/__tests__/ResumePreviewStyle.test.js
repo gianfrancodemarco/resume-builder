@@ -16,8 +16,7 @@ describe('ResumePreview Style', () => {
         experiencesVisible: true,
         education: [],
         educationVisible: true,
-        customSections: [],
-        customSectionsVisible: true
+        customSections: []
     }
 
     const mockStyle = {

@@ -1,5 +1,5 @@
 <template>
-  <div class="editor-card" :class="{ 'pt-8': !isMobile }">
+  <div class="editor-card">
     <v-tabs v-model="activeTab" color="primary" class="editor-tabs">
       <v-tab value="info">
         Info

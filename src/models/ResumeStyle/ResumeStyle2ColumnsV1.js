@@ -2,6 +2,20 @@ export class ResumeStyle2ColumnsV1 {
     static VERSION = 1;
     static TEMPLATE_NAME = '2 Columns';
 
+    static FONT_OPTIONS = [
+        'Roboto',
+        'Arial',
+        'Helvetica',
+        'Times New Roman',
+        'Georgia',
+        'Verdana',
+        'Open Sans',
+        'Lato',
+        'Montserrat',
+        'Poppins',
+        'Oswald'
+    ];
+
     static COLUMN_TYPES = {
         LEFT: 'left',
         RIGHT: 'right'

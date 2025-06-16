@@ -1,12 +1,13 @@
 <template>
     <div>
-        <!-- Slim hamburger column -->
-        <div class="menu-hamburger-col" :class="{ 'open': menuOpen }">
-            <div>
-                <v-btn icon="mdi-menu" color="primary" class="menu-hamburger-btn" variant="plain" @click="toggleMenu" />
-            </div>
+        <!-- Desktop menu -->
+        <div v-if="!isMobile" class="menu-container" :class="{ 'open': menuOpen }">
+            <v-btn icon="mdi-menu" color="primary" class="menu-toggle" variant="text" @click="toggleMenu" />
+
             <div class="menu-content" v-if="menuOpen">
                 <div class="menu-actions">
+                    <v-btn block color="white" prepend-icon="mdi-close" class="menu-action-btn"
+                        @click="toggleMenu">Close this menu</v-btn>
                     <v-btn block color="primary" prepend-icon="mdi-code-json" class="menu-action-btn"
                         @click="handleExportJSON">Export JSON</v-btn>
                     <v-btn block color="primary" prepend-icon="mdi-upload" class="menu-action-btn"
@@ -15,18 +16,16 @@
                         @click="handleDownloadPDF">Download PDF</v-btn>
                     <v-btn block color="primary" prepend-icon="mdi-file-code" class="menu-action-btn"
                         @click="handleDownloadHTML">Download HTML</v-btn>
-                    <v-btn block color="primary" prepend-icon="mdi-close" class="menu-action-btn"
-                        @click="toggleMenu">Close</v-btn>
                 </div>
             </div>
         </div>
 
         <!-- Mobile menu -->
-        <div v-if="isMobile" class="mobile-actions">
-            <div v-if="menuOpen" class="action-buttons">
+        <div v-else class="mobile-actions">
+            <div v-if="showActions" class="action-buttons">
                 <div class="action-item">
                     <span class="action-label">Close this menu</span>
-                    <v-btn icon="mdi-close" color="white" class="action-btn" elevation="2" @click="toggleMenu" />
+                    <v-btn icon="mdi-close" color="white" class="action-btn" elevation="2" @click="toggleActions" />
                 </div>
                 <div class="action-item">
                     <span class="action-label">Export JSON</span>
@@ -49,14 +48,11 @@
                         elevation="2" />
                 </div>
             </div>
-            <v-btn icon="mdi-lightning-bolt" color="primary" class="action-btn" elevation="2" @click="toggleMenu" />
+            <v-btn icon="mdi-lightning-bolt" color="primary" class="action-btn" elevation="2" @click="toggleActions" />
         </div>
 
-        <!-- Mobile overlay -->
-        <div v-if="isMobile && menuOpen" class="mobile-overlay" @click="toggleMenu"></div>
-
-        <!-- Desktop overlay -->
-        <div v-if="!isMobile && menuOpen" class="desktop-overlay" @click="toggleMenu"></div>
+        <!-- Overlay -->
+        <div v-if="menuOpen || showActions" class="menu-overlay" @click="closeAllMenus"></div>
     </div>
 </template>
 
@@ -75,90 +71,79 @@ const props = defineProps({
 })
 
 const menuOpen = ref(false)
+const showActions = ref(false)
+
 const toggleMenu = () => {
     menuOpen.value = !menuOpen.value
+    if (menuOpen.value) {
+        showActions.value = false
+    }
+}
+
+const toggleActions = () => {
+    showActions.value = !showActions.value
+    if (showActions.value) {
+        menuOpen.value = false
+    }
+}
+
+const closeAllMenus = () => {
+    menuOpen.value = false
+    showActions.value = false
 }
 </script>
 
 <style scoped>
-.menu-hamburger-col {
+.menu-container {
     position: fixed;
     top: 0;
     right: 0;
-    width: 44px;
+    width: 64px;
     height: 100vh;
-    background: #fff;
+    background: #ffffff;
     display: flex;
     flex-direction: column;
     align-items: center;
     z-index: 120;
-    cursor: pointer;
-    box-shadow: none;
-    padding: 0;
-    transition: width 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
 }
 
-.menu-hamburger-col.open {
-    width: 320px;
+.menu-container.open {
+    width: 280px;
 }
 
-.menu-hamburger-btn {
-    margin-top: 8px;
-    margin-bottom: 0;
+.menu-toggle {
+    margin: 16px 0;
     background: none !important;
-    box-shadow: none !important;
 }
 
 .menu-content {
     width: 100%;
     padding: 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-.menu-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 16px;
-    border-bottom: 1px solid #eee;
-}
-
-.menu-title {
-    color: #222;
-    font-size: 1.2rem;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-}
-
-.menu-close-btn {
-    background: none !important;
-    color: #222 !important;
+    opacity: 0;
+    transform: translateX(20px);
+    animation: slideInDesktop 0.3s forwards;
 }
 
 .menu-actions {
     display: flex;
     flex-direction: column;
     gap: 12px;
-    padding: 16px;
 }
 
 .menu-action-btn {
-    font-size: 1rem;
+    height: 48px;
+    border-radius: 8px;
     font-weight: 500;
-    letter-spacing: 0.5px;
-    height: 44px;
-    border: 1px solid #e0e0e0;
-    box-shadow: none !important;
-    background: white !important;
-    color: #222 !important;
-    transition: background 0.2s, color 0.2s;
+    text-transform: none;
+    letter-spacing: 0.3px;
+    transition: all 0.2s ease;
 }
 
 .menu-action-btn:hover {
-    background: #e0e0e0 !important;
-    color: #111 !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 /* Mobile styles */
@@ -170,7 +155,7 @@ const toggleMenu = () => {
     flex-direction: column;
     align-items: flex-end;
     gap: 12px;
-    z-index: 100;
+    z-index: 130;
 }
 
 .action-buttons {
@@ -205,35 +190,44 @@ const toggleMenu = () => {
     transform: translateY(-2px);
 }
 
-.mobile-overlay {
+.menu-overlay {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(0, 0, 0, 0.9);
-    z-index: 99;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(4px);
+    z-index: 110;
+    animation: fadeIn 0.3s forwards;
 }
 
-.desktop-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: 99;
+@keyframes slideInDesktop {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
 }
 
 @media (max-width: 600px) {
     .mobile-actions {
         bottom: 16px;
         right: 16px;
-    }
-
-    .action-btn {
-        width: 40px !important;
-        height: 40px !important;
     }
 }
 </style>

@@ -40,8 +40,7 @@ describe('ResumeEditor', () => {
                 visible: true,
                 items: ['Vue.js', 'JavaScript', 'Node.js']
             }
-        ],
-        customSectionsVisible: true
+        ]
     }
 
     const mockStyle = {
@@ -123,19 +122,19 @@ describe('ResumeEditor', () => {
             const titleInput = wrapper.find('input[aria-label="Job title"]')
             const companyInput = wrapper.find('input[aria-label="Company"]')
             const periodInput = wrapper.find('input[aria-label="Period"]')
-            const descriptionInput = wrapper.find('textarea[aria-label="Description"]')
+            const descriptionInput = wrapper.find('div[role="textbox"]').find('p')
 
             await titleInput.setValue('Full Stack Developer')
             await companyInput.setValue('Tech Corp')
             await periodInput.setValue('2019 - 2020')
-            await descriptionInput.setValue('Developed web applications')
+            descriptionInput.element.textContent = 'Developed web applications'
             await wrapper.vm.$nextTick()
 
             expect(wrapper.vm.resumeData.experiences).toContainEqual(expect.objectContaining({
                 title: 'Full Stack Developer',
                 company: 'Tech Corp',
                 period: '2019 - 2020',
-                description: 'Developed web applications',
+                description: '<p>Developed web applications</p>',
                 visible: true
             }))
         })
@@ -189,13 +188,13 @@ describe('ResumeEditor', () => {
             const schoolInput = wrapper.find('input[aria-label="School"]')
             const periodInput = wrapper.find('input[aria-label="Period"]')
             const markInput = wrapper.find('input[aria-label="Grade"]')
-            const thesisInput = wrapper.find('textarea[aria-label="Thesis / Notes"]')
+            const thesisInput = wrapper.find('div[role="textbox"]').find('p')
 
             await degreeInput.setValue('Bachelor in Computer Science')
             await schoolInput.setValue('University of Rome')
             await periodInput.setValue('2013 - 2016')
             await markInput.setValue('108/110')
-            await thesisInput.setValue('Web Development Basics')
+            thesisInput.element.textContent = 'Web Development Basics'
             await wrapper.vm.$nextTick()
 
             expect(wrapper.vm.resumeData.education).toContainEqual(expect.objectContaining({
@@ -203,7 +202,7 @@ describe('ResumeEditor', () => {
                 school: 'University of Rome',
                 period: '2013 - 2016',
                 mark: '108/110',
-                thesis: 'Web Development Basics',
+                thesis: '<p>Web Development Basics</p>',
                 visible: true
             }))
         })
@@ -245,8 +244,8 @@ describe('ResumeEditor', () => {
 
             expect(wrapper.vm.resumeData.customSections).toContainEqual(expect.objectContaining({
                 title: 'New Section',
-                type: 'text',
-                items: [],
+                content: '',
+                position: 'main',
                 visible: true
             }))
         })

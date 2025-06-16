@@ -14,4 +14,9 @@ body,
   margin: 0;
   padding: 0;
 }
+
+html:not(.resume-preview) {
+  font-family: 'Lato', sans-serif !important;
+}
+
 </style>

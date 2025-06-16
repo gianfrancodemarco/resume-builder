@@ -55,7 +55,7 @@
                             density="comfortable"></v-select>
                     </div>
                     <div>
-                        <div class="text-subtitle-2 mb-2">Body Font</div>
+                        <div class="text-subtitle-2 mb-2">Default Body Font</div>
                         <v-select v-model="styleData.typography.bodyFont" :items="fontOptions" variant="outlined"
                             density="comfortable"></v-select>
                     </div>
@@ -98,6 +98,7 @@
 
 <script setup>
 import { ref } from 'vue'
+import { ResumeStyle2ColumnsV1 } from '@/models/ResumeStyle/ResumeStyle2ColumnsV1'
 
 const props = defineProps({
     styleData: {
@@ -110,18 +111,7 @@ const emit = defineEmits(['update:style-data', 'change'])
 
 const activeTab = ref('colors')
 
-const fontOptions = [
-    'Roboto',
-    'Arial',
-    'Helvetica',
-    'Times New Roman',
-    'Georgia',
-    'Verdana',
-    'Open Sans',
-    'Lato',
-    'Montserrat',
-    'Poppins'
-]
+const fontOptions = ResumeStyle2ColumnsV1.FONT_OPTIONS
 
 const colorFields = {
     primary: { label: 'Primary Color' },
@@ -259,7 +249,6 @@ const validateHex = (key) => {
 }
 
 .color-hex {
-    font-family: monospace;
     font-size: 0.9em;
     color: rgba(0, 0, 0, 0.6);
 }
@@ -278,7 +267,6 @@ const validateHex = (key) => {
 }
 
 :deep(.color-input .v-field__input) {
-    font-family: monospace;
     font-size: 0.9em;
     padding: 0 8px;
     min-height: 32px;

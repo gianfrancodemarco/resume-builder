@@ -35,7 +35,9 @@
     .editor-panel .section-title .visibility-icon,
     .editor-panel .section-title .edit-icon,
     .editor-panel .section-title .delete-icon,
-    .editor-panel .section-title .move-icon {
+    .editor-panel .section-title .move-icon,
+    .editor-panel .section-title .position-icon,
+    .editor-panel .section-title .clone-icon {
         opacity: 0;
         transition: opacity 0.2s;
         cursor: pointer;
@@ -44,14 +46,18 @@
     .editor-panel:hover .section-title .visibility-icon,
     .editor-panel:hover .section-title .edit-icon,
     .editor-panel:hover .section-title .delete-icon,
-    .editor-panel:hover .section-title .move-icon {
+    .editor-panel:hover .section-title .move-icon,
+    .editor-panel:hover .section-title .position-icon,
+    .editor-panel:hover .section-title .clone-icon {
         opacity: 0.7;
     }
 
     .editor-panel .section-title .visibility-icon:hover,
     .editor-panel .section-title .edit-icon:hover,
     .editor-panel .section-title .delete-icon:hover,
-    .editor-panel .section-title .move-icon:hover {
+    .editor-panel .section-title .move-icon:hover,
+    .editor-panel .section-title .position-icon:hover,
+    .editor-panel .section-title .clone-icon:hover {
         opacity: 1;
     }
 
@@ -71,7 +77,9 @@
     .editor-panel .section-title .visibility-icon,
     .editor-panel .section-title .edit-icon,
     .editor-panel .section-title .delete-icon,
-    .editor-panel .section-title .move-icon {
+    .editor-panel .section-title .move-icon,
+    .editor-panel .section-title .position-icon,
+    .editor-panel .section-title .clone-icon {
         opacity: 0.7;
         cursor: pointer;
     }
@@ -96,8 +104,6 @@
 }
 
 :deep(.panel-title) {
-    font-weight: 600;
-    color: rgba(0, 0, 0, 0.87);
     padding: 16px 20px;
     font-size: 1.2rem;
     letter-spacing: 0.3px;
@@ -161,14 +167,6 @@
     font-weight: 600;
     letter-spacing: 0.3px;
     font-size: 1.1rem;
-}
-
-:deep(.v-tab--selected) {
-    font-weight: 600;
-}
-
-:deep(.v-expansion-panel-title__overlay) {
-    opacity: 0;
 }
 
 :deep(.v-expansion-panel--active > .v-expansion-panel-title) {
