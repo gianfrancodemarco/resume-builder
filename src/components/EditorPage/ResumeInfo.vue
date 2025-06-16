@@ -239,8 +239,7 @@
 
 <script setup>
 import { ref, nextTick, onMounted, onUnmounted } from 'vue'
-import { ResumeDataV1 as ResumeData } from '@/models/ResumeData/ResumeDataV1'
-import { ResumeStyle2ColumnsV1 as ResumeStyleClass } from '@/models/ResumeStyle/ResumeStyle2ColumnsV1'
+import { ResumeData, ResumeStyleClass } from '@/services/ResumeService'
 import TiptapEditor from './TiptapEditor.vue'
 
 const props = defineProps({
@@ -255,9 +254,6 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['update:resume-data', 'change'])
-
-const newCustomSectionItem = ref(ResumeData.getNewCustomSectionItem())
-const sectionTypes = ResumeStyleClass.SECTION_TYPES
 
 const editingSectionTitle = ref({})
 const deleteConfirmState = ref({})
@@ -313,19 +309,6 @@ const removeCustomSection = (index) => {
     }
     props.resumeData.customSections.splice(index, 1)
     deleteConfirmState.value[index] = false
-}
-
-const addCustomSectionItem = (sectionIndex) => {
-    if (!newCustomSectionItem.value.name && !newCustomSectionItem.value.proficiency && !newCustomSectionItem.value.value) {
-        return
-    }
-    const section = props.resumeData.customSections[sectionIndex]
-    section.items.push(newCustomSectionItem.value)
-    newCustomSectionItem.value = ResumeData.getNewCustomSectionItem()
-}
-
-const removeCustomSectionItem = (sectionIndex, itemIndex) => {
-    props.resumeData.customSections[sectionIndex].items.splice(itemIndex, 1)
 }
 
 const startEditingTitle = (index) => {

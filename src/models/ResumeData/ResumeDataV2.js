@@ -35,6 +35,15 @@ export class ResumeDataV2 {
         }));
     }
 
+    static getNewCustomSection() {
+        return {
+            title: 'New Section',
+            content: '',
+            visible: true,
+            position: 'main' // 'main' or 'sidebar'
+        };
+    }
+
     static createDefault() {
         return new ResumeDataV2({
             version: ResumeDataV2.VERSION,
