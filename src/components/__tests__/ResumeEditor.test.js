@@ -244,8 +244,8 @@ describe('ResumeEditor', () => {
 
             expect(wrapper.vm.resumeData.customSections).toContainEqual(expect.objectContaining({
                 title: 'New Section',
-                type: 'text',
-                items: [],
+                content: '',
+                position: 'main',
                 visible: true
             }))
         })
