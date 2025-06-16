@@ -1,5 +1,5 @@
-import { ResumeDataV1 as ResumeData } from '../models/ResumeData/ResumeDataV1'
-import { ResumeStyle2ColumnsV1 as ResumeStyleClass } from '../models/ResumeStyle/ResumeStyle2ColumnsV1'
+import { ResumeDataV1 as ResumeData } from '@/models/ResumeData/ResumeDataV1'
+import { ResumeStyle2ColumnsV1 as ResumeStyleClass } from '@/models/ResumeStyle/ResumeStyle2ColumnsV1'
 
 // Export the model classes
 // These always point to the latest version of the models

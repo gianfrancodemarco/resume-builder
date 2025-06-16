@@ -71,13 +71,13 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount, computed } from 'vue'
-import ResumeEditor from '../components/ResumeEditor.vue'
-import ResumePreview from '../components/ResumePreview.vue'
+import ResumeEditor from '@/components/EditorPage/ResumeEditor.vue'
+import ResumePreview from '@/components/EditorPage/ResumePreview.vue'
+import { ExporterService } from '@/services/ExporterService'
+import { ResumeData, ResumeService, ResumeStyleClass } from '@/services/ResumeService'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useDisplay } from 'vuetify'
-import { ResumeService, ResumeData, ResumeStyleClass } from '../services/ResumeService'
-import { ExporterService } from '../services/ExporterService'
 
 const router = useRouter()
 const { mobile } = useDisplay()

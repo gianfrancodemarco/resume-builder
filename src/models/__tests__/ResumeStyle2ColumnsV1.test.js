@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { ResumeStyle2ColumnsV1 } from '../ResumeStyle/ResumeStyle2ColumnsV1'
+import { ResumeStyle2ColumnsV1 } from '@/models/ResumeStyle/ResumeStyle2ColumnsV1'
 
 describe('ResumeStyle2ColumnsV1', () => {
     describe('constructor', () => {
