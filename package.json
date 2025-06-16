@@ -18,7 +18,7 @@
     "@mdi/font": "^7.4.47",
     "@tiptap/extension-color": "^2.14.0",
     "@tiptap/extension-font-family": "^2.14.0",
-    "@tiptap/extension-font-size": "^3.0.0-next.3",
+    "@tiptap/extension-font-size": "^2.14.0",
     "@tiptap/extension-link": "^2.14.0",
     "@tiptap/extension-text-align": "^2.14.0",
     "@tiptap/extension-text-style": "^2.14.0",
