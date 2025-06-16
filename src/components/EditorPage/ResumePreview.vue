@@ -4,9 +4,9 @@
       <div class="preview-container">
         <div class="container" :class="{ 'sidebar-left': sidebarPosition === 'left' }">
           <div class="sidebar">
-            <template v-for="(section, index) in visibleCustomSections" :key="index">
+            <template v-for="(section, index) in sidebarCustomSections" :key="index">
               <h2>{{ section.title }}</h2>
-              <component :is="getSectionComponent(section.type)" :items="section.items" :type="section.type" />
+              <div v-html="processContent(section.content)"></div>
             </template>
           </div>
           <div class="content">
@@ -15,19 +15,19 @@
 
             <div class="section"
               v-if="resumeData.experiencesVisible && resumeData.experiences && resumeData.experiences.filter(e => e?.visible).length">
-              <h2>Employment History</h2>
+              <h2>{{ resumeData.experiencesSectionName }}</h2>
               <div v-for="(e, i) in resumeData.experiences" :key="i">
                 <template v-if="e?.visible">
                   <p class="job-title">{{ e.title }} - {{ e.company }}</p>
                   <p class="date">{{ e.period }}</p>
-                  <p class="job-desc" v-html="e.description"></p>
+                  <p class="job-desc" v-html="processContent(e.description)"></p>
                 </template>
               </div>
             </div>
 
             <div class="section"
               v-if="resumeData.educationVisible && resumeData.education && resumeData.education.filter(e => e?.visible).length">
-              <h2>Education</h2>
+              <h2>{{ resumeData.educationSectionName }}</h2>
               <div v-for="(ed, i) in resumeData.education" :key="i">
                 <template v-if="ed?.visible">
                   <p class="job-title">{{ ed.degree }} - {{ ed.school }}</p>
@@ -35,10 +35,17 @@
                     <p class="date">{{ ed.period }}</p>
                     <p class="graduation-mark">{{ ed.mark }}</p>
                   </div>
-                  <p class="thesis">{{ ed.thesis }}</p>
+                  <p class="thesis" v-html="processContent(ed.thesis)"></p>
                 </template>
               </div>
             </div>
+
+            <template v-for="(section, index) in mainCustomSections" :key="index">
+              <div class="section">
+                <h2>{{ section.title }}</h2>
+                <div v-html="processContent(section.content)"></div>
+              </div>
+            </template>
           </div>
         </div>
       </div>
@@ -47,18 +54,7 @@
 </template>
 
 <script>
-import SkillsList from './sections/SkillsList.vue'
-import LanguageProficiency from './sections/LanguageProficiency.vue'
-import ItalicText from './sections/ItalicText.vue'
-import DefaultText from './sections/DefaultText.vue'
-
 export default {
-  components: {
-    SkillsList,
-    LanguageProficiency,
-    ItalicText,
-    DefaultText
-  },
   props: {
     resumeData: {
       type: Object,
@@ -76,6 +72,22 @@ export default {
       type: String,
       default: 'right',
       validator: (value) => ['left', 'right'].includes(value)
+    }
+  },
+  methods: {
+    processContent(content) {
+      if (!content) return ''
+      // Replace language proficiency text with bars
+      return content.replace(/\(([^)]+)\)\[BAR:(\d+)\]/g, (match, name, proficiency) => {
+        return `
+          <div class="language-proficiency">
+            <div class="language-proficiency-label">${name}</div>
+            <div class="language-proficiency-bar">
+              <div class="language-proficiency-bar-fill" style="width: ${proficiency}%"></div>
+            </div>
+          </div>
+        `
+      })
     }
   },
   computed: {
@@ -98,17 +110,12 @@ export default {
     },
     visibleCustomSections() {
       return this.resumeData.customSections.filter(s => s && s.visible !== false)
-    }
-  },
-  methods: {
-    getSectionComponent(type) {
-      const components = {
-        list: 'SkillsList',
-        languages: 'LanguageProficiency',
-        italic: 'ItalicText',
-        default: 'DefaultText'
-      }
-      return components[type] || components.default
+    },
+    sidebarCustomSections() {
+      return this.visibleCustomSections.filter(s => s.position === 'sidebar')
+    },
+    mainCustomSections() {
+      return this.visibleCustomSections.filter(s => s.position === 'main')
     }
   }
 }
@@ -313,6 +320,7 @@ export default {
   display: flex;
   flex-direction: column;
   padding: 16px 48px 64px;
+  white-space: pre-wrap;
 }
 
 .content h1,
@@ -398,6 +406,7 @@ export default {
 
 .job-desc {
   margin: 0;
+  white-space: pre-wrap;
 }
 
 p,
@@ -406,6 +415,7 @@ li {
   font-size: calc(var(--base-size) * 0.75);
   line-height: 1.5;
   margin: 0;
+  white-space: pre-wrap;
 }
 
 .language-proficiency {

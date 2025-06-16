@@ -35,7 +35,8 @@
     .editor-panel .section-title .visibility-icon,
     .editor-panel .section-title .edit-icon,
     .editor-panel .section-title .delete-icon,
-    .editor-panel .section-title .move-icon {
+    .editor-panel .section-title .move-icon,
+    .editor-panel .section-title .position-icon {
         opacity: 0;
         transition: opacity 0.2s;
         cursor: pointer;
@@ -44,14 +45,16 @@
     .editor-panel:hover .section-title .visibility-icon,
     .editor-panel:hover .section-title .edit-icon,
     .editor-panel:hover .section-title .delete-icon,
-    .editor-panel:hover .section-title .move-icon {
+    .editor-panel:hover .section-title .move-icon,
+    .editor-panel:hover .section-title .position-icon {
         opacity: 0.7;
     }
 
     .editor-panel .section-title .visibility-icon:hover,
     .editor-panel .section-title .edit-icon:hover,
     .editor-panel .section-title .delete-icon:hover,
-    .editor-panel .section-title .move-icon:hover {
+    .editor-panel .section-title .move-icon:hover,
+    .editor-panel .section-title .position-icon:hover {
         opacity: 1;
     }
 
@@ -71,7 +74,8 @@
     .editor-panel .section-title .visibility-icon,
     .editor-panel .section-title .edit-icon,
     .editor-panel .section-title .delete-icon,
-    .editor-panel .section-title .move-icon {
+    .editor-panel .section-title .move-icon,
+    .editor-panel .section-title .position-icon {
         opacity: 0.7;
         cursor: pointer;
     }

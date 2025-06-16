@@ -11,12 +11,22 @@
             <v-expansion-panel class="editor-panel">
                 <v-expansion-panel-title class="panel-title">
                     <div class="d-flex align-center w-100">
-                        <span class="section-title">
-                            Experience
+                        <span v-if="!editingSectionTitle.experience" class="section-title">
+                            {{ props.resumeData.experiencesSectionName }}
+                            <v-tooltip location="top">
+                                <template v-slot:activator="{ props: iconProps }">
+                                    <v-icon v-bind="iconProps" icon="mdi-pencil" size="small" class="edit-icon"
+                                        @click.stop="startEditingTitle('experience')" />
+                                </template>
+                                Edit section title
+                            </v-tooltip>
                             <v-icon :icon="props.resumeData.experiencesVisible ? 'mdi-eye' : 'mdi-eye-off'" size="small"
                                 class="visibility-icon"
                                 @click.stop="props.resumeData.experiencesVisible = !props.resumeData.experiencesVisible" />
                         </span>
+                        <v-text-field v-else v-model="props.resumeData.experiencesSectionName" variant="outlined"
+                            density="comfortable" class="title-edit-field" @blur="stopEditingTitle('experience')"
+                            @keyup.enter="stopEditingTitle('experience')" ref="experienceTitleField" />
                     </div>
                 </v-expansion-panel-title>
                 <v-expansion-panel-text>
@@ -38,7 +48,7 @@
                                                     size="small" class="delete-icon" @click.stop="removeExp(index)"
                                                     :disabled="!props.resumeData.experiencesVisible" />
                                             </template>
-                                            {{ deleteConfirmState[`exp-${index}`] ? 'Confirm delete' : 'Delete experience' }}
+                                            {{ deleteConfirmState[`exp-${index}`] ? 'Confirm delete' : "Delete experience" }}
                                         </v-tooltip>
                                     </span>
                                 </div>
@@ -56,10 +66,11 @@
                                 <v-text-field v-model="props.resumeData.experiences[index].period" label="Period"
                                     :disabled="!props.resumeData.experiencesVisible || !props.resumeData.experiences[index].visible"
                                     variant="outlined" density="comfortable" class="mb-2" aria-label="Period" />
-                                <v-textarea v-model="props.resumeData.experiences[index].description"
-                                    label="Description"
-                                    :disabled="!props.resumeData.experiencesVisible || !props.resumeData.experiences[index].visible"
-                                    variant="outlined" density="comfortable" aria-label="Description" />
+                                <div class="mb-2">
+                                    <label class="v-label">Description</label>
+                                    <TiptapEditor v-model="props.resumeData.experiences[index].description"
+                                        :disabled="!props.resumeData.experiencesVisible || !props.resumeData.experiences[index].visible" />
+                                </div>
                             </v-expansion-panel-text>
                         </v-expansion-panel>
                     </v-expansion-panels>
@@ -73,12 +84,22 @@
             <v-expansion-panel class="editor-panel">
                 <v-expansion-panel-title class="panel-title">
                     <div class="d-flex align-center w-100">
-                        <span class="section-title">
-                            Education
+                        <span v-if="!editingSectionTitle.education" class="section-title">
+                            {{ props.resumeData.educationSectionName }}
+                            <v-tooltip location="top">
+                                <template v-slot:activator="{ props: iconProps }">
+                                    <v-icon v-bind="iconProps" icon="mdi-pencil" size="small" class="edit-icon"
+                                        @click.stop="startEditingTitle('education')" />
+                                </template>
+                                Edit section title
+                            </v-tooltip>
                             <v-icon :icon="props.resumeData.educationVisible ? 'mdi-eye' : 'mdi-eye-off'" size="small"
                                 class="visibility-icon"
                                 @click.stop="props.resumeData.educationVisible = !props.resumeData.educationVisible" />
                         </span>
+                        <v-text-field v-else v-model="props.resumeData.educationSectionName" variant="outlined"
+                            density="comfortable" class="title-edit-field" @blur="stopEditingTitle('education')"
+                            @keyup.enter="stopEditingTitle('education')" ref="educationTitleField" />
                     </div>
                 </v-expansion-panel-title>
                 <v-expansion-panel-text>
@@ -100,7 +121,7 @@
                                                     size="small" class="delete-icon" @click.stop="removeEdu(index)"
                                                     :disabled="!props.resumeData.educationVisible" />
                                             </template>
-                                            {{ deleteConfirmState[`edu-${index}`] ? 'Confirm delete' : 'Delete education' }}
+                                            {{ deleteConfirmState[`edu-${index}`] ? 'Confirm delete' : "Delete education" }}
                                         </v-tooltip>
                                     </span>
                                 </div>
@@ -118,9 +139,11 @@
                                 <v-text-field v-model="props.resumeData.education[index].mark" label="Grade"
                                     :disabled="!props.resumeData.educationVisible || !props.resumeData.education[index].visible"
                                     variant="outlined" density="comfortable" class="mb-2" aria-label="Grade" />
-                                <v-textarea v-model="props.resumeData.education[index].thesis" label="Thesis / Notes"
-                                    :disabled="!props.resumeData.educationVisible || !props.resumeData.education[index].visible"
-                                    variant="outlined" density="comfortable" aria-label="Thesis / Notes" />
+                                <div class="mb-2">
+                                    <label class="v-label">Thesis / Notes</label>
+                                    <TiptapEditor v-model="props.resumeData.education[index].thesis"
+                                        :disabled="!props.resumeData.educationVisible || !props.resumeData.education[index].visible" />
+                                </div>
                             </v-expansion-panel-text>
                         </v-expansion-panel>
                     </v-expansion-panels>
@@ -155,6 +178,15 @@
                                 </v-tooltip>
                                 <v-tooltip location="top">
                                     <template v-slot:activator="{ props: iconProps }">
+                                        <v-icon v-bind="iconProps"
+                                            :icon="props.resumeData.customSections[index].position === 'sidebar' ? 'mdi-format-align-right' : 'mdi-format-align-left'"
+                                            size="small" class="position-icon"
+                                            @click.stop="toggleSectionPosition(index)" />
+                                    </template>
+                                    {{ props.resumeData.customSections[index].position === 'sidebar' ? 'Move to main content' : 'Move to sidebar' }}
+                                </v-tooltip>
+                                <v-tooltip location="top">
+                                    <template v-slot:activator="{ props: iconProps }">
                                         <v-icon v-bind="iconProps" icon="mdi-arrow-up" size="small" class="move-icon"
                                             @click.stop="moveCustomSection(index, 'up')" :disabled="index === 0" />
                                     </template>
@@ -185,108 +217,7 @@
                         </div>
                     </v-expansion-panel-title>
                     <v-expansion-panel-text>
-                        <div class="d-flex align-center mb-2">
-                            <v-select v-model="props.resumeData.customSections[index].type" :items="sectionTypes"
-                                label="Type" :disabled="!props.resumeData.customSections[index].visible"
-                                variant="outlined" density="comfortable" class="mr-2" style="max-width: 200px;"
-                                item-title="label" item-value="value" aria-label="Type" />
-                        </div>
-
-                        <template v-if="section.type === 'languages'">
-                            <div v-for="(item, itemIndex) in props.resumeData.customSections[index].items"
-                                :key="itemIndex" class="d-flex align-center mb-2">
-                                <v-text-field v-model="props.resumeData.customSections[index].items[itemIndex].name"
-                                    label="Language" :disabled="!props.resumeData.customSections[index].visible"
-                                    variant="outlined" density="comfortable" class="mr-2" aria-label="Language" />
-                                <v-slider v-model="props.resumeData.customSections[index].items[itemIndex].proficiency"
-                                    label="Proficiency" :disabled="!props.resumeData.customSections[index].visible"
-                                    min="0" max="100" step="5" class="mr-2" />
-                                <v-btn icon="mdi-delete" color="error" variant="text"
-                                    @click="removeCustomSectionItem(index, itemIndex)"
-                                    :disabled="!props.resumeData.customSections[index].visible"
-                                    aria-label="Delete language" />
-                            </div>
-                            <div class="d-flex align-center mb-2">
-                                <v-text-field v-model="newCustomSectionItem.name" label="Language"
-                                    :disabled="!props.resumeData.customSections[index].visible" variant="outlined"
-                                    density="comfortable" class="mr-2" aria-label="Language" />
-                                <v-slider v-model="newCustomSectionItem.proficiency" label="Proficiency"
-                                    :disabled="!props.resumeData.customSections[index].visible" min="0" max="100"
-                                    step="5" class="mr-2" />
-                                <v-btn color="primary" @click="addCustomSectionItem(index)"
-                                    :disabled="!props.resumeData.customSections[index].visible" prepend-icon="mdi-plus"
-                                    aria-label="Add language">Add Language</v-btn>
-                            </div>
-                        </template>
-
-                        <template v-else-if="section.type === 'list'">
-                            <div v-for="(item, itemIndex) in props.resumeData.customSections[index].items"
-                                :key="itemIndex" class="d-flex align-center mb-2">
-                                <v-text-field v-model="props.resumeData.customSections[index].items[itemIndex].value"
-                                    label="Item" :disabled="!props.resumeData.customSections[index].visible"
-                                    variant="outlined" density="comfortable" class="mr-2" aria-label="Item" />
-                                <v-btn icon="mdi-delete" color="error" variant="text"
-                                    @click="removeCustomSectionItem(index, itemIndex)"
-                                    :disabled="!props.resumeData.customSections[index].visible"
-                                    aria-label="Delete item" />
-                            </div>
-                            <div class="d-flex align-center mb-2">
-                                <v-text-field v-model="newCustomSectionItem.value" label="Item"
-                                    :disabled="!props.resumeData.customSections[index].visible" variant="outlined"
-                                    density="comfortable" class="mr-2" aria-label="Item" />
-                                <v-btn color="primary" @click="addCustomSectionItem(index)"
-                                    :disabled="!props.resumeData.customSections[index].visible" prepend-icon="mdi-plus"
-                                    aria-label="Add item">Add Item</v-btn>
-                            </div>
-                        </template>
-
-                        <template v-else>
-                            <div v-for="(item, itemIndex) in props.resumeData.customSections[index].items"
-                                :key="itemIndex" class="custom-section-item mb-4">
-                                <div class="d-flex align-center mb-2">
-                                    <v-textarea v-model="props.resumeData.customSections[index].items[itemIndex].value"
-                                        label="Item" :disabled="!props.resumeData.customSections[index].visible"
-                                        variant="outlined" density="comfortable" class="flex-grow-1"
-                                        aria-label="Item" />
-                                </div>
-                                <div class="d-flex align-center justify-end">
-                                    <v-switch v-model="props.resumeData.customSections[index].items[itemIndex].isLink"
-                                        label="Link" :disabled="!props.resumeData.customSections[index].visible"
-                                        hide-details density="compact" color="primary" class="mr-2" />
-                                    <v-btn icon="mdi-delete" color="error" variant="text"
-                                        @click="removeCustomSectionItem(index, itemIndex)"
-                                        :disabled="!props.resumeData.customSections[index].visible"
-                                        aria-label="Delete item" />
-                                </div>
-                                <div v-if="props.resumeData.customSections[index].items[itemIndex].isLink" class="mt-2">
-                                    <v-text-field v-model="props.resumeData.customSections[index].items[itemIndex].href"
-                                        label="URL" :disabled="!props.resumeData.customSections[index].visible"
-                                        variant="outlined" density="comfortable" placeholder="https://example.com"
-                                        aria-label="URL" />
-                                </div>
-                            </div>
-
-                            <div class="custom-section-item mb-4">
-                                <div class="d-flex align-center mb-2">
-                                    <v-textarea v-model="newCustomSectionItem.value" label="New Item"
-                                        :disabled="!props.resumeData.customSections[index].visible" variant="outlined"
-                                        density="comfortable" class="flex-grow-1" aria-label="New Item" />
-                                </div>
-                                <div class="d-flex align-center justify-end">
-                                    <v-switch v-model="newCustomSectionItem.isLink" label="Link"
-                                        :disabled="!props.resumeData.customSections[index].visible" hide-details
-                                        density="compact" color="primary" class="mr-2" />
-                                    <v-btn color="primary" @click="addCustomSectionItem(index)"
-                                        :disabled="!props.resumeData.customSections[index].visible"
-                                        prepend-icon="mdi-plus" aria-label="Add item">Add Item</v-btn>
-                                </div>
-                                <div v-if="newCustomSectionItem.isLink" class="mt-2">
-                                    <v-text-field v-model="newCustomSectionItem.href" label="URL"
-                                        :disabled="!props.resumeData.customSections[index].visible" variant="outlined"
-                                        density="comfortable" placeholder="https://example.com" aria-label="URL" />
-                                </div>
-                            </div>
-                        </template>
+                        <TiptapEditor v-model="section.content" />
                     </v-expansion-panel-text>
                 </v-expansion-panel>
             </template>
@@ -302,6 +233,7 @@
 import { ref, nextTick, onMounted, onUnmounted } from 'vue'
 import { ResumeDataV1 as ResumeData } from '@/models/ResumeData/ResumeDataV1'
 import { ResumeStyle2ColumnsV1 as ResumeStyleClass } from '@/models/ResumeStyle/ResumeStyle2ColumnsV1'
+import TiptapEditor from './TiptapEditor.vue'
 
 const props = defineProps({
     resumeData: {
@@ -415,6 +347,11 @@ const moveCustomSection = (index, direction) => {
     } else if (direction === 'down' && index < sections.length - 1) {
         [sections[index], sections[index + 1]] = [sections[index + 1], sections[index]]
     }
+}
+
+const toggleSectionPosition = (index) => {
+    props.resumeData.customSections[index].position =
+        props.resumeData.customSections[index].position === 'sidebar' ? 'main' : 'sidebar';
 }
 </script>
 

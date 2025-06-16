@@ -55,7 +55,7 @@
                             density="comfortable"></v-select>
                     </div>
                     <div>
-                        <div class="text-subtitle-2 mb-2">Body Font</div>
+                        <div class="text-subtitle-2 mb-2">Default Body Font</div>
                         <v-select v-model="styleData.typography.bodyFont" :items="fontOptions" variant="outlined"
                             density="comfortable"></v-select>
                     </div>
