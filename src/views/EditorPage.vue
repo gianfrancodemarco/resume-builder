@@ -4,7 +4,7 @@
             <div class="editor-content" :class="{ 'mobile-view': isMobile }">
                 <div class="editor-col" :style="isMobile ? { width: '100%' } : { width: `${editorWidth}%` }">
                     <ResumeEditor v-model:resume-data="resumeData" v-model:style="resumeStyle" @save="handleFormSave"
-                        @change="handleFormChange" :is-mobile="isMobile" @preview="toggleActions" />
+                        @change="handleFormChange" :is-mobile="isMobile" />
                 </div>
                 <div v-if="!isMobile" class="resize-handle" @mousedown.prevent="startResize"
                     @touchstart.prevent="startResize" @touchmove.prevent="handleResize" @touchend.prevent="stopResize">
@@ -20,45 +20,11 @@
             </div>
         </v-main>
 
-        <!-- Mobile action buttons -->
-        <div v-if="isMobile" class="mobile-actions">
-            <div v-if="showActions" class="action-buttons">
-                <div class="action-item">
-                    <span class="action-label">Close this menu</span>
-                    <v-btn icon="mdi-close" color="white" class="action-btn" elevation="2" @click="toggleActions" />
-                </div>
-                <div class="action-item">
-                    <span class="action-label">Export JSON</span>
-                    <v-btn icon="mdi-code-json" color="primary" @click="handleExportJSON" class="action-btn"
-                        elevation="2" />
-                </div>
-                <div class="action-item">
-                    <span class="action-label">Import JSON</span>
-                    <v-btn icon="mdi-upload" color="primary" @click="handleImportJSON" class="action-btn"
-                        elevation="2" />
-                </div>
-                <div class="action-item">
-                    <span class="action-label">Download PDF</span>
-                    <v-btn icon="mdi-file-pdf-box" color="primary" @click="handleDownloadPDF" class="action-btn"
-                        elevation="2" />
-                </div>
-                <div class="action-item">
-                    <span class="action-label">Download HTML</span>
-                    <v-btn icon="mdi-file-code" color="primary" @click="handleDownloadHTML" class="action-btn"
-                        elevation="2" />
-                </div>
-            </div>
-            <v-btn icon="mdi-lightning-bolt" color="primary" class="action-btn" elevation="2" @click="toggleActions" />
-        </div>
-
-        <!-- Mobile overlay -->
-        <div v-if="isMobile && showActions" class="mobile-overlay" @click="toggleActions"></div>
-
         <!-- Hidden file input for JSON import -->
         <input type="file" ref="fileInput" style="display: none" accept=".json" @change="handleFileUpload" />
 
-        <!-- Desktop Collapsible Menu -->
-        <CollapsibleMenu v-if="!isMobile" :handleExportJSON="handleExportJSON" :handleImportJSON="handleImportJSON"
+        <!-- Collapsible Menu - show on both mobile and desktop -->
+        <CollapsibleMenu :handleExportJSON="handleExportJSON" :handleImportJSON="handleImportJSON"
             :handleDownloadPDF="handleDownloadPDF" :handleDownloadHTML="handleDownloadHTML" />
     </v-app>
 </template>
@@ -86,8 +52,8 @@ const fileInput = ref(null)
 
 // Add drawer ref for mobile menu
 const drawer = ref(false)
-
 const showActions = ref(false)
+
 const hasUnsavedChanges = ref(false)
 const editorWidth = ref(35)
 const editorHeight = ref(50)
@@ -178,11 +144,6 @@ const handleFileUpload = async (event) => {
     // Reset the input so the same file can be selected again
     event.target.value = ''
 }
-
-const toggleActions = () => {
-    showActions.value = !showActions.value
-}
-
 const handleExportJSON = () => {
     drawer.value = false
     if (window.sa_event) {
@@ -258,6 +219,11 @@ const handleResize = (e) => {
 
 const stopResize = () => {
     isResizing.value = false
+}
+
+// Remove mobile menu related functions
+const toggleActions = () => {
+    showActions.value = !showActions.value
 }
 </script>
 
@@ -496,63 +462,12 @@ const stopResize = () => {
     transform: translateY(-2px);
 }
 
-.mobile-actions {
-    position: fixed;
-    bottom: 24px;
-    right: 24px;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 12px;
-    z-index: 100;
-}
-
-.action-buttons {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    align-items: flex-end;
-}
-
-.action-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.action-label {
-    background-color: rgba(0, 0, 0, 0.8);
-    color: white;
-    padding: 6px 12px;
-    border-radius: 4px;
-    font-size: 14px;
-    white-space: nowrap;
-}
-
+.mobile-actions,
+.action-buttons,
+.action-item,
+.action-label,
 .action-btn {
-    width: 48px !important;
-    height: 48px !important;
-    transition: all 0.2s ease;
-}
-
-.action-btn:hover {
-    transform: translateY(-2px);
-}
-
-.actions-btn {
-    font-size: 1rem;
-    font-weight: 500;
-    letter-spacing: 0.5px;
-}
-
-.mobile-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.9);
-    z-index: 99;
+    display: none;
 }
 
 .preview-container {
