@@ -33,7 +33,6 @@ export class ResumeDataV2 {
             visible: section.visible ?? true,
             position: section.position || 'main' // 'main' or 'sidebar'
         }));
-        this.customSectionsVisible = data.customSectionsVisible ?? true;
     }
 
     static createDefault() {
@@ -113,8 +112,7 @@ export class ResumeDataV2 {
                     visible: true,
                     position: 'sidebar'
                 }
-            ],
-            customSectionsVisible: true
+            ]
         });
     }
 
@@ -128,8 +126,7 @@ export class ResumeDataV2 {
             education: this.education,
             educationVisible: this.educationVisible,
             educationSectionName: this.educationSectionName,
-            customSections: this.customSections,
-            customSectionsVisible: this.customSectionsVisible
+            customSections: this.customSections
         };
     }
 

@@ -2,11 +2,12 @@ import { describe, it, expect, beforeEach } from 'vitest'
 import { mount } from '@vue/test-utils'
 import ResumePreview from '@/components/EditorPage/ResumePreview.vue'
 import { vuetify } from '@/test/setup'
+import { ResumeDataV2 } from '@/models/ResumeData/ResumeDataV2'
 
 describe('ResumePreview Content', () => {
     let wrapper
 
-    const mockResumeData = {
+    const mockResumeData = new ResumeDataV2({
         personal: {
             name: 'John Doe',
             title: 'Software Engineer',
@@ -75,9 +76,8 @@ describe('ResumePreview Content', () => {
                 visible: true,
                 position: 'sidebar'
             }
-        ],
-        customSectionsVisible: true
-    }
+        ]
+    })
 
     const mockStyle = {
         colors: {
@@ -133,11 +133,12 @@ describe('ResumePreview Content', () => {
         })
 
         it('hides experience section when not visible', async () => {
+            const updatedData = new ResumeDataV2({
+                ...mockResumeData.toJSON(),
+                experiencesVisible: false
+            })
             await wrapper.setProps({
-                resumeData: {
-                    ...mockResumeData,
-                    experiencesVisible: false
-                }
+                resumeData: updatedData
             })
             expect(wrapper.text()).not.toContain('Senior Software Engineer')
             expect(wrapper.text()).not.toContain('Tech Solutions Inc. - Milan')
@@ -165,11 +166,12 @@ describe('ResumePreview Content', () => {
         })
 
         it('hides education section when not visible', async () => {
+            const updatedData = new ResumeDataV2({
+                ...mockResumeData.toJSON(),
+                educationVisible: false
+            })
             await wrapper.setProps({
-                resumeData: {
-                    ...mockResumeData,
-                    educationVisible: false
-                }
+                resumeData: updatedData
             })
             expect(wrapper.text()).not.toContain('Master in Computer Science')
             expect(wrapper.text()).not.toContain('University of Milan')
@@ -205,11 +207,15 @@ describe('ResumePreview Content', () => {
         })
 
         it('hides custom sections when not visible', async () => {
+            const updatedData = new ResumeDataV2({
+                ...mockResumeData.toJSON(),
+                customSections: mockResumeData.customSections.map(section => ({
+                    ...section,
+                    visible: false
+                }))
+            })
             await wrapper.setProps({
-                resumeData: {
-                    ...mockResumeData,
-                    customSectionsVisible: false
-                }
+                resumeData: updatedData
             })
             expect(wrapper.text()).not.toContain('About Me')
             expect(wrapper.text()).not.toContain('Contact Details')

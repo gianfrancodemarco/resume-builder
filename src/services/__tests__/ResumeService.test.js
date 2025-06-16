@@ -82,7 +82,7 @@ describe('ResumeService', () => {
 
     describe('exportToJSON', () => {
         it('exports resume data and style to JSON', () => {
-            const resumeData = new ResumeDataV1({
+            const resumeData = new ResumeDataV2({
                 personal: {
                     name: 'John Doe',
                     title: 'Software Engineer'
@@ -109,7 +109,7 @@ describe('ResumeService', () => {
         })
 
         it('handles plain object style', () => {
-            const resumeData = new ResumeDataV1({
+            const resumeData = new ResumeDataV2({
                 personal: {
                     name: 'John Doe',
                     title: 'Software Engineer'

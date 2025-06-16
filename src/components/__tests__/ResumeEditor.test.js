@@ -40,8 +40,7 @@ describe('ResumeEditor', () => {
                 visible: true,
                 items: ['Vue.js', 'JavaScript', 'Node.js']
             }
-        ],
-        customSectionsVisible: true
+        ]
     }
 
     const mockStyle = {

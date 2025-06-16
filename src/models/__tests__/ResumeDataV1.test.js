@@ -54,8 +54,7 @@ describe('ResumeDataV1', () => {
                         visible: true,
                         items: []
                     }
-                ],
-                customSectionsVisible: false
+                ]
             }
 
             const resume = new ResumeDataV1(data)
@@ -65,7 +64,6 @@ describe('ResumeDataV1', () => {
             expect(resume.education).toEqual(data.education)
             expect(resume.educationVisible).toBe(data.educationVisible)
             expect(resume.customSections).toEqual(data.customSections)
-            expect(resume.customSectionsVisible).toBe(data.customSectionsVisible)
         })
     })
 
