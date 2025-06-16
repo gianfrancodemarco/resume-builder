@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import { mount } from '@vue/test-utils'
-import ResumePreview from '@/components/ResumePreview.vue'
-import { vuetify } from '@/test/setup'
+import ResumePreview from '../ResumePreview.vue'
+import { vuetify } from '../../test/setup'
 
 describe('ResumePreview Content', () => {
     let wrapper

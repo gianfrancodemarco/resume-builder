@@ -1,11 +1,11 @@
 import { mount } from '@vue/test-utils'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { createRouter, createWebHistory } from 'vue-router'
-import { ResumeDataV1 } from '@/models/ResumeData/ResumeDataV1'
-import { ResumeService } from '@/services/ResumeService'
-import { ExporterService } from '@/services/ExporterService'
-import { vuetify } from '@/test/setup'
-import EditorPage from '@/views/EditorPage.vue'
+import { ResumeDataV1 } from '../../models/ResumeData/ResumeDataV1'
+import { ResumeService } from '../../services/ResumeService'
+import { ExporterService } from '../../services/ExporterService'
+import { vuetify } from '../../test/setup'
+import EditorPage from '../../views/EditorPage.vue'
 
 describe('EditorPage', () => {
     let wrapper

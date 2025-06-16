@@ -1,7 +1,7 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest'
-import { ResumeService } from '@/services/ResumeService'
-import { ResumeDataV1 } from '@/models/ResumeData/ResumeDataV1'
-import { ResumeStyle2ColumnsV1 } from '@/models/ResumeStyle/ResumeStyle2ColumnsV1'
+import { ResumeService } from '../ResumeService'
+import { ResumeDataV1 } from '../../models/ResumeData/ResumeDataV1'
+import { ResumeStyle2ColumnsV1 } from '../../models/ResumeStyle/ResumeStyle2ColumnsV1'
 
 describe('ResumeService', () => {
     beforeEach(() => {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { ResumeDataV1 } from '@/models/ResumeData/ResumeDataV1'
+import { ResumeDataV1 } from '../ResumeData/ResumeDataV1'
 
 describe('ResumeDataV1', () => {
     describe('constructor', () => {
