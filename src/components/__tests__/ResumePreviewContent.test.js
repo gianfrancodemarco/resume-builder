@@ -29,6 +29,7 @@ describe('ResumePreview Content', () => {
             }
         ],
         experiencesVisible: true,
+        experiencesSectionName: 'Employment History',
         education: [
             {
                 degree: 'Master in Computer Science',
@@ -48,49 +49,31 @@ describe('ResumePreview Content', () => {
             }
         ],
         educationVisible: true,
+        educationSectionName: 'Education',
         customSections: [
             {
                 title: 'About Me',
-                type: 'italic',
+                content: '<p>Passionate software engineer with a strong focus on web development and user experience.</p><p>Skilled in both frontend and backend development.</p>',
                 visible: true,
-                items: [
-                    { value: 'Passionate software engineer with a strong focus on web development and user experience.', isLink: false, href: '' },
-                    { value: 'Skilled in both frontend and backend development.', isLink: false, href: '' }
-                ]
+                position: 'sidebar'
             },
             {
                 title: 'Contact Details',
-                type: 'text',
+                content: '<p>New York, USA</p><p><a href="mailto:john.doe@example.com">john.doe@example.com</a></p>',
                 visible: true,
-                items: [
-                    { value: 'New York, USA', isLink: false, href: '' },
-                    { value: 'john.doe@example.com', isLink: true, href: 'mailto:john.doe@example.com' }
-                ]
+                position: 'sidebar'
             },
             {
                 title: 'Technical Skills',
-                type: 'list',
+                content: 'Vue.js<br/>JavaScript<br/>TypeScript<br/>HTML/CSS<br/>Node.js',
                 visible: true,
-                items: [{
-                    value: 'Vue.js',
-                    isLink: false,
-                    href: ''
-                },
-                { value: 'JavaScript', isLink: false, href: '' },
-                { value: 'TypeScript', isLink: false, href: '' },
-                { value: 'HTML/CSS', isLink: false, href: '' },
-                { value: 'Node.js', isLink: false, href: '' }
-                ]
+                position: 'sidebar'
             },
             {
                 title: 'Languages',
-                type: 'languages',
+                content: '(Italian)[BAR:100]<br/>(English)[BAR:90]<br/>(Spanish)[BAR:70]',
                 visible: true,
-                items: [
-                    { name: 'Italian', proficiency: 100 },
-                    { name: 'English', proficiency: 90 },
-                    { name: 'Spanish', proficiency: 70 }
-                ]
+                position: 'sidebar'
             }
         ],
         customSectionsVisible: true
@@ -219,6 +202,19 @@ describe('ResumePreview Content', () => {
             expect(wrapper.text()).toContain('Italian')
             expect(wrapper.text()).toContain('English')
             expect(wrapper.text()).toContain('Spanish')
+        })
+
+        it('hides custom sections when not visible', async () => {
+            await wrapper.setProps({
+                resumeData: {
+                    ...mockResumeData,
+                    customSectionsVisible: false
+                }
+            })
+            expect(wrapper.text()).not.toContain('About Me')
+            expect(wrapper.text()).not.toContain('Contact Details')
+            expect(wrapper.text()).not.toContain('Technical Skills')
+            expect(wrapper.text()).not.toContain('Languages')
         })
     })
 }) 
