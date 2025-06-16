@@ -132,11 +132,6 @@ const colorFields = {
     link: { label: 'Link Color' }
 }
 
-watch(() => props.styleData, (newVal) => {
-    emit('update:style-data', newVal)
-    emit('change')
-}, { deep: true })
-
 const validateHex = (key) => {
     const value = props.styleData.colors[key]
     // Remove any non-hex characters
