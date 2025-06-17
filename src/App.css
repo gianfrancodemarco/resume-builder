@@ -1,0 +1,32 @@
+html,
+body,
+#app {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+html:not(.resume-preview) {
+    font-family: 'Lato', sans-serif !important;
+}
+
+
+.menu-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.action-btn.v-btn {
+    height: 48px;
+    border-radius: 8px;
+    font-weight: 500;
+    text-transform: none;
+    letter-spacing: 0.3px;
+    transition: all 0.2s ease;
+}
+
+.action-btn.v-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
