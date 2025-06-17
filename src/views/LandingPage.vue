@@ -8,13 +8,14 @@
                 <span class="cursor">|</span>
             </div>
             <v-btn color="primary" class="landing-btn" large to="/editor">Create your resume</v-btn>
-        </div>
-        <div class="website-link">
-            <a href="https://gianfrancodemarco.dev" target="_blank" rel="noopener noreferrer">gianfrancodemarco.dev</a>
+            <div class="website-link">
+            <a href="https://gianfrancodemarco.dev" target="_blank"
+                rel="noopener noreferrer">gianfrancodemarco.dev</a>
             <span class="separator">•</span>
             <a href="https://github.com/gianfrancodemarco/resume-builder" target="_blank" rel="noopener noreferrer">
                 ⭐ Star on GitHub
             </a>
+        </div>
         </div>
     </div>
 </template>
@@ -71,8 +72,8 @@ onMounted(() => {
 
 <style scoped>
 .landing-bg {
-    min-height: 100vh;
-    width: 100vw;
+    min-height: 100%;
+    width: 100%;
     background: linear-gradient(135deg, #0f2027 0%, #2c5364 100%);
     display: flex;
     align-items: center;
@@ -168,13 +169,11 @@ onMounted(() => {
 }
 
 .website-link {
-    position: absolute;
-    bottom: 2rem;
-    left: 50%;
-    transform: translateX(-50%);
+    gap: 8px;
     display: flex;
     align-items: center;
-    gap: 8px;
+    justify-content: center;
+    margin-top: 10rem;
 }
 
 .website-link a {
