@@ -10,6 +10,21 @@ export class CVConversionService {
             const schema = this.getResumeSchema()
 
             // Prepare the messages for OpenRouter
+            const fileType = file.type === 'application/pdf' ? 'pdf' : 'image'
+            const fileMessage = fileType === 'pdf' ? 
+            {
+                type: 'file',
+                file: {
+                    filename: file.name,
+                    file_data: base64File
+                }
+            } : {
+                type: 'image_url',
+                image_url: {
+                    url: `data:image/${fileType.split('/')[1]};base64,${base64File}`
+                }
+            }
+
             const messages = [
                 {
                     role: 'user',
@@ -21,7 +36,7 @@ export class CVConversionService {
                                 Extract all relevant information including personal details, work experience, education, and any other sections that could be added as custom sections. Format the content appropriately for a professional resume. 
                                 The content section is in HTML. Try to replicate original styles.
 
-                                Use links for websites, social media, etc. Use the following format: [Link Text](https://www.example.com)
+                                Use <a> for links of websites, social media, etc.
 
                                 For lists, use <ul> and <li> tags. Add a tabs before each item. Do not add new lines between items.
                                 Do not use lists in work experience and education sections, but use <br> to separate paragraphs.
@@ -31,13 +46,7 @@ export class CVConversionService {
                                 The CV is in the file attached.
                                 `
                         },
-                        {
-                            type: 'file',
-                            file: {
-                                filename: file.name,
-                                file_data: base64File
-                            }
-                        }
+                        fileMessage
                     ]
                 }
             ]
@@ -185,13 +194,8 @@ export class CVConversionService {
 
             // Filter models that support image input
             return data.data
-                .filter(model => model.architecture?.input_modalities?.includes('image'))
-                .map(model => ({
-                    title: model.name,
-                    value: model.id,
-                    description: model.description,
-                    contextLength: model.context_length
-                }))
+                //.filter(model => model.architecture?.input_modalities?.includes('image') || model.architecture?.input_modalities?.includes('file'))
+                .filter(model => model.architecture?.input_modalities?.includes('file'))
         } catch (error) {
             console.error('Error fetching models:', error)
             // Fallback to hardcoded models if API fails

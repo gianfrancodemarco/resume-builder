@@ -5,7 +5,8 @@
                 Convert CV
             </v-card-title>
             <v-card-subtitle>
-                Convert your old CV into Resume Builder format.
+                Convert your old CV into Resume Builder format. <br/> 
+                Note that this may take a while, depending on the model you choose.
             </v-card-subtitle>
 
             <v-card-text>
@@ -15,10 +16,13 @@
 
                     <v-autocomplete v-model="selectedModel" :items="models" label="Select Model"
                         :rules="[v => !!v || 'Model selection is required']" required :disabled="loading"
-                        item-title="title" item-value="value">
+                        item-title="name" item-value="id">
                     </v-autocomplete>
 
-                    <v-file-input v-model="file" label="Upload CV (PDF/Image/Text)" accept=".pdf,.png,.jpg,.jpeg,.txt"
+                    <!-- <v-file-input v-model="file" label="Upload CV (PDF/Image/Text)" accept=".pdf,.png,.jpg,.jpeg,.txt"
+                        :rules="[v => !!v || 'File is required']" required :disabled="loading"
+                        @change="handleFileChange"></v-file-input> -->
+                    <v-file-input v-model="file" label="Upload CV (PDF)" accept=".pdf"
                         :rules="[v => !!v || 'File is required']" required :disabled="loading"
                         @change="handleFileChange"></v-file-input>
                 </v-form>
@@ -87,9 +91,9 @@ const selectedModel = ref(null)
 const file = ref(null)
 
 watch(() => props.models, (newVal) => {
-    if (!selectedModel.value && newVal && newVal.length > 0) {
-        const defaultModel = newVal.find(model => model.value === 'openai/gpt-4.1')
-        selectedModel.value = defaultModel.value || newVal[0].value
+    if (!selectedModel.id && newVal && newVal.length > 0) {
+        const defaultModel = newVal.find(model => model.id === 'google/gemini-2.5-pro-preview')
+        selectedModel.value = defaultModel.id || newVal[0].id
     }
 }, { immediate: true })
 

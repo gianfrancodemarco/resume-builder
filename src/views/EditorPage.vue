@@ -281,10 +281,16 @@ const loadAvailableModels = async () => {
 }
 
 const handleConvertCVButtonClick = () => {
+    if (window.sa_event) {
+        window.sa_event('convert_cv_button_click')
+    }
     showConvertDialog.value = true
 }
 
 const handleConvert = async ({ file, apiKey, model }) => {
+    if (window.sa_event) {
+        window.sa_event('convert_cv')
+    }
     isConverting.value = true
     try {
         const newResumeData = await CVConversionService.convertCV(file, apiKey, model)
