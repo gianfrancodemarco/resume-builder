@@ -138,7 +138,6 @@ onMounted(() => {
 }
 
 .landing-title {
-    font-family: 'Oswald', sans-serif;
     font-size: 2.8rem;
     font-weight: 700;
     margin-bottom: 12px;

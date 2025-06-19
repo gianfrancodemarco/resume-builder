@@ -15,8 +15,8 @@ describe('ResumeStyle2ColumnsV1', () => {
                 link: '#ffffff'
             })
             expect(style.typography).toEqual({
-                headingFont: 'Oswald',
-                bodyFont: 'Lato',
+                headingFont: 'Helvetica',
+                bodyFont: 'Georgia',
                 baseSize: 16,
                 headingSize: 26
             })

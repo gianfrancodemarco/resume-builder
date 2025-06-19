@@ -111,7 +111,7 @@
 
 :deep(.panel-title .section-title) {
     font-size: 1.2rem;
-    font-weight: 600;
+    font-weight: 500;
 }
 
 :deep(.v-expansion-panel-text__wrapper) {

@@ -6,11 +6,6 @@ body,
     padding: 0;
 }
 
-html:not(.resume-preview) {
-    font-family: 'Lato', sans-serif !important;
-}
-
-
 .menu-actions {
     display: flex;
     flex-direction: column;

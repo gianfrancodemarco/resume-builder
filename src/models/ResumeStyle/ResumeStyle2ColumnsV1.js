@@ -42,12 +42,12 @@ value: 'italic' }
             text: data.colors?.text || '#08294D',
             background: data.colors?.background || '#ffffff',
             sidebar: data.colors?.sidebar || '#08294D',
-            link: data.colors?.link || '#ffffff'
+            link: data.colors?.link || '#08294D'
         };
 
         this.typography = {
-            headingFont: data.typography?.headingFont || 'Oswald',
-            bodyFont: data.typography?.bodyFont || 'Lato',
+            headingFont: data.typography?.headingFont || 'Helvetica',
+            bodyFont: data.typography?.bodyFont || 'Georgia',
             baseSize: data.typography?.baseSize || 16,
             headingSize: data.typography?.headingSize || 26
         };
@@ -76,8 +76,8 @@ value: 'italic' }
                 link: '#ffffff'
             },
             typography: {
-                headingFont: 'Oswald',
-                bodyFont: 'Lato',
+                headingFont: 'Helvetica',
+                bodyFont: 'Georgia',
                 baseSize: 16,
                 headingSize: 26
             },

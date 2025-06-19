@@ -16,7 +16,20 @@ export class CVConversionService {
                     content: [
                         {
                             type: 'text',
-                            text: 'Please analyze this CV and convert it into a structured format following the provided schema. Extract all relevant information including personal details, work experience, education, and any other sections that could be added as custom sections. Format the content appropriately for a professional resume.'
+                            text: `
+                                Please analyze this CV and convert it into a structured format following the provided schema. 
+                                Extract all relevant information including personal details, work experience, education, and any other sections that could be added as custom sections. Format the content appropriately for a professional resume. 
+                                The content section is in HTML. Try to replicate original styles.
+
+                                Use links for websites, social media, etc. Use the following format: [Link Text](https://www.example.com)
+
+                                For lists, use <ul> and <li> tags. Add a tabs before each item. Do not add new lines between items.
+                                Do not use lists in work experience and education sections, but use <br> to separate paragraphs.
+
+                                If there are bars for skills, languages, etc. use the following format: (Skill)[BAR:Percentage] with no space, no list and not other text, for example: (Italian)[BAR:90]
+                                
+                                The CV is in the file attached.
+                                `
                         },
                         {
                             type: 'file',
@@ -73,7 +86,12 @@ export class CVConversionService {
             const convertedData = JSON.parse(data.choices[0].message.content)
 
             // Create new ResumeDataV2 instance with the converted data
-            return ResumeDataV2.fromJSON(convertedData)
+            const resumeData = ResumeDataV2.fromJSON(convertedData)
+            // For now, force all custom sections to be in the sidebar
+            for (const section of resumeData.customSections) {
+                section.position = 'sidebar'
+            }
+            return resumeData
         } catch (error) {
             throw new Error(error.message)
         }
