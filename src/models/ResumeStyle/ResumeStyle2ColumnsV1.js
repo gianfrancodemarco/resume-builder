@@ -3,17 +3,19 @@ export class ResumeStyle2ColumnsV1 {
     static TEMPLATE_NAME = '2 Columns';
 
     static FONT_OPTIONS = [
-        'Roboto',
-        'Arial',
-        'Helvetica',
-        'Times New Roman',
-        'Georgia',
-        'Verdana',
-        'Open Sans',
-        'Lato',
-        'Montserrat',
-        'Poppins',
-        'Oswald'
+        "Arial",
+        "Verdana",
+        "Helvetica",
+        "Georgia",
+        "Times New Roman",
+        "Trebuchet MS",
+        "Tahoma",
+        "Courier New",
+        "Lucida Console",
+        "Palatino Linotype",
+        "Book Antiqua",
+        "Impact",
+        "Gill Sans"
     ];
 
     static COLUMN_TYPES = {
@@ -22,10 +24,14 @@ export class ResumeStyle2ColumnsV1 {
     };
 
     static SECTION_TYPES = [
-        { label: 'Text', value: 'text' },
-        { label: 'List', value: 'list' },
-        { label: 'Languages', value: 'languages' },
-        { label: 'Italic Text', value: 'italic' }
+        { label: 'Text',
+value: 'text' },
+        { label: 'List',
+value: 'list' },
+        { label: 'Languages',
+value: 'languages' },
+        { label: 'Italic Text',
+value: 'italic' }
     ]
 
     constructor(data = {}) {
@@ -82,8 +88,10 @@ export class ResumeStyle2ColumnsV1 {
                 sidebarWidth: 280
             },
             columns: {
-                left: ['personal', 'education'],
-                right: ['experiences', 'customSections']
+                left: ['personal',
+'education'],
+                right: ['experiences',
+'customSections']
             }
         });
     }
