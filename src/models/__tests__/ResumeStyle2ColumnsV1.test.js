@@ -12,7 +12,7 @@ describe('ResumeStyle2ColumnsV1', () => {
                 text: '#08294D',
                 background: '#ffffff',
                 sidebar: '#08294D',
-                link: '#ffffff'
+                link: '#08294D'
             })
             expect(style.typography).toEqual({
                 headingFont: 'Helvetica',
@@ -73,7 +73,7 @@ describe('ResumeStyle2ColumnsV1', () => {
             expect(style.version).toBe(ResumeStyle2ColumnsV1.VERSION)
             expect(style.templateName).toBe(ResumeStyle2ColumnsV1.TEMPLATE_NAME)
             expect(style.colors.primary).toBe('#08294D')
-            expect(style.typography.headingFont).toBe('Oswald')
+            expect(style.typography.headingFont).toBe('Helvetica')
             expect(style.spacing.section).toBe(24)
         })
     })
