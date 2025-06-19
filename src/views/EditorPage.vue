@@ -25,21 +25,29 @@
 
         <!-- Collapsible Menu - show on both mobile and desktop -->
         <CollapsibleMenu :handleExportJSON="handleExportJSON" :handleImportJSON="handleImportJSON"
-            :handleDownloadPDF="handleDownloadPDF" :handleDownloadHTML="handleDownloadHTML" />
+            :handleDownloadPDF="handleDownloadPDF" :handleDownloadHTML="handleDownloadHTML"
+            :handleConvertCV="handleConvertCVButtonClick" />
+
+        <!-- Convert CV Dialog -->
+        <ConvertCVDialog :dialog="showConvertDialog" :models="availableModels" :loading="isConverting"
+            :handleConvert="handleConvert" @close="showConvertDialog = false" />
+
+        <v-alert v-model="alertMessage.show" :type="alertMessage.type" :title="alertMessage.title"
+            :text="alertMessage.message" closable @click:close="hideAlert" class="alert-message" timeout="3000" />
     </v-app>
 </template>
 
 <script setup>
+import CollapsibleMenu from '@/components/EditorPage/CollapsibleMenu.vue'
+import ConvertCVDialog from '@/components/EditorPage/ConvertCVDialog.vue'
 import ResumeEditor from '@/components/EditorPage/ResumeEditor.vue'
 import ResumePreview from '@/components/EditorPage/ResumePreview.vue'
-import CollapsibleMenu from '@/components/EditorPage/CollapsibleMenu.vue'
+import { CVConversionService } from '@/services/CVConversionService'
 import { ExporterService } from '@/services/ExporterService'
 import { ResumeData, ResumeService, ResumeStyleClass } from '@/services/ResumeService'
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
-import { useRouter } from 'vue-router'
 import { useDisplay } from 'vuetify'
 
-const router = useRouter()
 const { mobile } = useDisplay()
 
 // Replace the resumeData ref with the ResumeData factory
@@ -49,20 +57,40 @@ const resumeData = ref(ResumeData.createDefault())
 const resumeStyle = ref(ResumeStyleClass.createDefault())
 
 const fileInput = ref(null)
-
-// Add drawer ref for mobile menu
-const drawer = ref(false)
-const showActions = ref(false)
-
 const hasUnsavedChanges = ref(false)
 const editorWidth = ref(35)
 const editorHeight = ref(50)
 const isResizing = ref(false)
 
 const isMobile = computed(() => mobile.value)
+const alertMessage = ref({
+    show: false,
+    title: '',
+    message: '',
+    type: 'success'
+})
+
+const showAlert = (title, message, type = 'success') => {
+    alertMessage.value = {
+        show: true,
+        title,
+        message,
+        type
+    }
+    setTimeout(() => {
+        hideAlert()
+    }, 3000)
+}
+
+const hideAlert = () => {
+    alertMessage.value.show = false
+}
 
 // Add event listener for page unload
-onMounted(() => {
+onMounted(async () => {
+    // Load available models
+    await loadAvailableModels()
+
     window.addEventListener('beforeunload', handleBeforeUnload)
     window.addEventListener('mousemove', handleResize)
     window.addEventListener('touchmove', handleResize)
@@ -137,43 +165,60 @@ const handleFileUpload = async (event) => {
             const { resumeData: newResumeData, resumeStyle: newResumeStyle } = await ResumeService.loadFromFile(file)
             resumeData.value = newResumeData
             resumeStyle.value = newResumeStyle
+            showAlert('Import Successful', 'Your resume has been imported successfully.', 'success')
         } catch (error) {
-            alert(error.message)
+            console.error('Error importing file:', error)
+            showAlert('Import Failed', error.message || 'Failed to import resume.', 'error')
         }
     }
     // Reset the input so the same file can be selected again
     event.target.value = ''
 }
+
 const handleExportJSON = () => {
-    drawer.value = false
     if (window.sa_event) {
         window.sa_event('export_json')
     }
-    exportJSON()
+    try {
+        exportJSON()
+        showAlert('Export Successful', 'Your resume has been exported as JSON.', 'success')
+    } catch (error) {
+        console.error('Error exporting JSON:', error)
+        showAlert('Export Failed', 'Failed to export resume as JSON.', 'error')
+    }
 }
 
 const handleImportJSON = () => {
-    drawer.value = false
     if (window.sa_event) {
         window.sa_event('import_json')
     }
     importJSON()
 }
 
-const handleDownloadPDF = () => {
-    drawer.value = false
+const handleDownloadPDF = async () => {
     if (window.sa_event) {
         window.sa_event('download_pdf')
     }
-    downloadPDF()
+    try {
+        await downloadPDF()
+        showAlert('PDF Generated', 'Your resume has been generated as PDF.', 'success')
+    } catch (error) {
+        console.error('Error generating PDF:', error)
+        showAlert('PDF Generation Failed', 'Failed to generate PDF. Please try again.', 'error')
+    }
 }
 
-const handleDownloadHTML = () => {
-    drawer.value = false
+const handleDownloadHTML = async () => {
     if (window.sa_event) {
         window.sa_event('download_html')
     }
-    downloadHTML()
+    try {
+        await downloadHTML()
+        showAlert('HTML Generated', 'Your resume has been generated as HTML.', 'success')
+    } catch (error) {
+        console.error('Error generating HTML:', error)
+        showAlert('HTML Generation Failed', 'Failed to generate HTML. Please try again.', 'error')
+    }
 }
 
 // Resize handlers
@@ -221,9 +266,42 @@ const stopResize = () => {
     isResizing.value = false
 }
 
-// Remove mobile menu related functions
-const toggleActions = () => {
-    showActions.value = !showActions.value
+// Convert CV Dialog State
+const showConvertDialog = ref(false)
+const availableModels = ref([])
+const isConverting = ref(false)
+
+const loadAvailableModels = async () => {
+    try {
+        availableModels.value = await CVConversionService.fetchAvailableModels()
+    } catch (error) {
+        console.error('Error fetching models:', error)
+        availableModels.value = []
+    }
+}
+
+const handleConvertCVButtonClick = () => {
+    if (window.sa_event) {
+        window.sa_event('convert_cv_button_click')
+    }
+    showConvertDialog.value = true
+}
+
+const handleConvert = async ({ file, apiKey, model }) => {
+    if (window.sa_event) {
+        window.sa_event('convert_cv')
+    }
+    isConverting.value = true
+    try {
+        const newResumeData = await CVConversionService.convertCV(file, apiKey, model)
+        resumeData.value = newResumeData
+        showAlert('CV successfully converted!', 'Your CV has been successfully converted.', 'success')
+        showConvertDialog.value = false
+    } catch (error) {
+        showAlert('Error converting CV', error, 'error')
+    } finally {
+        isConverting.value = false
+    }
 }
 </script>
 
@@ -293,57 +371,6 @@ const toggleActions = () => {
     width: 2px;
     height: 24px;
     background: rgba(0, 0, 0, 0.1);
-
-}
-
-.download-buttons {
-    position: fixed;
-    bottom: 24px;
-    right: 24px;
-    display: flex;
-    gap: 8px;
-    z-index: 100;
-}
-
-.download-btn {
-    transition: all 0.2s ease;
-    background: #0f2027 !important;
-    color: white !important;
-    box-shadow: 0 2px 8px rgba(15, 32, 39, 0.1) !important;
-}
-
-.download-btn:hover {
-    transform: translateY(-2px);
-    background: #1a2c35 !important;
-    box-shadow: 0 4px 12px rgba(15, 32, 39, 0.15) !important;
-}
-
-.gradient-navbar {
-    background: linear-gradient(135deg, #0f2027 0%, #2c5364 100%) !important;
-    box-shadow: 0 2px 8px rgba(44, 83, 100, 0.08);
-    border-bottom: none !important;
-    min-height: 48px !important;
-    height: 56px !important;
-    padding: 0 24px !important;
-    display: flex;
-    align-items: center;
-}
-
-.custom-navbar {
-    color: #fff !important;
-    font-size: 1.1rem;
-    letter-spacing: 0.5px;
-}
-
-.navbar-title {
-    margin: 0;
-    padding: 0;
-    font-size: 1.4rem;
-    font-weight: 600;
-    color: #fff !important;
-    display: flex;
-    align-items: center;
-    height: 100%;
 }
 
 :deep(.v-app-bar) {
@@ -383,93 +410,6 @@ const toggleActions = () => {
     opacity: 0.8;
 }
 
-@media (max-width: 960px) {
-    .editor-content {
-        flex-direction: column;
-        height: 100vh;
-        overflow: hidden;
-    }
-
-    .editor-col {
-        width: 100% !important;
-        height: 100%;
-        overflow-y: auto;
-        -webkit-overflow-scrolling: touch;
-    }
-
-    .preview-col {
-        width: 100% !important;
-        height: 100%;
-        overflow-y: auto;
-        -webkit-overflow-scrolling: touch;
-    }
-
-    .resize-handle {
-        width: 100%;
-        height: 8px;
-        cursor: row-resize;
-    }
-
-    .resize-handle::after {
-        width: 24px;
-        height: 2px;
-    }
-}
-
-@media (max-width: 600px) {
-    .editor-content {
-        height: 100vh;
-        overflow: hidden;
-    }
-
-    .editor-col {
-        height: 100%;
-        overflow-y: auto;
-        -webkit-overflow-scrolling: touch;
-    }
-
-    .navbar-title {
-        font-size: 1.2rem;
-    }
-
-    .download-buttons {
-        bottom: 16px;
-        right: 16px;
-    }
-
-    .download-btn {
-        width: 40px;
-        height: 40px;
-    }
-}
-
-.desktop-actions {
-    position: fixed;
-    bottom: 24px;
-    right: 24px;
-    display: flex;
-    gap: 8px;
-    z-index: 100;
-}
-
-.desktop-btn {
-    background: linear-gradient(135deg, #0f2027 0%, #2c5364 100%) !important;
-    color: white !important;
-}
-
-.desktop-btn:hover {
-    background: linear-gradient(135deg, #1a2c35 0%, #3c6374 100%) !important;
-    transform: translateY(-2px);
-}
-
-.mobile-actions,
-.action-buttons,
-.action-item,
-.action-label,
-.action-btn {
-    display: none;
-}
-
 .preview-container {
     position: relative;
     height: 100%;
@@ -486,21 +426,13 @@ const toggleActions = () => {
     margin-bottom: 24px;
 }
 
-.preview-actions {
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-    justify-content: center;
-}
-
-.preview-actions .action-btn {
-    width: auto;
-    min-width: 150px;
-    justify-content: center;
-    text-transform: none;
-    letter-spacing: 0.2px;
-    font-weight: 500;
-    font-size: 0.8rem;
-    height: 36px;
+.alert-message {
+    position: fixed;
+    top: 24px;
+    right: 50%;
+    transform: translateX(50%);
+    z-index: 1000;
+    min-width: 500px;
+    max-width: 800px;
 }
 </style>

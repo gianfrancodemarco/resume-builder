@@ -3,17 +3,19 @@ export class ResumeStyle2ColumnsV1 {
     static TEMPLATE_NAME = '2 Columns';
 
     static FONT_OPTIONS = [
-        'Roboto',
-        'Arial',
-        'Helvetica',
-        'Times New Roman',
-        'Georgia',
-        'Verdana',
-        'Open Sans',
-        'Lato',
-        'Montserrat',
-        'Poppins',
-        'Oswald'
+        "Arial",
+        "Verdana",
+        "Helvetica",
+        "Georgia",
+        "Times New Roman",
+        "Trebuchet MS",
+        "Tahoma",
+        "Courier New",
+        "Lucida Console",
+        "Palatino Linotype",
+        "Book Antiqua",
+        "Impact",
+        "Gill Sans"
     ];
 
     static COLUMN_TYPES = {
@@ -22,10 +24,14 @@ export class ResumeStyle2ColumnsV1 {
     };
 
     static SECTION_TYPES = [
-        { label: 'Text', value: 'text' },
-        { label: 'List', value: 'list' },
-        { label: 'Languages', value: 'languages' },
-        { label: 'Italic Text', value: 'italic' }
+        { label: 'Text',
+value: 'text' },
+        { label: 'List',
+value: 'list' },
+        { label: 'Languages',
+value: 'languages' },
+        { label: 'Italic Text',
+value: 'italic' }
     ]
 
     constructor(data = {}) {
@@ -36,12 +42,12 @@ export class ResumeStyle2ColumnsV1 {
             text: data.colors?.text || '#08294D',
             background: data.colors?.background || '#ffffff',
             sidebar: data.colors?.sidebar || '#08294D',
-            link: data.colors?.link || '#ffffff'
+            link: data.colors?.link || '#08294D'
         };
 
         this.typography = {
-            headingFont: data.typography?.headingFont || 'Oswald',
-            bodyFont: data.typography?.bodyFont || 'Lato',
+            headingFont: data.typography?.headingFont || 'Helvetica',
+            bodyFont: data.typography?.bodyFont || 'Georgia',
             baseSize: data.typography?.baseSize || 16,
             headingSize: data.typography?.headingSize || 26
         };
@@ -70,8 +76,8 @@ export class ResumeStyle2ColumnsV1 {
                 link: '#ffffff'
             },
             typography: {
-                headingFont: 'Oswald',
-                bodyFont: 'Lato',
+                headingFont: 'Helvetica',
+                bodyFont: 'Georgia',
                 baseSize: 16,
                 headingSize: 26
             },
@@ -82,8 +88,10 @@ export class ResumeStyle2ColumnsV1 {
                 sidebarWidth: 280
             },
             columns: {
-                left: ['personal', 'education'],
-                right: ['experiences', 'customSections']
+                left: ['personal',
+'education'],
+                right: ['experiences',
+'customSections']
             }
         });
     }

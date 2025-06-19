@@ -6,16 +6,18 @@
 
             <div class="menu-content" v-if="menuOpen">
                 <div class="menu-actions">
-                    <v-btn block color="white" prepend-icon="mdi-close" class="menu-action-btn"
-                        @click="toggleMenu">Close this menu</v-btn>
-                    <v-btn block color="primary" prepend-icon="mdi-code-json" class="menu-action-btn"
-                        @click="handleExportJSON">Export JSON</v-btn>
-                    <v-btn block color="primary" prepend-icon="mdi-upload" class="menu-action-btn"
-                        @click="handleImportJSON">Import JSON</v-btn>
-                    <v-btn block color="primary" prepend-icon="mdi-file-pdf-box" class="menu-action-btn"
-                        @click="handleDownloadPDF">Download PDF</v-btn>
-                    <v-btn block color="primary" prepend-icon="mdi-file-code" class="menu-action-btn"
-                        @click="handleDownloadHTML">Download HTML</v-btn>
+                    <v-btn block color="white" prepend-icon="mdi-close" class="action-btn" @click="toggleMenu">Close
+                        this menu</v-btn>
+                    <v-btn block color="primary" prepend-icon="mdi-code-json" class="action-btn"
+                        @click="() => { closeAllMenus(); handleExportJSON() }">Export JSON</v-btn>
+                    <v-btn block color="primary" prepend-icon="mdi-upload" class="action-btn"
+                        @click="() => { closeAllMenus(); handleImportJSON() }">Import JSON</v-btn>
+                    <v-btn block color="primary" prepend-icon="mdi-file-pdf-box" class="action-btn"
+                        @click="() => { closeAllMenus(); handleDownloadPDF() }">Download PDF</v-btn>
+                    <v-btn block color="primary" prepend-icon="mdi-file-code" class="action-btn"
+                        @click="() => { closeAllMenus(); handleDownloadHTML() }">Download HTML</v-btn>
+                    <v-btn block color="primary" prepend-icon="mdi-file-document-edit" class="action-btn"
+                        @click="() => { closeAllMenus(); handleConvertCV() }">Convert CV</v-btn>
                 </div>
             </div>
         </div>
@@ -24,31 +26,37 @@
         <div v-else class="mobile-actions">
             <div v-if="showActions" class="action-buttons">
                 <div class="action-item">
-                    <span class="action-label">Close this menu</span>
-                    <v-btn icon="mdi-close" color="white" class="action-btn" elevation="2" @click="toggleActions" />
+                    <span class="mobile-action-label">Close this menu</span>
+                    <v-btn icon="mdi-close" color="white" class="mobile-action-btn" elevation="2" @click="toggleActions" />
                 </div>
                 <div class="action-item">
-                    <span class="action-label">Export JSON</span>
-                    <v-btn icon="mdi-code-json" color="primary" @click="handleExportJSON" class="action-btn"
+                    <span class="mobile-action-label">Export JSON</span>
+                    <v-btn icon="mdi-code-json" color="primary" @click="() => { closeAllMenus(); handleExportJSON() }" class="mobile-action-btn"
                         elevation="2" />
                 </div>
                 <div class="action-item">
-                    <span class="action-label">Import JSON</span>
-                    <v-btn icon="mdi-upload" color="primary" @click="handleImportJSON" class="action-btn"
+                    <span class="mobile-action-label">Import JSON</span>
+                    <v-btn icon="mdi-upload" color="primary" @click="() => { closeAllMenus(); handleImportJSON() }" class="mobile-action-btn"
                         elevation="2" />
                 </div>
                 <div class="action-item">
-                    <span class="action-label">Download PDF</span>
-                    <v-btn icon="mdi-file-pdf-box" color="primary" @click="handleDownloadPDF" class="action-btn"
+                    <span class="mobile-action-label">Download PDF</span>
+                    <v-btn icon="mdi-file-pdf-box" color="primary" @click="() => { closeAllMenus(); handleDownloadPDF() }" class="mobile-action-btn"
                         elevation="2" />
                 </div>
                 <div class="action-item">
-                    <span class="action-label">Download HTML</span>
-                    <v-btn icon="mdi-file-code" color="primary" @click="handleDownloadHTML" class="action-btn"
+                    <span class="mobile-action-label">Download HTML</span>
+                    <v-btn icon="mdi-file-code" color="primary" @click="() => { closeAllMenus(); handleDownloadHTML() }" class="mobile-action-btn"
+                        elevation="2" />
+                </div>
+                <div class="action-item">
+                    <span class="mobile-action-label">Convert CV</span>
+                    <v-btn icon="mdi-file-document-edit" color="primary" @click="() => { closeAllMenus(); handleConvertCV() }" class="mobile-action-btn"
                         elevation="2" />
                 </div>
             </div>
-            <v-btn icon="mdi-lightning-bolt" color="primary" class="action-btn" elevation="2" @click="toggleActions" />
+            <v-btn icon="mdi-lightning-bolt" color="primary" class="mobile-action-btn" elevation="2"
+                @click="toggleActions" />
         </div>
 
         <!-- Overlay -->
@@ -67,7 +75,8 @@ const props = defineProps({
     handleExportJSON: Function,
     handleImportJSON: Function,
     handleDownloadPDF: Function,
-    handleDownloadHTML: Function
+    handleDownloadHTML: Function,
+    handleConvertCV: Function
 })
 
 const menuOpen = ref(false)
@@ -126,26 +135,6 @@ const closeAllMenus = () => {
     animation: slideInDesktop 0.3s forwards;
 }
 
-.menu-actions {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-.menu-action-btn {
-    height: 48px;
-    border-radius: 8px;
-    font-weight: 500;
-    text-transform: none;
-    letter-spacing: 0.3px;
-    transition: all 0.2s ease;
-}
-
-.menu-action-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
 /* Mobile styles */
 .mobile-actions {
     position: fixed;
@@ -156,6 +145,18 @@ const closeAllMenus = () => {
     align-items: flex-end;
     gap: 12px;
     z-index: 130;
+}
+
+.menu-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(4px);
+    z-index: 110;
+    animation: fadeIn 0.3s forwards;
 }
 
 .action-buttons {
@@ -171,7 +172,7 @@ const closeAllMenus = () => {
     gap: 12px;
 }
 
-.action-label {
+.mobile-action-label {
     background-color: rgba(0, 0, 0, 0.8);
     color: white;
     padding: 6px 12px;
@@ -180,26 +181,10 @@ const closeAllMenus = () => {
     white-space: nowrap;
 }
 
-.action-btn {
+.mobile-action-btn {
     width: 48px !important;
     height: 48px !important;
-    transition: all 0.2s ease;
-}
-
-.action-btn:hover {
-    transform: translateY(-2px);
-}
-
-.menu-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.4);
-    backdrop-filter: blur(4px);
-    z-index: 110;
-    animation: fadeIn 0.3s forwards;
+    transition: all .2s ease;
 }
 
 @keyframes slideInDesktop {

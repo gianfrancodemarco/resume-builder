@@ -2,38 +2,39 @@
     <div>
         <div class="tiptap-toolbar">
             <button type="button" @click="toggleBold" :class="{ active: isActive('bold') }"
-                title="Bold"><b>B</b></button>
+                title="Make text bold (Ctrl+B)"><b>B</b></button>
             <button type="button" @click="toggleItalic" :class="{ active: isActive('italic') }"
-                title="Italic"><i>I</i></button>
+                title="Make text italic (Ctrl+I)"><i>I</i></button>
             <button type="button" @click="toggleStrike" :class="{ active: isActive('strike') }"
-                title="Strikethrough"><s>S</s></button>
+                title="Strikethrough text"><s>S</s></button>
             <button type="button" @click="toggleUnderline" :class="{ active: isActive('underline') }"
-                title="Underline"><u>U</u></button>
+                title="Underline text (Ctrl+U)"><u>U</u></button>
             <span class="toolbar-separator"></span>
-            <button type="button" @click="addLanguageProficiency" title="Add Language Proficiency">🌐</button>
+            <button type="button" @click="addLanguageProficiency" title="Add language proficiency bar">🌐</button>
             <span class="toolbar-separator"></span>
             <select v-model="currentFont" @change="setFontFamily($event.target.value)" class="toolbar-select"
-                title="Font Family">
+                title="Change font family">
                 <option v-for="font in fonts" :key="font" :value="font">{{ font }}</option>
             </select>
             <select v-model="currentFontSize" @change="setFontSize($event.target.value)" class="toolbar-select"
-                title="Font Size">
+                title="Change font size">
                 <option v-for="size in fontSizes" :key="size" :value="size">{{ size }}</option>
             </select>
             <input type="color" v-model="currentColor" @input="setColor($event.target.value)" class="toolbar-color"
-                title="Font Color" />
+                title="Change text color" />
             <span class="toolbar-separator"></span>
             <button type="button" @click="setLink" :class="{ active: isActive('link') }"
-                title="Add/Edit Link">🔗</button>
-            <button type="button" @click="unsetLink" title="Remove Link">❌</button>
+                title="Add or edit link (Ctrl+K)">🔗</button>
+            <button type="button" @click="unsetLink" title="Remove link">❌</button>
             <span class="toolbar-separator"></span>
             <button type="button" @click="toggleBulletList" :class="{ active: isActive('bulletList') }"
-                title="Bullet List">• List</button>
+                title="Create bullet list">• List</button>
             <button type="button" @click="toggleOrderedList" :class="{ active: isActive('orderedList') }"
-                title="Ordered List">1. List</button>
+                title="Create numbered list">1. List</button>
+            <button type="button" @click="removeList" title="Remove list formatting">📝</button>
             <span class="toolbar-separator"></span>
-            <button type="button" @click="undo" title="Undo">↺</button>
-            <button type="button" @click="redo" title="Redo">↻</button>
+            <button type="button" @click="undo" title="Undo last action (Ctrl+Z)">↺</button>
+            <button type="button" @click="redo" title="Redo last action (Ctrl+Y)">↻</button>
         </div>
         <EditorContent class="tiptap-editor-content" :editor="editor" />
     </div>
@@ -175,6 +176,16 @@ const toggleStrike = () => editor.value && editor.value.chain().focus().toggleSt
 const toggleUnderline = () => editor.value && editor.value.chain().focus().toggleUnderline().run()
 const toggleBulletList = () => editor.value && editor.value.chain().focus().toggleBulletList().run()
 const toggleOrderedList = () => editor.value && editor.value.chain().focus().toggleOrderedList().run()
+const removeList = () => {
+    if (!editor.value) return
+
+    // Check if we're in a list and remove it properly
+    if (editor.value.isActive('bulletList')) {
+        editor.value.chain().focus().toggleBulletList().run()
+    } else if (editor.value.isActive('orderedList')) {
+        editor.value.chain().focus().toggleOrderedList().run()
+    }
+}
 const undo = () => editor.value && editor.value.chain().focus().undo().run()
 const redo = () => editor.value && editor.value.chain().focus().redo().run()
 const isActive = (format) => editor.value && editor.value.isActive(format)

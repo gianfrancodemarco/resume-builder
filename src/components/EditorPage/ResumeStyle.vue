@@ -52,12 +52,26 @@
                     <div>
                         <div class="text-subtitle-2 mb-2">Heading Font</div>
                         <v-select v-model="styleData.typography.headingFont" :items="fontOptions" variant="outlined"
-                            density="comfortable"></v-select>
+                            density="comfortable" :item-text="item => item" :item-value="item => item">
+                            <template v-slot:selection="{ item }">
+                                <span :style="{ fontFamily: item.value }">{{ item.value }}</span>
+                            </template>
+                            <template v-slot:item="{ props: itemProps, item }">
+                                <v-list-item v-bind="itemProps" :style="{ fontFamily: item.value }"/>
+                            </template>
+                        </v-select>
                     </div>
                     <div>
                         <div class="text-subtitle-2 mb-2">Default Body Font</div>
                         <v-select v-model="styleData.typography.bodyFont" :items="fontOptions" variant="outlined"
-                            density="comfortable"></v-select>
+                            density="comfortable" :item-text="item => item" :item-value="item => item">
+                            <template v-slot:selection="{ item }">
+                                <span :style="{ fontFamily: item.value }">{{ item.value }}</span>
+                            </template>
+                            <template v-slot:item="{ props: itemProps, item }">
+                                <v-list-item v-bind="itemProps" :style="{ fontFamily: item.value }" />
+                            </template>
+                        </v-select>
                     </div>
                     <div>
                         <div class="text-subtitle-2 mb-2">Font Sizes</div>

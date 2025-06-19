@@ -87,7 +87,6 @@ A modern, single-page resume builder application built with Vue 3 and Vuetify. C
 
 - [Vue 3](https://vuejs.org/) - Progressive JavaScript framework
 - [Vuetify 3](https://vuetifyjs.com/) - Material Design component framework
-- [Google Fonts](https://fonts.google.com/) - Typography
 
 ## Contributing
 
@@ -106,5 +105,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Acknowledgments
 
 - Icons by [Material Design Icons](https://materialdesignicons.com/)
-- Fonts by [Google Fonts](https://fonts.google.com/)
 - Inspiration from modern resume templates
