@@ -10,7 +10,7 @@ import * as directives from 'vuetify/directives'
 import '@mdi/font/css/materialdesignicons.css'
 
 // Phosphor Icons
-import { PhEye, PhEyeSlash, PhPencilSimple, PhCheck, PhTrash, PhPlus, PhTextAlignRight, PhTextAlignLeft, PhArrowUp, PhArrowDown, PhCopy, PhPalette, PhTextT, PhArrowsOutLineVertical, PhGlobe, PhLink, PhX, PhArrowCounterClockwise, PhArrowClockwise, PhTextB, PhTextItalic, PhTextStrikethrough, PhTextUnderline, PhListBullets, PhListNumbers, PhList, PhBracketsCurly, PhUpload, PhFilePdf, PhFileCode, PhFileText, PhLightning, PhUser } from '@phosphor-icons/vue'
+import { PhEye, PhEyeSlash, PhPencilSimple, PhCheck, PhTrash, PhPlus, PhTextAlignRight, PhTextAlignLeft, PhArrowUp, PhArrowDown, PhCopy, PhPalette, PhTextT, PhArrowsOutLineVertical, PhGlobe, PhLink, PhX, PhArrowCounterClockwise, PhArrowClockwise, PhTextB, PhTextItalic, PhTextStrikethrough, PhTextUnderline, PhListBullets, PhListNumbers, PhList, PhBracketsCurly, PhUpload, PhFilePdf, PhFileCode, PhFileText, PhLightning, PhUser, PhUserCircle, PhBriefcase, PhGraduationCap, PhPlusCircle, PhTranslate, PhCertificate, PhFolder, PhBookOpen, PhTrophy, PhHeart, PhStar, PhUsers, PhTarget, PhMedal, PhGameController, PhBuildings, PhLightbulb, PhPhone, PhMagnifyingGlassPlus, PhMagnifyingGlassMinus, PhHouse } from '@phosphor-icons/vue'
 
 const vuetify = createVuetify({
     components,
@@ -53,7 +53,28 @@ const vuetify = createVuetify({
                         'ph-file-code': PhFileCode,
                         'ph-file-text': PhFileText,
                         'ph-lightning': PhLightning,
-                        'ph-user': PhUser
+                        'ph-user': PhUser,
+                        'ph-user-circle': PhUserCircle,
+                        'ph-briefcase': PhBriefcase,
+                        'ph-graduation-cap': PhGraduationCap,
+                        'ph-plus-circle': PhPlusCircle,
+                        'ph-translate': PhTranslate,
+                        'ph-certificate': PhCertificate,
+                        'ph-folder': PhFolder,
+                        'ph-book-open': PhBookOpen,
+                        'ph-trophy': PhTrophy,
+                        'ph-heart': PhHeart,
+                        'ph-star': PhStar,
+                        'ph-users': PhUsers,
+                        'ph-target': PhTarget,
+                        'ph-medal': PhMedal,
+                        'ph-game-controller': PhGameController,
+                        'ph-buildings': PhBuildings,
+                        'ph-lightbulb': PhLightbulb,
+                        'ph-phone': PhPhone,
+                        'ph-magnifying-glass-plus': PhMagnifyingGlassPlus,
+                        'ph-magnifying-glass-minus': PhMagnifyingGlassMinus,
+                        'ph-house': PhHouse
                     }
                     const IconComponent = iconMap[props.icon]
                     return IconComponent ? h(IconComponent, { ...props, icon: undefined }) : null

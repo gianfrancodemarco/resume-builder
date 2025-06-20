@@ -2,7 +2,7 @@
     <div>
         <div class="editor-sections">
             <!-- Personal Section -->
-            <div class="editor-section">
+            <div class="editor-section" data-section="personal">
                 <div class="section-header">
                     <div class="d-flex align-center w-100">
                         <span class="section-title">
@@ -23,7 +23,7 @@
             </div>
 
             <!-- Experience Section -->
-            <div class="editor-section">
+            <div class="editor-section" data-section="experience">
                 <div class="section-header">
                     <div class="d-flex align-center w-100">
                         <span class="section-title">
@@ -79,7 +79,7 @@
             </div>
 
             <!-- Education Section -->
-            <div class="editor-section">
+            <div class="editor-section" data-section="education">
                 <div class="section-header">
                     <div class="d-flex align-center w-100">
                         <span class="section-title">
@@ -134,7 +134,8 @@
             </div>
 
             <!-- Custom Sections -->
-            <div v-for="(section, index) in props.resumeData.customSections" :key="index" class="editor-section">
+            <div v-for="(section, index) in props.resumeData.customSections" :key="index" class="editor-section"
+                :data-section="`custom-${index}`">
                 <div class="section-header">
                     <div class="custom-section-title-row">
                         <div class="section-title">{{ section.title }}</div>

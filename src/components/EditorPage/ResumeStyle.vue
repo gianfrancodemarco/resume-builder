@@ -1,23 +1,16 @@
 <template>
     <div class="style-editor">
-        <v-tabs v-model="activeTab" color="primary" class="style-tabs mb-4">
-            <v-tab value="colors">
-                <v-icon icon="ph-palette" class="mr-2" />
-                Colors
-            </v-tab>
-            <v-tab value="typography">
-                <v-icon icon="ph-text-t" class="mr-2" />
-                Typography
-            </v-tab>
-            <v-tab value="spacing">
-                <v-icon icon="ph-arrows-out-line-vertical" class="mr-2" />
-                Spacing
-            </v-tab>
-        </v-tabs>
-
-        <v-window v-model="activeTab">
-            <v-window-item value="colors">
-                <div class="d-flex flex-column gap-4 pa-4">
+        <!-- Colors Section -->
+        <div class="editor-section" data-section="colors">
+            <div class="section-header">
+                <div class="d-flex align-center w-100">
+                    <span class="section-title">
+                        <v-icon icon="ph-palette" class="mr-2" /> Colors
+                    </span>
+                </div>
+            </div>
+            <div class="section-content">
+                <div class="d-flex flex-column gap-4">
                     <div v-for="(color, key) in colorFields" :key="key" class="color-field">
                         <div class="d-flex align-center justify-space-between mb-2">
                             <span class="text-subtitle-2">{{ color.label }}</span>
@@ -45,10 +38,20 @@
                         </div>
                     </div>
                 </div>
-            </v-window-item>
+            </div>
+        </div>
 
-            <v-window-item value="typography">
-                <div class="d-flex flex-column gap-4 pa-4">
+        <!-- Typography Section -->
+        <div class="editor-section" data-section="typography">
+            <div class="section-header">
+                <div class="d-flex align-center w-100">
+                    <span class="section-title">
+                        <v-icon icon="ph-text-t" class="mr-2" /> Typography
+                    </span>
+                </div>
+            </div>
+            <div class="section-content">
+                <div class="d-flex flex-column gap-4">
                     <div>
                         <div class="text-subtitle-2 mb-2">Heading Font</div>
                         <v-select v-model="styleData.typography.headingFont" :items="fontOptions" variant="outlined"
@@ -81,10 +84,20 @@
                             step="1" thumb-label class="style-slider"></v-slider>
                     </div>
                 </div>
-            </v-window-item>
+            </div>
+        </div>
 
-            <v-window-item value="spacing">
-                <div class="d-flex flex-column gap-4 pa-4">
+        <!-- Spacing Section -->
+        <div class="editor-section" data-section="spacing">
+            <div class="section-header">
+                <div class="d-flex align-center w-100">
+                    <span class="section-title">
+                        <v-icon icon="ph-arrows-out-line-vertical" class="mr-2" /> Spacing
+                    </span>
+                </div>
+            </div>
+            <div class="section-content">
+                <div class="d-flex flex-column gap-4">
                     <div>
                         <div class="text-subtitle-2 mb-2">Section Spacing</div>
                         <v-slider v-model="styleData.spacing.section" label="Section Gap" min="12" max="48" step="4"
@@ -105,13 +118,12 @@
                             density="compact" color="primary"></v-switch>
                     </div>
                 </div>
-            </v-window-item>
-        </v-window>
+            </div>
+        </div>
     </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
 import { ResumeStyle2ColumnsV1 } from '@/models/ResumeStyle/ResumeStyle2ColumnsV1'
 
 const props = defineProps({
@@ -122,8 +134,6 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['update:style-data', 'change'])
-
-const activeTab = ref('colors')
 
 const fontOptions = ResumeStyle2ColumnsV1.FONT_OPTIONS
 
@@ -156,36 +166,12 @@ const validateHex = (key) => {
 }
 </script>
 
+<style scoped src="./ResumeEditorStyles.css"></style>
+
 <style scoped>
-.style-editor {
-    padding: 16px;
-}
-
-.style-tabs {
-    position: sticky;
-    top: 0;
-    z-index: 2;
-    background-color: white;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-}
-
-:deep(.v-window) {
-    background: transparent;
-}
-
-:deep(.v-window__container) {
-    height: auto !important;
-}
-
-:deep(.v-window-item) {
-    height: auto !important;
-}
-
 .color-field {
-    background-color: #f8fafc;
     border-radius: 12px;
     padding: 12px 16px;
-    border: 1px solid rgba(0, 0, 0, 0.08);
 }
 
 .color-preview {
@@ -206,99 +192,15 @@ const validateHex = (key) => {
     border-color: rgba(0, 0, 0, 0.16);
 }
 
-.edit-icon {
-    opacity: 0;
-    color: white;
-    transition: opacity 0.2s ease-in-out;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-}
-
-.color-preview:hover .edit-icon {
-    opacity: 1;
-}
-
 .color-picker-card {
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important;
-}
-
-:deep(.v-slider .v-slider-track__fill) {
-    background-color: rgb(var(--v-theme-primary)) !important;
-}
-
-:deep(.v-slider .v-slider-thumb__surface) {
-    border-color: rgb(var(--v-theme-primary)) !important;
-}
-
-:deep(.v-select .v-field) {
-    border-radius: 8px !important;
-}
-
-:deep(.v-select .v-field__outline) {
-    border-color: rgba(0, 0, 0, 0.12) !important;
-}
-
-:deep(.v-select .v-field--focused .v-field__outline) {
-    border-color: rgb(var(--v-theme-primary)) !important;
-}
-
-.color-pickers {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    padding: 16px;
-}
-
-.color-picker-item {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-}
-
-.color-picker-item label {
-    min-width: 120px;
-    font-weight: 500;
-    color: rgba(0, 0, 0, 0.87);
-}
-
-.color-hex {
-    font-size: 0.9em;
-    color: rgba(0, 0, 0, 0.6);
-}
-
-:deep(.v-color-picker) {
-    width: 100%;
-    max-width: 200px;
-}
-
-:deep(.v-color-picker__input) {
-    display: none;
+    max-width: 300px;
 }
 
 .color-input {
-    width: 100%;
-}
-
-:deep(.color-input .v-field__input) {
-    font-size: 0.9em;
-    padding: 0 8px;
-    min-height: 32px;
-}
-
-:deep(.color-input .v-field__outline) {
-    border-color: rgba(0, 0, 0, 0.12);
-}
-
-:deep(.color-input .v-field--focused .v-field__outline) {
-    border-color: rgb(var(--v-theme-primary));
+    font-family: monospace;
 }
 
 .style-slider {
-    max-width: 340px;
-    width: 100%;
-    margin-left: auto;
-    margin-right: auto;
-    display: block;
+    margin-bottom: 16px;
 }
 </style>
