@@ -1,0 +1,84 @@
+/* Tiptap Editor Dark Theme Overrides */
+
+/* Toolbar */
+.tiptap-toolbar {
+    background: #1e293b !important;
+    /* slate-800 */
+    border: 1px solid #334155 !important;
+    /* slate-700 */
+    border-radius: 6px 6px 0 0 !important;
+    padding: 8px !important;
+}
+
+.tiptap-toolbar button {
+    background: none !important;
+    border: none !important;
+    color: #cbd5e1 !important;
+    /* slate-300 */
+    transition: background 0.15s;
+}
+
+.tiptap-toolbar button.active {
+    background: rgba(102, 126, 234, 0.2) !important;
+    /* primary with opacity */
+    color: #a5b4fc !important;
+    /* indigo-300 */
+}
+
+.tiptap-toolbar button:hover {
+    background: #334155 !important;
+    /* slate-700 */
+    color: #e2e8f0 !important;
+    /* slate-200 */
+}
+
+.toolbar-separator {
+    background: #334155 !important;
+    /* slate-700 */
+}
+
+.toolbar-select {
+    background-color: #1e293b !important;
+    color: #cbd5e1 !important;
+    border: 1px solid #334155 !important;
+}
+
+/* Editor Content Area */
+.tiptap-editor-content {
+    background: #0f172a !important;
+    /* slate-900 */
+    border: 1px solid #334155 !important;
+    border-top: none !important;
+    border-radius: 0 0 6px 6px !important;
+    padding: 1rem 1.5rem !important;
+}
+
+.tiptap {
+    color: #e2e8f0 !important;
+    /* slate-200 */
+    min-height: 200px !important;
+}
+
+.tiptap:focus {
+    outline: none !important;
+}
+
+.tiptap p {
+    color: #e2e8f0 !important;
+}
+
+.tiptap a {
+    color: #93c5fd !important;
+    /* blue-300 */
+    text-decoration: underline !important;
+}
+
+.tiptap h1,
+.tiptap h2,
+.tiptap h3,
+.tiptap h4,
+.tiptap h5,
+.tiptap h6 {
+    color: #f1f5f9 !important;
+    /* slate-100 */
+}

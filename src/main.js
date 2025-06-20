@@ -15,6 +15,23 @@ import { PhEye, PhEyeSlash, PhPencilSimple, PhCheck, PhTrash, PhPlus, PhTextAlig
 const vuetify = createVuetify({
     components,
     directives,
+    theme: {
+        defaultTheme: 'dark',
+        themes: {
+            dark: {
+                dark: true,
+                colors: {
+                    primary: '#667eea',
+                    secondary: '#764ba2',
+                    background: '#0a0a0a',
+                    surface: '#1a1a1a',
+                    'surface-variant': 'rgba(255, 255, 255, 0.05)',
+                    'on-surface': 'rgba(255, 255, 255, 0.9)',
+                    'on-surface-variant': 'rgba(255, 255, 255, 0.7)',
+                }
+            }
+        }
+    },
     icons: {
         defaultSet: 'ph',
         sets: {

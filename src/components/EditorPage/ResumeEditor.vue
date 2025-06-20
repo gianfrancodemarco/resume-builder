@@ -14,6 +14,7 @@
 </template>
 
 <script setup>
+import './ResumeEditorStyles.css'
 import { ref, watch } from 'vue'
 import ResumeStyle from './ResumeStyle.vue'
 import ResumeInfo from './ResumeInfo.vue'
@@ -61,5 +62,3 @@ const updateResumeData = (newData) => {
   emit('change')
 }
 </script>
-
-<style scoped src="./ResumeEditorStyles.css"></style>

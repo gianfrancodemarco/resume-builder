@@ -237,12 +237,16 @@ const handleScroll = () => {
         if (!editorWindow) return
 
         const sections = document.querySelectorAll('.editor-section[data-section], .section-block[data-section]')
+        if (!sections || sections.length === 0) return
+
         const scrollTop = editorWindow.scrollTop
         const containerHeight = editorWindow.clientHeight
 
         let bestMatch = { section: '', sectionTop: Infinity }
 
         sections.forEach(section => {
+            if (!section) return
+
             const rect = section.getBoundingClientRect()
             const containerRect = editorWindow.getBoundingClientRect()
             const sectionTop = rect.top - containerRect.top
@@ -325,6 +329,10 @@ const scrollToSection = (sectionName) => {
 
 // Get icon for custom section based on title or type
 const getCustomSectionIcon = (section) => {
+    if (!section || !section.title) {
+        return 'ph-plus-circle'
+    }
+
     const title = section.title.toLowerCase().trim()
 
     // Map common section titles to icons
@@ -367,8 +375,10 @@ const getCustomSectionIcon = (section) => {
 .lateral-menu {
     display: flex;
     flex-direction: column;
-    background-color: #fff;
-    border-right: 1px solid rgba(0, 0, 0, 0.06);
+    background-color: rgba(30, 41, 59, 0.3);
+    /* slate-800 with opacity */
+    border-right: 1px solid rgba(51, 65, 85, 0.6);
+    /* slate-700 with opacity */
     padding: 12px 8px;
     width: 56px;
     flex-shrink: 0;
@@ -378,11 +388,10 @@ const getCustomSectionIcon = (section) => {
     gap: 8px;
     position: relative;
     z-index: 10;
-    min-width: 56px;
-    max-width: 56px;
+    backdrop-filter: blur(10px);
+    height: 100vh;
     overflow-y: auto;
     overflow-x: hidden;
-    height: 100vh;
     scrollbar-width: none;
     /* Firefox */
     -ms-overflow-style: none;
@@ -405,7 +414,8 @@ const getCustomSectionIcon = (section) => {
 .menu-divider {
     width: 32px;
     height: 1px;
-    border-top: 1px solid rgba(0, 0, 0, 0.2);
+    border-top: 1px solid rgba(71, 85, 105, 0.6);
+    /* slate-600 with opacity */
     margin: 16px 0;
     flex-shrink: 0;
 }
@@ -418,25 +428,22 @@ const getCustomSectionIcon = (section) => {
 .menu-btn {
     width: 40px !important;
     height: 40px !important;
-    border-radius: 6px !important;
-    transition: all 0.2s ease;
-    cursor: pointer !important;
-    flex-shrink: 0;
-    min-width: 40px;
+    border-radius: 8px !important;
+    transition: all 0.2s ease !important;
+    color: #94a3b8 !important;
+    /* slate-400 */
 }
 
 .menu-btn:hover {
-    background-color: rgba(var(--v-theme-primary), 0.05) !important;
+    background-color: rgba(var(--v-theme-primary), 0.1) !important;
+    color: #e2e8f0 !important;
+    /* slate-200 */
 }
 
 .menu-btn.active {
-    background-color: rgba(var(--v-theme-primary), 0.1) !important;
+    background-color: rgba(var(--v-theme-primary), 0.2) !important;
     color: rgb(var(--v-theme-primary)) !important;
     transform: scale(1.05);
-}
-
-.menu-btn.active:hover {
-    background-color: rgba(var(--v-theme-primary), 0.15) !important;
 }
 
 /* Mobile responsiveness */

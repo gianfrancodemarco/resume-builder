@@ -204,8 +204,8 @@
                             </v-tooltip>
                         </div>
                     </div>
-                    <div class="custom-section-preview" v-html="section.content"></div>
                 </div>
+                <div class="custom-section-preview" v-html="section.content"></div>
             </div>
         </div>
 

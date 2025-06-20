@@ -325,14 +325,14 @@ const handleHome = () => {
     display: flex;
     position: relative;
     overflow: hidden;
-    background-color: #f5f5f5;
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
     height: 100vh;
     width: 100%;
     max-width: 100vw;
 }
 
 .editor-col {
-    transition: all 0.2s ease;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     flex-shrink: 0;
     height: 100%;
     overflow-y: auto;
@@ -348,6 +348,8 @@ const handleHome = () => {
     transition: width 0.2s ease;
     flex-shrink: 0;
     min-width: 0;
+    background-color: #1e293b;
+    /* A muted dark background */
 }
 
 .preview-col.hidden {
@@ -376,24 +378,28 @@ const handleHome = () => {
 
 :deep(.v-list-item) {
     min-height: 44px;
-    border-radius: 6px;
-    margin: 2px 8px;
+    border-radius: 8px;
+    margin: 4px 8px;
     transition: all 0.2s ease;
 }
 
 :deep(.v-list-item:hover) {
-    background-color: rgba(var(--v-theme-primary), 0.04);
+    background-color: rgba(var(--v-theme-primary), 0.1);
+}
+
+:deep(.v-list-item--active) {
+    background-color: rgba(var(--v-theme-primary), 0.2);
+    border-left: 3px solid rgb(var(--v-theme-primary));
 }
 
 :deep(.v-list-item-title) {
     font-size: 0.9rem;
     font-weight: 500;
-    color: rgba(0, 0, 0, 0.8);
 }
 
 :deep(.v-icon) {
     font-size: 1.2rem;
-    opacity: 0.8;
+    opacity: 0.9;
 }
 
 .preview-container {
@@ -404,6 +410,7 @@ const handleHome = () => {
     flex-direction: column;
     align-items: center;
     transition: transform 0.3s ease;
+    /* The resume paper itself will be white, so this container can be transparent */
 }
 
 .preview-header {
