@@ -325,7 +325,7 @@ const handleHome = () => {
     display: flex;
     position: relative;
     overflow: hidden;
-    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    background: linear-gradient(135deg, rgb(var(--v-theme-background)) 0%, rgb(var(--v-theme-surface)) 100%);
     height: 100vh;
     width: 100%;
     max-width: 100vw;
@@ -348,8 +348,7 @@ const handleHome = () => {
     transition: width 0.2s ease;
     flex-shrink: 0;
     min-width: 0;
-    background-color: #1e293b;
-    /* A muted dark background */
+    background-color: rgb(var(--v-theme-surface));
 }
 
 .preview-col.hidden {
@@ -372,8 +371,8 @@ const handleHome = () => {
 }
 
 :deep(.v-navigation-drawer) {
-    background-color: #fff !important;
-    border-right: 1px solid rgba(0, 0, 0, 0.06);
+    background-color: rgb(var(--v-theme-surface)) !important;
+    border-right: 1px solid rgb(var(--v-theme-editor-border));
 }
 
 :deep(.v-list-item) {
@@ -410,7 +409,6 @@ const handleHome = () => {
     flex-direction: column;
     align-items: center;
     transition: transform 0.3s ease;
-    /* The resume paper itself will be white, so this container can be transparent */
 }
 
 .preview-header {
@@ -434,8 +432,8 @@ const handleHome = () => {
     display: flex;
     flex-direction: column;
     gap: 8px;
-    background-color: #fff;
-    border-right: 1px solid rgba(0, 0, 0, 0.06);
+    background-color: rgb(var(--v-theme-surface));
+    border-right: 1px solid rgb(var(--v-theme-editor-border));
     padding: 12px 8px;
     width: 56px;
     flex-shrink: 0;

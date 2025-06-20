@@ -78,10 +78,16 @@
                     </div>
                     <div>
                         <div class="text-subtitle-2 mb-2">Font Sizes</div>
-                        <v-slider v-model="styleData.typography.baseSize" label="Base Size" min="12" max="20" step="1"
-                            thumb-label class="style-slider"></v-slider>
-                        <v-slider v-model="styleData.typography.headingSize" label="Heading Size" min="16" max="32"
-                            step="1" thumb-label class="style-slider"></v-slider>
+                        <div class="slider-container">
+                            <div class="text-subtitle-2">Base Size</div>
+                            <v-slider v-model="styleData.typography.baseSize" min="12" max="20" step="1"
+                                thumb-label></v-slider>
+                        </div>
+                        <div class="slider-container">
+                            <div class="text-subtitle-2">Heading Size</div>
+                            <v-slider v-model="styleData.typography.headingSize" min="16" max="32" step="1"
+                                thumb-label></v-slider>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -98,20 +104,18 @@
             </div>
             <div class="section-content">
                 <div class="d-flex flex-column gap-4">
-                    <div>
-                        <div class="text-subtitle-2 mb-2">Section Spacing</div>
-                        <v-slider v-model="styleData.spacing.section" label="Section Gap" min="12" max="48" step="4"
-                            thumb-label class="style-slider"></v-slider>
+                    <div class="slider-container">
+                        <div class="text-subtitle-2">Section Spacing</div>
+                        <v-slider v-model="styleData.spacing.section" min="12" max="48" step="4" thumb-label></v-slider>
                     </div>
-                    <div>
-                        <div class="text-subtitle-2 mb-2">Content Spacing</div>
-                        <v-slider v-model="styleData.spacing.content" label="Content Gap" min="0" max="24" step="2"
-                            thumb-label class="style-slider"></v-slider>
+                    <div class="slider-container">
+                        <div class="text-subtitle-2">Content Spacing</div>
+                        <v-slider v-model="styleData.spacing.content" min="0" max="24" step="2" thumb-label></v-slider>
                     </div>
-                    <div>
-                        <div class="text-subtitle-2 mb-2">Sidebar Width</div>
-                        <v-slider v-model="styleData.spacing.sidebarWidth" label="Width" min="200" max="400" step="10"
-                            thumb-label class="style-slider"></v-slider>
+                    <div class="slider-container">
+                        <div class="text-subtitle-2">Sidebar Width</div>
+                        <v-slider v-model="styleData.spacing.sidebarWidth" min="200" max="400" step="10"
+                            thumb-label></v-slider>
                     </div>
                     <div>
                         <v-switch v-model="styleData.spacing.sidebarLeft" label="Sidebar on Left" hide-details
@@ -192,15 +196,150 @@ const validateHex = (key) => {
     border-color: rgba(0, 0, 0, 0.16);
 }
 
+.color-preview .edit-icon {
+    color: rgba(0, 0, 0, 0.6);
+    opacity: 0.7;
+}
+
+.color-preview:hover .edit-icon {
+    opacity: 1;
+}
+
+.color-hex {
+    color: rgb(var(--v-theme-editor-text-secondary));
+    font-family: monospace;
+    font-size: 0.9rem;
+}
+
 .color-picker-card {
     max-width: 300px;
+    background-color: rgb(var(--v-theme-surface)) !important;
+    border: 1px solid rgb(var(--v-theme-editor-border)) !important;
 }
 
 .color-input {
     font-family: monospace;
 }
 
-.style-slider {
+/* Override Vuetify slider defaults completely */
+:deep(.v-slider) {
     margin-bottom: 16px;
+    min-height: 40px;
+}
+
+:deep(.v-slider .v-slider-track) {
+    height: 4px !important;
+    border-radius: 2px !important;
+}
+
+:deep(.v-slider .v-slider-track__fill) {
+    background-color: rgb(var(--v-theme-primary)) !important;
+    border-radius: 2px !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+:deep(.v-slider .v-slider-track__background) {
+    background-color: rgb(var(--v-theme-editor-border)) !important;
+    border-radius: 2px !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* Force small thumb size */
+:deep(.v-slider .v-slider-thumb) {
+    background-color: rgb(var(--v-theme-primary)) !important;
+    border: 2px solid rgb(var(--v-theme-surface)) !important;
+    width: 12px !important;
+    height: 12px !important;
+    min-width: 12px !important;
+    min-height: 12px !important;
+    max-width: 12px !important;
+    max-height: 12px !important;
+    transform: translate(-50%, -50%) !important;
+}
+
+:deep(.v-slider .v-slider-thumb::before) {
+    width: 12px !important;
+    height: 12px !important;
+    min-width: 12px !important;
+    min-height: 12px !important;
+    max-width: 12px !important;
+    max-height: 12px !important;
+}
+
+:deep(.v-slider .v-slider-thumb__label) {
+    background-color: rgb(var(--v-theme-primary)) !important;
+    color: white !important;
+    font-weight: 600 !important;
+}
+
+:deep(.v-slider .v-label) {
+    color: rgb(var(--v-theme-editor-text-primary)) !important;
+    font-weight: 500 !important;
+}
+
+/* Additional overrides for Vuetify's default styling */
+:deep(.v-slider .v-slider-track__background::before) {
+    background-color: rgb(var(--v-theme-editor-border)) !important;
+    opacity: 1 !important;
+}
+
+:deep(.v-slider .v-slider-track__fill::before) {
+    background-color: rgb(var(--v-theme-primary)) !important;
+    opacity: 1 !important;
+}
+
+/* Style the text labels */
+.text-subtitle-2 {
+    color: rgb(var(--v-theme-editor-text-primary)) !important;
+    font-weight: 500;
+    width: 50%;
+    display: inline-block;
+}
+
+/* Create 50/50 layout for slider containers */
+.slider-container {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.slider-container .text-subtitle-2 {
+    width: 50%;
+    margin-bottom: 0;
+}
+
+.slider-container .v-slider {
+    width: 50%;
+    margin-bottom: 0;
+}
+
+/* Style the switch with better visibility */
+:deep(.v-switch) {
+    margin-bottom: 16px;
+}
+
+:deep(.v-switch .v-label) {
+    color: rgb(var(--v-theme-editor-text-primary)) !important;
+    font-weight: 500;
+}
+
+:deep(.v-switch .v-selection-control__input) {
+    color: rgb(var(--v-theme-primary)) !important;
+}
+
+:deep(.v-switch .v-selection-control__wrapper) {
+    background-color: rgba(0, 0, 0, 0.12) !important;
+}
+
+:deep(.v-switch .v-selection-control--dirty .v-selection-control__wrapper) {
+    background-color: rgb(var(--v-theme-primary)) !important;
+}
+
+:deep(.v-switch .v-selection-control__thumb) {
+    background-color: white !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 </style>

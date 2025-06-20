@@ -215,25 +215,26 @@
         </div>
 
         <!-- Custom Section Modal -->
-        <v-dialog v-model="customSectionModal.show" max-width="800px">
-            <v-card>
-                <v-card-title class="text-h5">
+        <v-dialog v-model="customSectionModal.show" max-width="800px" persistent>
+            <v-card class="modal-card">
+                <v-card-title class="modal-title">
+                    <v-icon icon="ph-folder-simple" class="mr-2" />
                     {{ customSectionModal.isNew ? 'Add Custom Section' : 'Edit Custom Section' }}
                 </v-card-title>
-                <v-card-text>
+                <v-card-text class="modal-content">
                     <v-text-field v-model="customSectionModal.data.title" label="Section Title" variant="outlined"
-                        density="comfortable" class="mb-4" />
+                        density="comfortable" class="mb-4" prepend-inner-icon="ph-text-t" />
                     <div class="mb-4">
-                        <label class="v-label">Content</label>
+                        <label class="v-label mb-2 d-block">Content</label>
                         <TiptapEditor v-model="customSectionModal.data.content" />
                     </div>
                 </v-card-text>
-                <v-card-actions>
+                <v-card-actions class="modal-actions">
                     <v-spacer></v-spacer>
-                    <v-btn color="grey-darken-1" variant="text" @click="closeCustomSectionModal">
+                    <v-btn color="grey-darken-1" variant="outlined" @click="closeCustomSectionModal" class="modal-btn">
                         Cancel
                     </v-btn>
-                    <v-btn color="primary" @click="saveCustomSection">
+                    <v-btn color="primary" @click="saveCustomSection" class="modal-btn" prepend-icon="ph-check">
                         {{ customSectionModal.isNew ? 'Add' : 'Save' }}
                     </v-btn>
                 </v-card-actions>
@@ -241,21 +242,23 @@
         </v-dialog>
 
         <!-- Experience Section Modal -->
-        <v-dialog v-model="experienceSectionModal.show" max-width="500px">
-            <v-card>
-                <v-card-title class="text-h5">
+        <v-dialog v-model="experienceSectionModal.show" max-width="500px" persistent>
+            <v-card class="modal-card">
+                <v-card-title class="modal-title">
+                    <v-icon icon="ph-briefcase" class="mr-2" />
                     Edit Experience Section
                 </v-card-title>
-                <v-card-text>
+                <v-card-text class="modal-content">
                     <v-text-field v-model="experienceSectionModal.data.sectionName" label="Section Title"
-                        variant="outlined" density="comfortable" />
+                        variant="outlined" density="comfortable" prepend-inner-icon="ph-text-t" />
                 </v-card-text>
-                <v-card-actions>
+                <v-card-actions class="modal-actions">
                     <v-spacer></v-spacer>
-                    <v-btn color="grey-darken-1" variant="text" @click="closeExperienceSectionModal">
+                    <v-btn color="grey-darken-1" variant="outlined" @click="closeExperienceSectionModal"
+                        class="modal-btn">
                         Cancel
                     </v-btn>
-                    <v-btn color="primary" @click="saveExperienceSection">
+                    <v-btn color="primary" @click="saveExperienceSection" class="modal-btn" prepend-icon="ph-check">
                         Save
                     </v-btn>
                 </v-card-actions>
@@ -263,29 +266,30 @@
         </v-dialog>
 
         <!-- Experience Modal -->
-        <v-dialog v-model="experienceModal.show" max-width="800px">
-            <v-card>
-                <v-card-title class="text-h5">
+        <v-dialog v-model="experienceModal.show" max-width="800px" persistent>
+            <v-card class="modal-card">
+                <v-card-title class="modal-title">
+                    <v-icon icon="ph-briefcase" class="mr-2" />
                     {{ experienceModal.isNew ? 'Add Experience' : 'Edit Experience' }}
                 </v-card-title>
-                <v-card-text>
+                <v-card-text class="modal-content">
                     <v-text-field v-model="experienceModal.data.title" label="Job Title" variant="outlined"
-                        density="comfortable" class="mb-3" />
+                        density="comfortable" class="mb-3" prepend-inner-icon="ph-user" />
                     <v-text-field v-model="experienceModal.data.company" label="Company (+ location)" variant="outlined"
-                        density="comfortable" class="mb-3" />
+                        density="comfortable" class="mb-3" prepend-inner-icon="ph-buildings" />
                     <v-text-field v-model="experienceModal.data.period" label="Period" variant="outlined"
-                        density="comfortable" class="mb-3" />
+                        density="comfortable" class="mb-3" prepend-inner-icon="ph-calendar" />
                     <div class="mb-3">
-                        <label class="v-label">Description</label>
+                        <label class="v-label mb-2 d-block">Description</label>
                         <TiptapEditor v-model="experienceModal.data.description" />
                     </div>
                 </v-card-text>
-                <v-card-actions>
+                <v-card-actions class="modal-actions">
                     <v-spacer></v-spacer>
-                    <v-btn color="grey-darken-1" variant="text" @click="closeExperienceModal">
+                    <v-btn color="grey-darken-1" variant="outlined" @click="closeExperienceModal" class="modal-btn">
                         Cancel
                     </v-btn>
-                    <v-btn color="primary" @click="saveExperience">
+                    <v-btn color="primary" @click="saveExperience" class="modal-btn" prepend-icon="ph-check">
                         {{ experienceModal.isNew ? 'Add' : 'Save' }}
                     </v-btn>
                 </v-card-actions>
@@ -293,21 +297,23 @@
         </v-dialog>
 
         <!-- Education Section Modal -->
-        <v-dialog v-model="educationSectionModal.show" max-width="500px">
-            <v-card>
-                <v-card-title class="text-h5">
+        <v-dialog v-model="educationSectionModal.show" max-width="500px" persistent>
+            <v-card class="modal-card">
+                <v-card-title class="modal-title">
+                    <v-icon icon="ph-graduation-cap" class="mr-2" />
                     Edit Education Section
                 </v-card-title>
-                <v-card-text>
+                <v-card-text class="modal-content">
                     <v-text-field v-model="educationSectionModal.data.sectionName" label="Section Title"
-                        variant="outlined" density="comfortable" />
+                        variant="outlined" density="comfortable" prepend-inner-icon="ph-text-t" />
                 </v-card-text>
-                <v-card-actions>
+                <v-card-actions class="modal-actions">
                     <v-spacer></v-spacer>
-                    <v-btn color="grey-darken-1" variant="text" @click="closeEducationSectionModal">
+                    <v-btn color="grey-darken-1" variant="outlined" @click="closeEducationSectionModal"
+                        class="modal-btn">
                         Cancel
                     </v-btn>
-                    <v-btn color="primary" @click="saveEducationSection">
+                    <v-btn color="primary" @click="saveEducationSection" class="modal-btn" prepend-icon="ph-check">
                         Save
                     </v-btn>
                 </v-card-actions>
@@ -315,31 +321,32 @@
         </v-dialog>
 
         <!-- Education Modal -->
-        <v-dialog v-model="educationModal.show" max-width="800px">
-            <v-card>
-                <v-card-title class="text-h5">
+        <v-dialog v-model="educationModal.show" max-width="800px" persistent>
+            <v-card class="modal-card">
+                <v-card-title class="modal-title">
+                    <v-icon icon="ph-graduation-cap" class="mr-2" />
                     {{ educationModal.isNew ? 'Add Education' : 'Edit Education' }}
                 </v-card-title>
-                <v-card-text>
+                <v-card-text class="modal-content">
                     <v-text-field v-model="educationModal.data.degree" label="Degree" variant="outlined"
-                        density="comfortable" class="mb-3" />
+                        density="comfortable" class="mb-3" prepend-inner-icon="ph-certificate" />
                     <v-text-field v-model="educationModal.data.school" label="School" variant="outlined"
-                        density="comfortable" class="mb-3" />
+                        density="comfortable" class="mb-3" prepend-inner-icon="ph-buildings" />
                     <v-text-field v-model="educationModal.data.period" label="Period" variant="outlined"
-                        density="comfortable" class="mb-3" />
+                        density="comfortable" class="mb-3" prepend-inner-icon="ph-calendar" />
                     <v-text-field v-model="educationModal.data.mark" label="Grade" variant="outlined"
-                        density="comfortable" class="mb-3" />
+                        density="comfortable" class="mb-3" prepend-inner-icon="ph-star" />
                     <div class="mb-3">
-                        <label class="v-label">Thesis / Notes</label>
+                        <label class="v-label mb-2 d-block">Thesis / Notes</label>
                         <TiptapEditor v-model="educationModal.data.thesis" />
                     </div>
                 </v-card-text>
-                <v-card-actions>
+                <v-card-actions class="modal-actions">
                     <v-spacer></v-spacer>
-                    <v-btn color="grey-darken-1" variant="text" @click="closeEducationModal">
+                    <v-btn color="grey-darken-1" variant="outlined" @click="closeEducationModal" class="modal-btn">
                         Cancel
                     </v-btn>
-                    <v-btn color="primary" @click="saveEducation">
+                    <v-btn color="primary" @click="saveEducation" class="modal-btn" prepend-icon="ph-check">
                         {{ educationModal.isNew ? 'Add' : 'Save' }}
                     </v-btn>
                 </v-card-actions>

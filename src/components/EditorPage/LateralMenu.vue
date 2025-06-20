@@ -55,8 +55,8 @@
                 </v-tooltip>
 
                 <!-- Custom Sections -->
-                <template v-for="(section, index) in customSections" :key="`custom-${index}`">
-                    <v-tooltip location="right" :model-value="showAllTooltips">
+                <template v-for="(section, index) in (customSections || [])" :key="`custom-${index}`">
+                    <v-tooltip location="right" :model-value="showAllTooltips" v-if="section && section.title">
                         <template v-slot:activator="{ props: tooltipProps }">
                             <v-btn v-bind="tooltipProps" :icon="getCustomSectionIcon(section)"
                                 :color="currentSection === `custom-${index}` ? 'primary' : 'grey'" variant="text"
@@ -172,6 +172,13 @@
         <div class="menu-section">
             <v-tooltip location="right" :model-value="showAllTooltips">
                 <template v-slot:activator="{ props: tooltipProps }">
+                    <v-btn v-bind="tooltipProps" :icon="isDark ? 'ph-sun' : 'ph-moon'" color="grey" variant="text"
+                        class="menu-btn" @click="toggleTheme" />
+                </template>
+                {{ isDark ? 'Switch to Light Theme' : 'Switch to Dark Theme' }}
+            </v-tooltip>
+            <v-tooltip location="right" :model-value="showAllTooltips">
+                <template v-slot:activator="{ props: tooltipProps }">
                     <v-btn v-bind="tooltipProps" icon="ph-house" color="grey" variant="text" class="menu-btn"
                         @click="handleHome" />
                 </template>
@@ -182,7 +189,11 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted, onBeforeUnmount } from 'vue'
+import { ref, watch, onMounted, onBeforeUnmount, computed } from 'vue'
+import { useTheme } from 'vuetify'
+
+const theme = useTheme()
+const isDark = computed(() => theme.global.current.value.dark)
 
 const props = defineProps({
     activeTab: {
@@ -211,6 +222,16 @@ const emit = defineEmits(['update:activeTab', 'scrollToSection'])
 const activeTab = ref(props.activeTab)
 const currentSection = ref('')
 const showAllTooltips = ref(false)
+
+// Theme toggle function
+const toggleTheme = () => {
+    theme.global.name.value = theme.global.current.value.dark ? 'light' : 'dark'
+}
+
+// Computed property to safely handle customSections
+const safeCustomSections = computed(() => {
+    return props.customSections?.filter(section => section && section.title) || []
+})
 
 // Scroll detection setup
 let scrollTimeout = null
@@ -375,10 +396,8 @@ const getCustomSectionIcon = (section) => {
 .lateral-menu {
     display: flex;
     flex-direction: column;
-    background-color: rgba(30, 41, 59, 0.3);
-    /* slate-800 with opacity */
-    border-right: 1px solid rgba(51, 65, 85, 0.6);
-    /* slate-700 with opacity */
+    background-color: rgb(var(--v-theme-editor-bg));
+    border-right: 1px solid rgb(var(--v-theme-editor-border));
     padding: 12px 8px;
     width: 56px;
     flex-shrink: 0;
@@ -393,14 +412,11 @@ const getCustomSectionIcon = (section) => {
     overflow-y: auto;
     overflow-x: hidden;
     scrollbar-width: none;
-    /* Firefox */
     -ms-overflow-style: none;
-    /* Internet Explorer 10+ */
 }
 
 .lateral-menu::-webkit-scrollbar {
     display: none;
-    /* Chrome, Safari, Opera */
 }
 
 .menu-section {
@@ -414,8 +430,7 @@ const getCustomSectionIcon = (section) => {
 .menu-divider {
     width: 32px;
     height: 1px;
-    border-top: 1px solid rgba(71, 85, 105, 0.6);
-    /* slate-600 with opacity */
+    border-top: 1px solid rgb(var(--v-theme-editor-divider));
     margin: 16px 0;
     flex-shrink: 0;
 }
@@ -430,14 +445,12 @@ const getCustomSectionIcon = (section) => {
     height: 40px !important;
     border-radius: 8px !important;
     transition: all 0.2s ease !important;
-    color: #94a3b8 !important;
-    /* slate-400 */
+    color: rgb(var(--v-theme-editor-text-muted)) !important;
 }
 
 .menu-btn:hover {
     background-color: rgba(var(--v-theme-primary), 0.1) !important;
-    color: #e2e8f0 !important;
-    /* slate-200 */
+    color: rgb(var(--v-theme-editor-text-primary)) !important;
 }
 
 .menu-btn.active {
