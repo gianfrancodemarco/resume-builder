@@ -2,16 +2,54 @@
     <div>
         <div class="tiptap-toolbar">
             <button type="button" @click="toggleBold" :class="{ active: isActive('bold') }"
-                title="Make text bold (Ctrl+B)"><b>B</b></button>
+                title="Make text bold (Ctrl+B)">
+                <v-icon icon="ph-text-b" size="small" />
+            </button>
             <button type="button" @click="toggleItalic" :class="{ active: isActive('italic') }"
-                title="Make text italic (Ctrl+I)"><i>I</i></button>
+                title="Make text italic (Ctrl+I)">
+                <v-icon icon="ph-text-italic" size="small" />
+            </button>
             <button type="button" @click="toggleStrike" :class="{ active: isActive('strike') }"
-                title="Strikethrough text"><s>S</s></button>
+                title="Strikethrough text">
+                <v-icon icon="ph-text-strikethrough" size="small" />
+            </button>
             <button type="button" @click="toggleUnderline" :class="{ active: isActive('underline') }"
-                title="Underline text (Ctrl+U)"><u>U</u></button>
+                title="Underline text (Ctrl+U)">
+                <v-icon icon="ph-text-underline" size="small" />
+            </button>
             <span class="toolbar-separator"></span>
-            <button type="button" @click="addLanguageProficiency" title="Add language proficiency bar">🌐</button>
+            <button type="button" @click="addLanguageProficiency" title="Add language proficiency bar">
+                <v-icon icon="ph-globe" size="small" />
+            </button>
             <span class="toolbar-separator"></span>
+            <button type="button" @click="setLink" :class="{ active: isActive('link') }"
+                title="Add or edit link (Ctrl+K)">
+                <v-icon icon="ph-link" size="small" />
+            </button>
+            <button type="button" @click="unsetLink" title="Remove link">
+                <v-icon icon="ph-x" size="small" />
+            </button>
+            <span class="toolbar-separator"></span>
+            <button type="button" @click="toggleBulletList" :class="{ active: isActive('bulletList') }"
+                title="Create bullet list">
+                <v-icon icon="ph-list-bullets" size="small" />
+            </button>
+            <button type="button" @click="toggleOrderedList" :class="{ active: isActive('orderedList') }"
+                title="Create numbered list">
+                <v-icon icon="ph-list-numbers" size="small" />
+            </button>
+            <span class="toolbar-separator"></span>
+            <button type="button" @click="undo" title="Undo last action (Ctrl+Z)">
+                <v-icon icon="ph-arrow-counter-clockwise" size="small" />
+            </button>
+            <button type="button" @click="redo" title="Redo last action (Ctrl+Y)">
+                <v-icon icon="ph-arrow-clockwise" size="small" />
+            </button>
+            <span class="toolbar-separator"></span>
+            <button type="button" @click="removeList" title="Remove list formatting" class="delete-button">
+                <v-icon icon="ph-text-t" size="small" />
+            </button>
+            <br />
             <select v-model="currentFont" @change="setFontFamily($event.target.value)" class="toolbar-select"
                 title="Change font family">
                 <option v-for="font in fonts" :key="font" :value="font">{{ font }}</option>
@@ -22,19 +60,6 @@
             </select>
             <input type="color" v-model="currentColor" @input="setColor($event.target.value)" class="toolbar-color"
                 title="Change text color" />
-            <span class="toolbar-separator"></span>
-            <button type="button" @click="setLink" :class="{ active: isActive('link') }"
-                title="Add or edit link (Ctrl+K)">🔗</button>
-            <button type="button" @click="unsetLink" title="Remove link">❌</button>
-            <span class="toolbar-separator"></span>
-            <button type="button" @click="toggleBulletList" :class="{ active: isActive('bulletList') }"
-                title="Create bullet list">• List</button>
-            <button type="button" @click="toggleOrderedList" :class="{ active: isActive('orderedList') }"
-                title="Create numbered list">1. List</button>
-            <button type="button" @click="removeList" title="Remove list formatting">📝</button>
-            <span class="toolbar-separator"></span>
-            <button type="button" @click="undo" title="Undo last action (Ctrl+Z)">↺</button>
-            <button type="button" @click="redo" title="Redo last action (Ctrl+Y)">↻</button>
         </div>
         <EditorContent class="tiptap-editor-content" :editor="editor" />
     </div>

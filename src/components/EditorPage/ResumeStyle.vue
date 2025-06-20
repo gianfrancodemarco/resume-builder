@@ -2,15 +2,15 @@
     <div class="style-editor">
         <v-tabs v-model="activeTab" color="primary" class="style-tabs mb-4">
             <v-tab value="colors">
-                <v-icon icon="mdi-palette" class="mr-2" />
+                <v-icon icon="ph-palette" class="mr-2" />
                 Colors
             </v-tab>
             <v-tab value="typography">
-                <v-icon icon="mdi-format-font" class="mr-2" />
+                <v-icon icon="ph-text-t" class="mr-2" />
                 Typography
             </v-tab>
             <v-tab value="spacing">
-                <v-icon icon="mdi-format-line-spacing" class="mr-2" />
+                <v-icon icon="ph-arrows-out-line-vertical" class="mr-2" />
                 Spacing
             </v-tab>
         </v-tabs>
@@ -27,7 +27,7 @@
                                     <template v-slot:activator="{ props }">
                                         <div class="color-preview" v-bind="props"
                                             :style="{ backgroundColor: styleData.colors[key] }">
-                                            <v-icon icon="mdi-pencil" size="small" class="edit-icon"></v-icon>
+                                            <v-icon icon="ph-pencil-simple" size="small" class="edit-icon"></v-icon>
                                         </div>
                                     </template>
                                     <v-card class="color-picker-card">
@@ -57,7 +57,7 @@
                                 <span :style="{ fontFamily: item.value }">{{ item.value }}</span>
                             </template>
                             <template v-slot:item="{ props: itemProps, item }">
-                                <v-list-item v-bind="itemProps" :style="{ fontFamily: item.value }"/>
+                                <v-list-item v-bind="itemProps" :style="{ fontFamily: item.value }" />
                             </template>
                         </v-select>
                     </div>

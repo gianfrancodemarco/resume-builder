@@ -2,21 +2,21 @@
     <div>
         <!-- Desktop menu -->
         <div v-if="!isMobile" class="menu-container" :class="{ 'open': menuOpen }">
-            <v-btn icon="mdi-menu" color="primary" class="menu-toggle" variant="text" @click="toggleMenu" />
+            <v-btn icon="ph-list" color="primary" class="menu-toggle" variant="text" @click="toggleMenu" />
 
             <div class="menu-content" v-if="menuOpen">
                 <div class="menu-actions">
-                    <v-btn block color="white" prepend-icon="mdi-close" class="action-btn" @click="toggleMenu">Close
+                    <v-btn block color="white" prepend-icon="ph-x" class="action-btn" @click="toggleMenu">Close
                         this menu</v-btn>
-                    <v-btn block color="primary" prepend-icon="mdi-code-json" class="action-btn"
+                    <v-btn block color="primary" prepend-icon="ph-brackets-curly" class="action-btn"
                         @click="() => { closeAllMenus(); handleExportJSON() }">Export JSON</v-btn>
-                    <v-btn block color="primary" prepend-icon="mdi-upload" class="action-btn"
+                    <v-btn block color="primary" prepend-icon="ph-upload" class="action-btn"
                         @click="() => { closeAllMenus(); handleImportJSON() }">Import JSON</v-btn>
-                    <v-btn block color="primary" prepend-icon="mdi-file-pdf-box" class="action-btn"
+                    <v-btn block color="primary" prepend-icon="ph-file-pdf" class="action-btn"
                         @click="() => { closeAllMenus(); handleDownloadPDF() }">Download PDF</v-btn>
-                    <v-btn block color="primary" prepend-icon="mdi-file-code" class="action-btn"
+                    <v-btn block color="primary" prepend-icon="ph-file-code" class="action-btn"
                         @click="() => { closeAllMenus(); handleDownloadHTML() }">Download HTML</v-btn>
-                    <v-btn block color="primary" prepend-icon="mdi-file-document-edit" class="action-btn"
+                    <v-btn block color="primary" prepend-icon="ph-file-text" class="action-btn"
                         @click="() => { closeAllMenus(); handleConvertCV() }">Convert CV</v-btn>
                 </div>
             </div>
@@ -27,36 +27,36 @@
             <div v-if="showActions" class="action-buttons">
                 <div class="action-item">
                     <span class="mobile-action-label">Close this menu</span>
-                    <v-btn icon="mdi-close" color="white" class="mobile-action-btn" elevation="2" @click="toggleActions" />
+                    <v-btn icon="ph-x" color="white" class="mobile-action-btn" elevation="2" @click="toggleActions" />
                 </div>
                 <div class="action-item">
                     <span class="mobile-action-label">Export JSON</span>
-                    <v-btn icon="mdi-code-json" color="primary" @click="() => { closeAllMenus(); handleExportJSON() }" class="mobile-action-btn"
+                    <v-btn icon="ph-brackets-curly" color="primary"
+                        @click="() => { closeAllMenus(); handleExportJSON() }" class="mobile-action-btn"
                         elevation="2" />
                 </div>
                 <div class="action-item">
                     <span class="mobile-action-label">Import JSON</span>
-                    <v-btn icon="mdi-upload" color="primary" @click="() => { closeAllMenus(); handleImportJSON() }" class="mobile-action-btn"
-                        elevation="2" />
+                    <v-btn icon="ph-upload" color="primary" @click="() => { closeAllMenus(); handleImportJSON() }"
+                        class="mobile-action-btn" elevation="2" />
                 </div>
                 <div class="action-item">
                     <span class="mobile-action-label">Download PDF</span>
-                    <v-btn icon="mdi-file-pdf-box" color="primary" @click="() => { closeAllMenus(); handleDownloadPDF() }" class="mobile-action-btn"
-                        elevation="2" />
+                    <v-btn icon="ph-file-pdf" color="primary" @click="() => { closeAllMenus(); handleDownloadPDF() }"
+                        class="mobile-action-btn" elevation="2" />
                 </div>
                 <div class="action-item">
                     <span class="mobile-action-label">Download HTML</span>
-                    <v-btn icon="mdi-file-code" color="primary" @click="() => { closeAllMenus(); handleDownloadHTML() }" class="mobile-action-btn"
-                        elevation="2" />
+                    <v-btn icon="ph-file-code" color="primary" @click="() => { closeAllMenus(); handleDownloadHTML() }"
+                        class="mobile-action-btn" elevation="2" />
                 </div>
                 <div class="action-item">
                     <span class="mobile-action-label">Convert CV</span>
-                    <v-btn icon="mdi-file-document-edit" color="primary" @click="() => { closeAllMenus(); handleConvertCV() }" class="mobile-action-btn"
-                        elevation="2" />
+                    <v-btn icon="ph-file-text" color="primary" @click="() => { closeAllMenus(); handleConvertCV() }"
+                        class="mobile-action-btn" elevation="2" />
                 </div>
             </div>
-            <v-btn icon="mdi-lightning-bolt" color="primary" class="mobile-action-btn" elevation="2"
-                @click="toggleActions" />
+            <v-btn icon="ph-lightning" color="primary" class="mobile-action-btn" elevation="2" @click="toggleActions" />
         </div>
 
         <!-- Overlay -->

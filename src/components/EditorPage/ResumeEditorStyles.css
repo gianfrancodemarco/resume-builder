@@ -99,7 +99,6 @@
     border: 1px solid rgba(0, 0, 0, 0.06) !important;
     border-radius: 8px !important;
     overflow: hidden;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.02);
     transition: all 0.2s ease;
 }
 
@@ -409,4 +408,191 @@
 
 .title-edit-field {
     width: 100%;
+}
+
+.editor-sections {
+    background: transparent;
+}
+
+.editor-section {
+    margin-bottom: 8px;
+    background-color: white;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    border-radius: 8px;
+    overflow: hidden;
+    transition: all 0.2s ease;
+}
+
+.editor-section:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.section-header {
+    padding: 16px 20px;
+    letter-spacing: 0.3px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.section-header .section-title {
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.section-content {
+    padding: 16px 20px;
+}
+
+.experience-item,
+.education-item {
+    padding: 12px;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    border-radius: 6px;
+    margin-bottom: 8px;
+    transition: all 0.2s ease;
+}
+
+.experience-item:hover,
+.education-item:hover {
+    border-color: rgba(0, 0, 0, 0.1);
+}
+
+.item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.item-title {
+    font-weight: 400;
+}
+
+.item-actions {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+}
+
+.custom-section-preview {
+    padding: 12px;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    border-radius: 6px;
+    min-height: 60px;
+}
+
+.custom-section-preview:empty::before {
+    content: "No content";
+    color: rgba(0, 0, 0, 0.4);
+    font-style: italic;
+}
+
+.custom-section-header {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    margin-right: 8px;
+}
+
+.custom-section-title {
+    font-size: 1.2rem;
+    font-weight: 500;
+    margin-bottom: 8px;
+    color: rgba(0, 0, 0, 0.9);
+}
+
+.custom-section-preview-text {
+    font-weight: 400;
+    color: rgba(0, 0, 0, 0.6);
+    font-size: 0.9rem;
+    font-style: italic;
+    line-height: 1.4;
+    margin-bottom: 12px;
+    padding: 8px 12px;
+    background-color: rgba(0, 0, 0, 0.03);
+    border-radius: 4px;
+    border-left: 3px solid rgba(0, 0, 0, 0.1);
+}
+
+.custom-section-preview-text:empty::before {
+    content: "No content";
+    color: rgba(0, 0, 0, 0.4);
+    font-style: italic;
+}
+
+.section-actions {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    justify-content: flex-end;
+    margin-top: 8px;
+}
+
+.custom-section-title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.section-actions {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+}
+
+.editor-panel .section-title .move-icon.v-icon--disabled {
+    opacity: 0;
+    cursor: not-allowed;
+}
+
+.editor-panel:hover .section-title .move-icon.v-icon--disabled {
+    opacity: 0.3;
+}
+
+.editor-panel .section-title .v-icon--disabled {
+    opacity: 0 !important;
+    cursor: not-allowed !important;
+    color: #ccc !important;
+    pointer-events: none !important;
+}
+
+.editor-panel:hover .section-title .v-icon--disabled {
+    opacity: 0.3 !important;
+    color: #ccc !important;
+}
+
+.editor-panel .section-title .move-icon.v-icon--disabled {
+    opacity: 0 !important;
+    cursor: not-allowed !important;
+    color: #ccc !important;
+    pointer-events: none !important;
+}
+
+.editor-panel:hover .section-title .move-icon.v-icon--disabled {
+    opacity: 0.3 !important;
+    color: #ccc !important;
+}
+
+/* Red styling for delete buttons */
+.editor-panel .section-title .delete-icon:hover {
+    background: #ffebee !important;
+    color: #d32f2f !important;
+    border-radius: 4px;
+}
+
+.editor-panel .section-title .delete-icon:active {
+    background: #d32f2f !important;
+    color: #fff !important;
+}
+
+/* Also apply to delete buttons in item actions */
+.item-actions .delete-icon:hover {
+    background: #ffebee !important;
+    color: #d32f2f !important;
+    border-radius: 4px;
+}
+
+.item-actions .delete-icon:active {
+    background: #d32f2f !important;
+    color: #fff !important;
 }

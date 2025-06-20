@@ -2,15 +2,32 @@
     <v-app>
         <v-main>
             <div class="editor-content" :class="{ 'mobile-view': isMobile }">
-                <div class="editor-col" :style="isMobile ? { width: '100%' } : { width: `${editorWidth}%` }">
-                    <ResumeEditor v-model:resume-data="resumeData" v-model:style="resumeStyle" @save="handleFormSave"
-                        @change="handleFormChange" :is-mobile="isMobile" />
+                <!-- Tab switching lateral bar -->
+                <div class="tab-switcher">
+                    <v-tooltip location="right" open-on-hover>
+                        <template v-slot:activator="{ props: tooltipProps }">
+                            <v-btn v-bind="tooltipProps" icon="ph-user"
+                                :color="activeTab === 'info' ? 'primary' : 'grey'" variant="text" class="tab-btn"
+                                @click="activeTab = 'info'" :class="{ 'active': activeTab === 'info' }" />
+                        </template>
+                        Info
+                    </v-tooltip>
+                    <v-tooltip location="right" open-on-hover>
+                        <template v-slot:activator="{ props: tooltipProps }">
+                            <v-btn v-bind="tooltipProps" icon="ph-palette"
+                                :color="activeTab === 'style' ? 'primary' : 'grey'" variant="text" class="tab-btn"
+                                @click="activeTab = 'style'" :class="{ 'active': activeTab === 'style' }" />
+                        </template>
+                        Style
+                    </v-tooltip>
                 </div>
-                <div v-if="!isMobile" class="resize-handle" @mousedown.prevent="startResize"
-                    @touchstart.prevent="startResize" @touchmove.prevent="handleResize" @touchend.prevent="stopResize">
+
+                <div class="editor-col" :style="isMobile ? { width: '100%' } : { width: '30%' }">
+                    <ResumeEditor v-model:resume-data="resumeData" v-model:style="resumeStyle"
+                        v-model:active-tab="activeTab" @save="handleFormSave" @change="handleFormChange"
+                        :is-mobile="isMobile" />
                 </div>
-                <div class="preview-col" :class="{ 'hidden': isMobile }"
-                    :style="!isMobile ? { width: `${100 - editorWidth}%` } : {}">
+                <div class="preview-col" :class="{ 'hidden': isMobile }" :style="!isMobile ? { width: '70%' } : {}">
                     <div class="preview-container">
                         <div class="preview-header"></div>
                         <ResumePreview :resume-data="resumeData" :style="resumeStyle"
@@ -56,11 +73,11 @@ const resumeData = ref(ResumeData.createDefault())
 // Initialize the style with the class instance
 const resumeStyle = ref(ResumeStyleClass.createDefault())
 
+// Active Tab State
+const activeTab = ref('info')
+
 const fileInput = ref(null)
 const hasUnsavedChanges = ref(false)
-const editorWidth = ref(35)
-const editorHeight = ref(50)
-const isResizing = ref(false)
 
 const isMobile = computed(() => mobile.value)
 const alertMessage = ref({
@@ -92,10 +109,6 @@ onMounted(async () => {
     await loadAvailableModels()
 
     window.addEventListener('beforeunload', handleBeforeUnload)
-    window.addEventListener('mousemove', handleResize)
-    window.addEventListener('touchmove', handleResize)
-    window.addEventListener('mouseup', stopResize)
-    window.addEventListener('touchend', stopResize)
 
     // Set initial scale to 75%
     const printableArea = document.getElementById('printable-area')
@@ -109,10 +122,6 @@ onMounted(async () => {
 // Remove event listener when component is destroyed
 onBeforeUnmount(() => {
     window.removeEventListener('beforeunload', handleBeforeUnload)
-    window.removeEventListener('mousemove', handleResize)
-    window.removeEventListener('touchmove', handleResize)
-    window.removeEventListener('mouseup', stopResize)
-    window.removeEventListener('touchend', stopResize)
 })
 
 // Handle beforeunload event
@@ -221,51 +230,6 @@ const handleDownloadHTML = async () => {
     }
 }
 
-// Resize handlers
-const startResize = (e) => {
-    isResizing.value = true
-    e.preventDefault()
-}
-
-const handleResize = (e) => {
-    if (!isResizing.value) return
-
-    const container = document.querySelector('.editor-content')
-    if (!container) return
-
-    // Calculate scale based on editor width - inverse relationship
-    const printableArea = document.getElementById('printable-area')
-    if (printableArea) {
-        const scale = 0.75 * (1 - (editorWidth.value - 35) / 100) // Decrease scale as editor width increases
-        printableArea.style.transform = `scale(${Math.max(0.35, scale)})`
-        printableArea.style.transformOrigin = 'center top'
-    }
-
-    if (isMobile.value) {
-        // Handle vertical resize for mobile
-        const containerRect = container.getBoundingClientRect()
-        const clientY = e.clientY || (e.touches && e.touches[0].clientY)
-
-        if (clientY) {
-            const newHeight = ((clientY - containerRect.top) / containerRect.height) * 100
-            editorHeight.value = Math.min(Math.max(newHeight, 20), 80) // Limit between 20% and 80%
-        }
-    } else {
-        // Handle horizontal resize for desktop
-        const containerRect = container.getBoundingClientRect()
-        const clientX = e.clientX || (e.touches && e.touches[0].clientX)
-
-        if (clientX) {
-            const newWidth = ((clientX - containerRect.left) / containerRect.width) * 100
-            editorWidth.value = Math.max(35, Math.min(newWidth, 50)) // Minimum 35%, maximum 60%
-        }
-    }
-}
-
-const stopResize = () => {
-    isResizing.value = false
-}
-
 // Convert CV Dialog State
 const showConvertDialog = ref(false)
 const availableModels = ref([])
@@ -346,33 +310,6 @@ const handleConvert = async ({ file, apiKey, model }) => {
     overflow: hidden;
 }
 
-.resize-handle {
-    width: 8px;
-    background: transparent;
-    cursor: col-resize;
-    position: relative;
-    z-index: 10;
-    flex-shrink: 0;
-    touch-action: none;
-    transition: background-color 0.2s ease;
-}
-
-.resize-handle:hover,
-.resize-handle:active {
-    background: rgba(0, 0, 0, 0.05);
-}
-
-.resize-handle::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 2px;
-    height: 24px;
-    background: rgba(0, 0, 0, 0.1);
-}
-
 :deep(.v-app-bar) {
     box-shadow: none !important;
     border-bottom: none !important;
@@ -434,5 +371,36 @@ const handleConvert = async ({ file, apiKey, model }) => {
     z-index: 1000;
     min-width: 500px;
     max-width: 800px;
+}
+
+.tab-switcher {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    background-color: #fff;
+    border-right: 1px solid rgba(0, 0, 0, 0.06);
+    padding: 12px 8px;
+    width: 56px;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: flex-start;
+    padding-top: 20px;
+}
+
+.tab-btn {
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 6px !important;
+    transition: all 0.2s ease;
+    cursor: pointer !important;
+}
+
+.tab-btn.active {
+    background-color: rgba(var(--v-theme-primary), 0.1) !important;
+    color: rgb(var(--v-theme-primary)) !important;
+}
+
+.tab-btn:hover {
+    background-color: rgba(var(--v-theme-primary), 0.05) !important;
 }
 </style>

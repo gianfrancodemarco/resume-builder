@@ -1,244 +1,354 @@
 <template>
     <div>
-        <div class="mb-4">
-            <v-text-field v-model="props.resumeData.personal.name" label="Name" variant="outlined" density="comfortable"
-                class="mb-2" aria-label="Name" />
-            <v-text-field v-model="props.resumeData.personal.title" label="Title" variant="outlined"
-                density="comfortable" aria-label="Title" />
-        </div>
-        <v-expansion-panels class="editor-panels" multiple>
-            <!-- Experience Section -->
-            <v-expansion-panel class="editor-panel">
-                <v-expansion-panel-title class="panel-title">
+        <div class="editor-sections">
+            <!-- Personal Section -->
+            <div class="editor-section">
+                <div class="section-header">
                     <div class="d-flex align-center w-100">
-                        <span v-if="!editingSectionTitle.experience" class="section-title">
+                        <span class="section-title">
+                            Personal Information
+                            <v-icon :icon="props.resumeData.personal.visible ? 'ph-eye' : 'ph-eye-slash'" size="small"
+                                class="visibility-icon"
+                                @click.stop="props.resumeData.personal.visible = !props.resumeData.personal.visible" />
+                        </span>
+                    </div>
+                </div>
+                <div class="section-content">
+                    <v-text-field v-model="props.resumeData.personal.name" label="Name" variant="outlined"
+                        density="comfortable" class="mb-2" aria-label="Name"
+                        :disabled="!props.resumeData.personal.visible" />
+                    <v-text-field v-model="props.resumeData.personal.title" label="Title" variant="outlined"
+                        density="comfortable" aria-label="Title" :disabled="!props.resumeData.personal.visible" />
+                </div>
+            </div>
+
+            <!-- Experience Section -->
+            <div class="editor-section">
+                <div class="section-header">
+                    <div class="d-flex align-center w-100">
+                        <span class="section-title">
                             {{ props.resumeData.experiencesSectionName }}
                             <v-tooltip location="top">
                                 <template v-slot:activator="{ props: iconProps }">
-                                    <v-icon v-bind="iconProps" icon="mdi-pencil" size="small" class="edit-icon"
-                                        @click.stop="startEditingTitle('experience')" />
+                                    <v-icon v-bind="iconProps" icon="ph-pencil-simple" size="small" class="edit-icon"
+                                        @click.stop="openExperienceSectionModal" />
                                 </template>
-                                Edit section title
+                                Edit section
                             </v-tooltip>
-                            <v-icon :icon="props.resumeData.experiencesVisible ? 'mdi-eye' : 'mdi-eye-off'" size="small"
+                            <v-icon :icon="props.resumeData.experiencesVisible ? 'ph-eye' : 'ph-eye-slash'" size="small"
                                 class="visibility-icon"
                                 @click.stop="props.resumeData.experiencesVisible = !props.resumeData.experiencesVisible" />
                         </span>
-                        <v-text-field v-else v-model="props.resumeData.experiencesSectionName" variant="outlined"
-                            density="comfortable" class="title-edit-field" @blur="stopEditingTitle('experience')"
-                            @keyup.enter="stopEditingTitle('experience')" ref="experienceTitleField" />
                     </div>
-                </v-expansion-panel-title>
-                <v-expansion-panel-text>
-                    <v-expansion-panels>
-                        <v-expansion-panel v-for="(exp, index) in props.resumeData.experiences" :key="index"
-                            class="mb-4 experience-card">
-                            <v-expansion-panel-title>
-                                <div class="d-flex align-center w-100">
-                                    <span class="section-title">
-                                        {{ exp.title }} - {{ exp.company }}
-                                        <v-icon
-                                            :icon="props.resumeData.experiences[index].visible ? 'mdi-eye' : 'mdi-eye-off'"
-                                            size="small" class="visibility-icon"
-                                            @click.stop="props.resumeData.experiences[index].visible = !props.resumeData.experiences[index].visible" />
-                                        <v-tooltip location="top">
-                                            <template v-slot:activator="{ props: iconProps }">
-                                                <v-icon v-bind="iconProps"
-                                                    :icon="deleteConfirmState[`exp-${index}`] ? 'mdi-check' : 'mdi-delete'"
-                                                    size="small" class="delete-icon" @click.stop="removeExp(index)"
-                                                    :disabled="!props.resumeData.experiencesVisible" />
-                                            </template>
-                                            {{ deleteConfirmState[`exp-${index}`] ? 'Confirm delete' : "Delete experience" }}
-                                        </v-tooltip>
-                                    </span>
-                                </div>
-                            </v-expansion-panel-title>
-                            <v-expansion-panel-text>
-                                <div class="d-flex align-center mb-2">
-                                    <v-text-field v-model="props.resumeData.experiences[index].title" label="Job title"
-                                        :disabled="!props.resumeData.experiencesVisible || !props.resumeData.experiences[index].visible"
-                                        variant="outlined" density="comfortable" aria-label="Job title" />
-                                </div>
-                                <v-text-field v-model="props.resumeData.experiences[index].company"
-                                    label="Company (+ location)"
-                                    :disabled="!props.resumeData.experiencesVisible || !props.resumeData.experiences[index].visible"
-                                    variant="outlined" density="comfortable" class="mb-2" aria-label="Company" />
-                                <v-text-field v-model="props.resumeData.experiences[index].period" label="Period"
-                                    :disabled="!props.resumeData.experiencesVisible || !props.resumeData.experiences[index].visible"
-                                    variant="outlined" density="comfortable" class="mb-2" aria-label="Period" />
-                                <div class="mb-2">
-                                    <label class="v-label">Description</label>
-                                    <TiptapEditor v-model="props.resumeData.experiences[index].description"
-                                        :disabled="!props.resumeData.experiencesVisible || !props.resumeData.experiences[index].visible" />
-                                </div>
-                            </v-expansion-panel-text>
-                        </v-expansion-panel>
-                    </v-expansion-panels>
-                    <v-btn color="primary" @click="addExp" aria-label="Add Experience"
-                        :disabled="!props.resumeData.experiencesVisible" prepend-icon="mdi-plus">Add
-                        Experience</v-btn>
-                </v-expansion-panel-text>
-            </v-expansion-panel>
+                </div>
+                <div class="section-content">
+                    <div v-for="(exp, index) in props.resumeData.experiences" :key="index" class="experience-item">
+                        <div class="item-header">
+                            <span class="item-title">{{ exp.title }} - {{ exp.company }}</span>
+                            <div class="item-actions">
+                                <v-icon :icon="props.resumeData.experiences[index].visible ? 'ph-eye' : 'ph-eye-slash'"
+                                    size="small" class="visibility-icon"
+                                    @click.stop="props.resumeData.experiences[index].visible = !props.resumeData.experiences[index].visible" />
+                                <v-tooltip location="top">
+                                    <template v-slot:activator="{ props: iconProps }">
+                                        <v-icon v-bind="iconProps" icon="ph-pencil-simple" size="small"
+                                            class="edit-icon" @click.stop="openExperienceModal(index)" />
+                                    </template>
+                                    Edit experience
+                                </v-tooltip>
+                                <v-tooltip location="top">
+                                    <template v-slot:activator="{ props: iconProps }">
+                                        <v-icon v-bind="iconProps"
+                                            :icon="deleteConfirmState[`exp-${index}`] ? 'ph-check' : 'ph-delete'"
+                                            size="small" class="delete-icon"
+                                            :class="{ 'v-icon--disabled': !props.resumeData.experiencesVisible }"
+                                            @click.stop="removeExp(index)"
+                                            :disabled="!props.resumeData.experiencesVisible" />
+                                    </template>
+                                    {{ deleteConfirmState[`exp-${index}`] ? 'Confirm delete' : "Delete experience" }}
+                                </v-tooltip>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-center">
+                        <v-btn color="primary" @click="addExp" aria-label="Add Experience"
+                            :disabled="!props.resumeData.experiencesVisible" prepend-icon="ph-plus">Add
+                            Experience</v-btn>
+                    </div>
+                </div>
+            </div>
 
             <!-- Education Section -->
-            <v-expansion-panel class="editor-panel">
-                <v-expansion-panel-title class="panel-title">
+            <div class="editor-section">
+                <div class="section-header">
                     <div class="d-flex align-center w-100">
-                        <span v-if="!editingSectionTitle.education" class="section-title">
+                        <span class="section-title">
                             {{ props.resumeData.educationSectionName }}
                             <v-tooltip location="top">
                                 <template v-slot:activator="{ props: iconProps }">
-                                    <v-icon v-bind="iconProps" icon="mdi-pencil" size="small" class="edit-icon"
-                                        @click.stop="startEditingTitle('education')" />
+                                    <v-icon v-bind="iconProps" icon="ph-pencil-simple" size="small" class="edit-icon"
+                                        @click.stop="openEducationSectionModal" />
                                 </template>
-                                Edit section title
+                                Edit section
                             </v-tooltip>
-                            <v-icon :icon="props.resumeData.educationVisible ? 'mdi-eye' : 'mdi-eye-off'" size="small"
+                            <v-icon :icon="props.resumeData.educationVisible ? 'ph-eye' : 'ph-eye-slash'" size="small"
                                 class="visibility-icon"
                                 @click.stop="props.resumeData.educationVisible = !props.resumeData.educationVisible" />
                         </span>
-                        <v-text-field v-else v-model="props.resumeData.educationSectionName" variant="outlined"
-                            density="comfortable" class="title-edit-field" @blur="stopEditingTitle('education')"
-                            @keyup.enter="stopEditingTitle('education')" ref="educationTitleField" />
                     </div>
-                </v-expansion-panel-title>
-                <v-expansion-panel-text>
-                    <v-expansion-panels>
-                        <v-expansion-panel v-for="(edu, index) in props.resumeData.education" :key="index"
-                            class="mb-4 education-card">
-                            <v-expansion-panel-title>
-                                <div class="d-flex align-center w-100">
-                                    <span class="section-title">
-                                        {{ edu.degree }} - {{ edu.school }}
-                                        <v-icon
-                                            :icon="props.resumeData.education[index].visible ? 'mdi-eye' : 'mdi-eye-off'"
-                                            size="small" class="visibility-icon"
-                                            @click.stop="props.resumeData.education[index].visible = !props.resumeData.education[index].visible" />
-                                        <v-tooltip location="top">
-                                            <template v-slot:activator="{ props: iconProps }">
-                                                <v-icon v-bind="iconProps"
-                                                    :icon="deleteConfirmState[`edu-${index}`] ? 'mdi-check' : 'mdi-delete'"
-                                                    size="small" class="delete-icon" @click.stop="removeEdu(index)"
-                                                    :disabled="!props.resumeData.educationVisible" />
-                                            </template>
-                                            {{ deleteConfirmState[`edu-${index}`] ? 'Confirm delete' : "Delete education" }}
-                                        </v-tooltip>
-                                    </span>
-                                </div>
-                            </v-expansion-panel-title>
-                            <v-expansion-panel-text>
-                                <v-text-field v-model="props.resumeData.education[index].degree" label="Degree"
-                                    :disabled="!props.resumeData.educationVisible || !props.resumeData.education[index].visible"
-                                    variant="outlined" density="comfortable" aria-label="Degree" />
-                                <v-text-field v-model="props.resumeData.education[index].school" label="School"
-                                    :disabled="!props.resumeData.educationVisible || !props.resumeData.education[index].visible"
-                                    variant="outlined" density="comfortable" class="mb-2" aria-label="School" />
-                                <v-text-field v-model="props.resumeData.education[index].period" label="Period"
-                                    :disabled="!props.resumeData.educationVisible || !props.resumeData.education[index].visible"
-                                    variant="outlined" density="comfortable" class="mb-2" aria-label="Period" />
-                                <v-text-field v-model="props.resumeData.education[index].mark" label="Grade"
-                                    :disabled="!props.resumeData.educationVisible || !props.resumeData.education[index].visible"
-                                    variant="outlined" density="comfortable" class="mb-2" aria-label="Grade" />
-                                <div class="mb-2">
-                                    <label class="v-label">Thesis / Notes</label>
-                                    <TiptapEditor v-model="props.resumeData.education[index].thesis"
-                                        :disabled="!props.resumeData.educationVisible || !props.resumeData.education[index].visible" />
-                                </div>
-                            </v-expansion-panel-text>
-                        </v-expansion-panel>
-                    </v-expansion-panels>
-                    <v-btn color="primary" @click="addEdu" aria-label="Add Education"
-                        :disabled="!props.resumeData.educationVisible" prepend-icon="mdi-plus">Add Education</v-btn>
-                </v-expansion-panel-text>
-            </v-expansion-panel>
+                </div>
+                <div class="section-content">
+                    <div v-for="(edu, index) in props.resumeData.education" :key="index" class="education-item">
+                        <div class="item-header">
+                            <span class="item-title">{{ edu.degree }} - {{ edu.school }}</span>
+                            <div class="item-actions">
+                                <v-icon :icon="props.resumeData.education[index].visible ? 'ph-eye' : 'ph-eye-slash'"
+                                    size="small" class="visibility-icon"
+                                    @click.stop="props.resumeData.education[index].visible = !props.resumeData.education[index].visible" />
+                                <v-tooltip location="top">
+                                    <template v-slot:activator="{ props: iconProps }">
+                                        <v-icon v-bind="iconProps" icon="ph-pencil-simple" size="small"
+                                            class="edit-icon" @click.stop="openEducationModal(index)" />
+                                    </template>
+                                    Edit education
+                                </v-tooltip>
+                                <v-tooltip location="top">
+                                    <template v-slot:activator="{ props: iconProps }">
+                                        <v-icon v-bind="iconProps"
+                                            :icon="deleteConfirmState[`edu-${index}`] ? 'ph-check' : 'ph-delete'"
+                                            size="small" class="delete-icon"
+                                            :class="{ 'v-icon--disabled': !props.resumeData.educationVisible }"
+                                            @click.stop="removeEdu(index)"
+                                            :disabled="!props.resumeData.educationVisible" />
+                                    </template>
+                                    {{ deleteConfirmState[`edu-${index}`] ? 'Confirm delete' : "Delete education" }}
+                                </v-tooltip>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-center">
+                        <v-btn color="primary" @click="addEdu" aria-label="Add Education"
+                            :disabled="!props.resumeData.educationVisible" prepend-icon="ph-plus">Add Education</v-btn>
+                    </div>
+                </div>
+            </div>
 
             <!-- Custom Sections -->
-            <template v-for="(section, index) in props.resumeData.customSections" :key="index">
-                <v-expansion-panel class="editor-panel">
-                    <v-expansion-panel-title class="panel-title">
-                        <div class="d-flex align-center w-100">
-                            <span v-if="!editingSectionTitle[index]" class="section-title">
-                                {{ section.title }}
-                                <v-tooltip location="top">
-                                    <template v-slot:activator="{ props: iconProps }">
-                                        <v-icon v-bind="iconProps" icon="mdi-pencil" size="small" class="edit-icon"
-                                            @click.stop="startEditingTitle(index)" />
-                                    </template>
-                                    Edit section title
-                                </v-tooltip>
-                                <v-tooltip location="top">
-                                    <template v-slot:activator="{ props: iconProps }">
-                                        <v-icon v-bind="iconProps"
-                                            :icon="props.resumeData.customSections[index].visible ? 'mdi-eye' : 'mdi-eye-off'"
-                                            size="small" class="visibility-icon"
-                                            @click.stop="props.resumeData.customSections[index].visible = !props.resumeData.customSections[index].visible" />
-                                    </template>
-                                    {{ props.resumeData.customSections[index].visible ? 'Hide section' : 'Show section'
-                                    }}
-                                </v-tooltip>
-                                <v-tooltip location="top">
-                                    <template v-slot:activator="{ props: iconProps }">
-                                        <v-icon v-bind="iconProps"
-                                            :icon="props.resumeData.customSections[index].position === 'sidebar' ? 'mdi-format-align-right' : 'mdi-format-align-left'"
-                                            size="small" class="position-icon"
-                                            @click.stop="toggleSectionPosition(index)" />
-                                    </template>
-                                    {{ props.resumeData.customSections[index].position === 'sidebar' ? 'Move to main content' : 'Move to sidebar' }}
-                                </v-tooltip>
-                                <v-tooltip location="top">
-                                    <template v-slot:activator="{ props: iconProps }">
-                                        <v-icon v-bind="iconProps" icon="mdi-arrow-up" size="small" class="move-icon"
-                                            @click.stop="moveCustomSection(index, 'up')" :disabled="index === 0" />
-                                    </template>
-                                    Move section up
-                                </v-tooltip>
-                                <v-tooltip location="top">
-                                    <template v-slot:activator="{ props: iconProps }">
-                                        <v-icon v-bind="iconProps" icon="mdi-arrow-down" size="small" class="move-icon"
-                                            @click.stop="moveCustomSection(index, 'down')"
-                                            :disabled="index === props.resumeData.customSections.length - 1" />
-                                    </template>
-                                    Move section down
-                                </v-tooltip>
-                                <v-tooltip location="top">
-                                    <template v-slot:activator="{ props: iconProps }">
-                                        <v-icon v-bind="iconProps"
-                                            :icon="deleteConfirmState[index] ? 'mdi-check' : 'mdi-delete'" size="small"
-                                            class="delete-icon" @click.stop="removeCustomSection(index)"
-                                            :disabled="!props.resumeData.customSections[index].visible" />
-                                    </template>
-                                    {{ deleteConfirmState[index] ? 'Confirm delete' : 'Delete section' }}
-                                </v-tooltip>
-                                <v-tooltip location="top">
-                                    <template v-slot:activator="{ props: iconProps }">
-                                        <v-icon v-bind="iconProps" icon="mdi-content-copy" size="small"
-                                            class="clone-icon" @click.stop="cloneCustomSection(index)"
-                                            :disabled="!props.resumeData.customSections[index].visible" />
-                                    </template>
-                                    Clone section
-                                </v-tooltip>
-                            </span>
-                            <v-text-field v-else v-model="props.resumeData.customSections[index].title" variant="plain"
-                                density="compact" hide-details class="title-edit-field" @blur="stopEditingTitle(index)"
-                                @keyup.enter="stopEditingTitle(index)" @keyup.esc="cancelEditingTitle(index)"
-                                ref="titleField" />
+            <div v-for="(section, index) in props.resumeData.customSections" :key="index" class="editor-section">
+                <div class="section-header">
+                    <div class="custom-section-title-row">
+                        <div class="section-title">{{ section.title }}</div>
+                        <div class="section-actions">
+                            <v-tooltip location="top">
+                                <template v-slot:activator="{ props: iconProps }">
+                                    <v-icon v-bind="iconProps" icon="ph-pencil-simple" size="small" class="edit-icon"
+                                        @click.stop="openCustomSectionModal(index)" />
+                                </template>
+                                Edit section
+                            </v-tooltip>
+                            <v-tooltip location="top">
+                                <template v-slot:activator="{ props: iconProps }">
+                                    <v-icon v-bind="iconProps"
+                                        :icon="props.resumeData.customSections[index].visible ? 'ph-eye' : 'ph-eye-slash'"
+                                        size="small" class="visibility-icon"
+                                        @click.stop="props.resumeData.customSections[index].visible = !props.resumeData.customSections[index].visible" />
+                                </template>
+                                {{ props.resumeData.customSections[index].visible ? 'Hide section' : 'Show section'
+                                }}
+                            </v-tooltip>
+                            <v-tooltip location="top">
+                                <template v-slot:activator="{ props: iconProps }">
+                                    <v-icon v-bind="iconProps"
+                                        :icon="props.resumeData.customSections[index].position === 'sidebar' ? 'ph-format-align-right' : 'ph-format-align-left'"
+                                        size="small" class="position-icon" @click.stop="toggleSectionPosition(index)" />
+                                </template>
+                                {{ getPositionTooltipText(props.resumeData.customSections[index].position) }}
+                            </v-tooltip>
+                            <v-tooltip location="top">
+                                <template v-slot:activator="{ props: iconProps }">
+                                    <v-icon v-bind="iconProps" icon="ph-arrow-up" size="small" class="move-icon"
+                                        :class="{ 'v-icon--disabled': index === 0 }"
+                                        @click.stop="moveCustomSection(index, 'up')" :disabled="index === 0" />
+                                </template>
+                                Move section up
+                            </v-tooltip>
+                            <v-tooltip location="top">
+                                <template v-slot:activator="{ props: iconProps }">
+                                    <v-icon v-bind="iconProps" icon="ph-arrow-down" size="small" class="move-icon"
+                                        :class="{ 'v-icon--disabled': index === props.resumeData.customSections.length - 1 }"
+                                        @click.stop="moveCustomSection(index, 'down')"
+                                        :disabled="index === props.resumeData.customSections.length - 1" />
+                                </template>
+                                Move section down
+                            </v-tooltip>
+                            <v-tooltip location="top">
+                                <template v-slot:activator="{ props: iconProps }">
+                                    <v-icon v-bind="iconProps"
+                                        :icon="deleteConfirmState[index] ? 'ph-check' : 'ph-delete'" size="small"
+                                        class="delete-icon"
+                                        :class="{ 'v-icon--disabled': !props.resumeData.customSections[index].visible }"
+                                        @click.stop="removeCustomSection(index)"
+                                        :disabled="!props.resumeData.customSections[index].visible" />
+                                </template>
+                                {{ deleteConfirmState[index] ? 'Confirm delete' : 'Delete section' }}
+                            </v-tooltip>
+                            <v-tooltip location="top">
+                                <template v-slot:activator="{ props: iconProps }">
+                                    <v-icon v-bind="iconProps" icon="ph-content-copy" size="small" class="clone-icon"
+                                        :class="{ 'v-icon--disabled': !props.resumeData.customSections[index].visible }"
+                                        @click.stop="cloneCustomSection(index)"
+                                        :disabled="!props.resumeData.customSections[index].visible" />
+                                </template>
+                                Clone section
+                            </v-tooltip>
                         </div>
-                    </v-expansion-panel-title>
-                    <v-expansion-panel-text>
-                        <TiptapEditor v-model="section.content" />
-                    </v-expansion-panel-text>
-                </v-expansion-panel>
-            </template>
-        </v-expansion-panels>
+                    </div>
+                    <div class="custom-section-preview" v-html="section.content"></div>
+                </div>
+            </div>
+        </div>
+
         <div class="d-flex flex-column align-center">
-            <v-btn color="primary" @click="addCustomSection" prepend-icon="mdi-plus" class="mt-4 action-btn"
+            <v-btn color="primary" @click="addCustomSection" prepend-icon="ph-plus" class="mt-4 action-btn"
                 aria-label="Add custom section">Add Custom Section</v-btn>
         </div>
+
+        <!-- Custom Section Modal -->
+        <v-dialog v-model="customSectionModal.show" max-width="800px">
+            <v-card>
+                <v-card-title class="text-h5">
+                    {{ customSectionModal.isNew ? 'Add Custom Section' : 'Edit Custom Section' }}
+                </v-card-title>
+                <v-card-text>
+                    <v-text-field v-model="customSectionModal.data.title" label="Section Title" variant="outlined"
+                        density="comfortable" class="mb-4" />
+                    <div class="mb-4">
+                        <label class="v-label">Content</label>
+                        <TiptapEditor v-model="customSectionModal.data.content" />
+                    </div>
+                </v-card-text>
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn color="grey-darken-1" variant="text" @click="closeCustomSectionModal">
+                        Cancel
+                    </v-btn>
+                    <v-btn color="primary" @click="saveCustomSection">
+                        {{ customSectionModal.isNew ? 'Add' : 'Save' }}
+                    </v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+
+        <!-- Experience Section Modal -->
+        <v-dialog v-model="experienceSectionModal.show" max-width="500px">
+            <v-card>
+                <v-card-title class="text-h5">
+                    Edit Experience Section
+                </v-card-title>
+                <v-card-text>
+                    <v-text-field v-model="experienceSectionModal.data.sectionName" label="Section Title"
+                        variant="outlined" density="comfortable" />
+                </v-card-text>
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn color="grey-darken-1" variant="text" @click="closeExperienceSectionModal">
+                        Cancel
+                    </v-btn>
+                    <v-btn color="primary" @click="saveExperienceSection">
+                        Save
+                    </v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+
+        <!-- Experience Modal -->
+        <v-dialog v-model="experienceModal.show" max-width="800px">
+            <v-card>
+                <v-card-title class="text-h5">
+                    {{ experienceModal.isNew ? 'Add Experience' : 'Edit Experience' }}
+                </v-card-title>
+                <v-card-text>
+                    <v-text-field v-model="experienceModal.data.title" label="Job Title" variant="outlined"
+                        density="comfortable" class="mb-3" />
+                    <v-text-field v-model="experienceModal.data.company" label="Company (+ location)" variant="outlined"
+                        density="comfortable" class="mb-3" />
+                    <v-text-field v-model="experienceModal.data.period" label="Period" variant="outlined"
+                        density="comfortable" class="mb-3" />
+                    <div class="mb-3">
+                        <label class="v-label">Description</label>
+                        <TiptapEditor v-model="experienceModal.data.description" />
+                    </div>
+                </v-card-text>
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn color="grey-darken-1" variant="text" @click="closeExperienceModal">
+                        Cancel
+                    </v-btn>
+                    <v-btn color="primary" @click="saveExperience">
+                        {{ experienceModal.isNew ? 'Add' : 'Save' }}
+                    </v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+
+        <!-- Education Section Modal -->
+        <v-dialog v-model="educationSectionModal.show" max-width="500px">
+            <v-card>
+                <v-card-title class="text-h5">
+                    Edit Education Section
+                </v-card-title>
+                <v-card-text>
+                    <v-text-field v-model="educationSectionModal.data.sectionName" label="Section Title"
+                        variant="outlined" density="comfortable" />
+                </v-card-text>
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn color="grey-darken-1" variant="text" @click="closeEducationSectionModal">
+                        Cancel
+                    </v-btn>
+                    <v-btn color="primary" @click="saveEducationSection">
+                        Save
+                    </v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+
+        <!-- Education Modal -->
+        <v-dialog v-model="educationModal.show" max-width="800px">
+            <v-card>
+                <v-card-title class="text-h5">
+                    {{ educationModal.isNew ? 'Add Education' : 'Edit Education' }}
+                </v-card-title>
+                <v-card-text>
+                    <v-text-field v-model="educationModal.data.degree" label="Degree" variant="outlined"
+                        density="comfortable" class="mb-3" />
+                    <v-text-field v-model="educationModal.data.school" label="School" variant="outlined"
+                        density="comfortable" class="mb-3" />
+                    <v-text-field v-model="educationModal.data.period" label="Period" variant="outlined"
+                        density="comfortable" class="mb-3" />
+                    <v-text-field v-model="educationModal.data.mark" label="Grade" variant="outlined"
+                        density="comfortable" class="mb-3" />
+                    <div class="mb-3">
+                        <label class="v-label">Thesis / Notes</label>
+                        <TiptapEditor v-model="educationModal.data.thesis" />
+                    </div>
+                </v-card-text>
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn color="grey-darken-1" variant="text" @click="closeEducationModal">
+                        Cancel
+                    </v-btn>
+                    <v-btn color="primary" @click="saveEducation">
+                        {{ educationModal.isNew ? 'Add' : 'Save' }}
+                    </v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
     </div>
 </template>
 
 <script setup>
-import { ref, nextTick, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { ResumeData, ResumeStyleClass } from '@/services/ResumeService'
 import TiptapEditor from './TiptapEditor.vue'
 
@@ -255,8 +365,61 @@ const props = defineProps({
 
 const emit = defineEmits(['update:resume-data', 'change'])
 
-const editingSectionTitle = ref({})
 const deleteConfirmState = ref({})
+
+// Modal states
+const customSectionModal = ref({
+    show: false,
+    isNew: false,
+    index: -1,
+    data: {
+        title: '',
+        content: '',
+        visible: true,
+        position: 'main'
+    }
+})
+
+const experienceSectionModal = ref({
+    show: false,
+    data: {
+        sectionName: ''
+    }
+})
+
+const experienceModal = ref({
+    show: false,
+    isNew: false,
+    index: -1,
+    data: {
+        title: '',
+        company: '',
+        period: '',
+        description: '',
+        visible: true
+    }
+})
+
+const educationSectionModal = ref({
+    show: false,
+    data: {
+        sectionName: ''
+    }
+})
+
+const educationModal = ref({
+    show: false,
+    isNew: false,
+    index: -1,
+    data: {
+        degree: '',
+        school: '',
+        period: '',
+        mark: '',
+        thesis: '',
+        visible: true
+    }
+})
 
 const handleClickOutside = (event) => {
     Object.keys(deleteConfirmState.value).forEach(key => {
@@ -272,8 +435,203 @@ onUnmounted(() => {
     document.removeEventListener('click', handleClickOutside)
 })
 
+// Custom Section Modal Methods
+const openCustomSectionModal = (index = -1) => {
+    if (index >= 0) {
+        // Edit existing section
+        const section = props.resumeData.customSections[index]
+        customSectionModal.value = {
+            show: true,
+            isNew: false,
+            index,
+            data: {
+                title: section.title,
+                content: section.content,
+                visible: section.visible,
+                position: section.position
+            }
+        }
+    } else {
+        // Add new section
+        customSectionModal.value = {
+            show: true,
+            isNew: true,
+            index: -1,
+            data: {
+                title: '',
+                content: '',
+                visible: true,
+                position: 'main'
+            }
+        }
+    }
+}
+
+const closeCustomSectionModal = () => {
+    customSectionModal.value.show = false
+}
+
+const saveCustomSection = () => {
+    if (customSectionModal.value.isNew) {
+        // Add new section
+        props.resumeData.customSections.push({
+            ...customSectionModal.value.data
+        })
+    } else {
+        // Update existing section
+        const index = customSectionModal.value.index
+        Object.assign(props.resumeData.customSections[index], customSectionModal.value.data)
+    }
+    closeCustomSectionModal()
+}
+
+// Experience Section Modal Methods
+const openExperienceSectionModal = () => {
+    experienceSectionModal.value = {
+        show: true,
+        data: {
+            sectionName: props.resumeData.experiencesSectionName
+        }
+    }
+}
+
+const closeExperienceSectionModal = () => {
+    experienceSectionModal.value.show = false
+}
+
+const saveExperienceSection = () => {
+    props.resumeData.experiencesSectionName = experienceSectionModal.value.data.sectionName
+    closeExperienceSectionModal()
+}
+
+// Experience Modal Methods
+const openExperienceModal = (index = -1) => {
+    if (index >= 0) {
+        // Edit existing experience
+        const exp = props.resumeData.experiences[index]
+        experienceModal.value = {
+            show: true,
+            isNew: false,
+            index,
+            data: {
+                title: exp.title,
+                company: exp.company,
+                period: exp.period,
+                description: exp.description,
+                visible: exp.visible
+            }
+        }
+    } else {
+        // Add new experience
+        experienceModal.value = {
+            show: true,
+            isNew: true,
+            index: -1,
+            data: {
+                title: '',
+                company: '',
+                period: '',
+                description: '',
+                visible: true
+            }
+        }
+    }
+}
+
+const closeExperienceModal = () => {
+    experienceModal.value.show = false
+}
+
+const saveExperience = () => {
+    if (experienceModal.value.isNew) {
+        // Add new experience
+        props.resumeData.experiences.push({
+            ...experienceModal.value.data
+        })
+    } else {
+        // Update existing experience
+        const index = experienceModal.value.index
+        Object.assign(props.resumeData.experiences[index], experienceModal.value.data)
+    }
+    closeExperienceModal()
+}
+
+// Education Section Modal Methods
+const openEducationSectionModal = () => {
+    educationSectionModal.value = {
+        show: true,
+        data: {
+            sectionName: props.resumeData.educationSectionName
+        }
+    }
+}
+
+const closeEducationSectionModal = () => {
+    educationSectionModal.value.show = false
+}
+
+const saveEducationSection = () => {
+    props.resumeData.educationSectionName = educationSectionModal.value.data.sectionName
+    closeEducationSectionModal()
+}
+
+// Education Modal Methods
+const openEducationModal = (index = -1) => {
+    if (index >= 0) {
+        // Edit existing education
+        const edu = props.resumeData.education[index]
+        educationModal.value = {
+            show: true,
+            isNew: false,
+            index,
+            data: {
+                degree: edu.degree,
+                school: edu.school,
+                period: edu.period,
+                mark: edu.mark,
+                thesis: edu.thesis,
+                visible: edu.visible
+            }
+        }
+    } else {
+        // Add new education
+        educationModal.value = {
+            show: true,
+            isNew: true,
+            index: -1,
+            data: {
+                degree: '',
+                school: '',
+                period: '',
+                mark: '',
+                thesis: '',
+                visible: true
+            }
+        }
+    }
+}
+
+const closeEducationModal = () => {
+    educationModal.value.show = false
+}
+
+const saveEducation = () => {
+    if (educationModal.value.isNew) {
+        // Add new education
+        props.resumeData.education.push({
+            ...educationModal.value.data
+        })
+    } else {
+        // Update existing education
+        const index = educationModal.value.index
+        Object.assign(props.resumeData.education[index], educationModal.value.data)
+    }
+    closeEducationModal()
+}
+
+// Legacy methods (updated to use modals)
 const addExp = () => {
-    props.resumeData.experiences.push(ResumeData.getNewExperience())
+    openExperienceModal()
 }
 
 const removeExp = (index) => {
@@ -286,7 +644,7 @@ const removeExp = (index) => {
 }
 
 const addEdu = () => {
-    props.resumeData.education.push(ResumeData.getNewEducation())
+    openEducationModal()
 }
 
 const removeEdu = (index) => {
@@ -299,7 +657,7 @@ const removeEdu = (index) => {
 }
 
 const addCustomSection = () => {
-    props.resumeData.customSections.push(ResumeData.getNewCustomSection())
+    openCustomSectionModal()
 }
 
 const removeCustomSection = (index) => {
@@ -309,26 +667,6 @@ const removeCustomSection = (index) => {
     }
     props.resumeData.customSections.splice(index, 1)
     deleteConfirmState.value[index] = false
-}
-
-const startEditingTitle = (index) => {
-    editingSectionTitle.value[index] = true
-    nextTick(() => {
-        const input = document.querySelector(`.title-edit-field input`)
-        if (input) {
-            input.focus()
-            input.select()
-        }
-    })
-}
-
-const stopEditingTitle = (index) => {
-    editingSectionTitle.value[index] = false
-}
-
-const cancelEditingTitle = (index) => {
-    props.resumeData.customSections[index].title = props.resumeData.customSections[index].title
-    editingSectionTitle.value[index] = false
 }
 
 const moveCustomSection = (index, direction) => {
@@ -352,6 +690,27 @@ const cloneCustomSection = (index) => {
         title: `${sectionToClone.title} (Copy)`
     }
     props.resumeData.customSections.splice(index + 1, 0, clonedSection)
+}
+
+const getCustomSectionPreview = (content) => {
+    if (!content) return '';
+
+    // Strip HTML tags and get plain text
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = content;
+    const plainText = tempDiv.textContent || tempDiv.innerText || '';
+
+    // Return first 80 characters with ellipsis if longer
+    return plainText.length > 80 ? plainText.substring(0, 80) + '...' : plainText;
+}
+
+const getPositionTooltipText = (position) => {
+    if (position === 'sidebar') {
+        return 'Move to main content';
+    } else if (position === 'main') {
+        return 'Move to sidebar';
+    }
+    return '';
 }
 </script>
 
