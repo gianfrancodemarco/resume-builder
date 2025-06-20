@@ -57,9 +57,25 @@
                         <div class="feature-card">
                             <div class="feature-icon">🎨</div>
                             <div class="feature-content">
-                                <h3 class="feature-title">Professional Templates</h3>
+                                <h3 class="feature-title">
+                                    Professional Templates
+                                    <span class="coming-soon-badge">Coming Soon</span>
+                                </h3>
                                 <p class="feature-description">Choose from multiple templates designed for different
                                     industries</p>
+                            </div>
+                        </div>
+
+                        <div class="feature-card guide-card">
+                            <div class="feature-icon">📚</div>
+                            <div class="feature-content">
+                                <h3 class="feature-title">CV Writing Guide</h3>
+                                <p class="feature-description">Learn how to write an outstanding CV with Guido's
+                                    comprehensive guide for developers</p>
+                                <a href="https://github.com/GuidoPenta/galactic-CV-guide-for-developers/blob/main/docs/english.md"
+                                    target="_blank" class="guide-link">
+                                    Read the Guide →
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -195,8 +211,10 @@ onMounted(() => {
     min-height: 100vh;
     width: 100%;
     position: relative;
-    overflow: hidden;
+    overflow-x: hidden;
     background: #0a0a0a;
+    display: flex;
+    flex-direction: column;
 }
 
 /* Background Animation */
@@ -267,10 +285,12 @@ onMounted(() => {
 .content-wrapper {
     position: relative;
     z-index: 2;
-    min-height: 100vh;
+    flex: 1;
     display: flex;
     flex-direction: column;
     color: #ffffff;
+    justify-content: space-between;
+    min-height: 100vh;
 }
 
 /* Hero Section */
@@ -278,22 +298,23 @@ onMounted(() => {
     flex: 1;
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 4rem;
+    gap: 3rem;
     align-items: center;
-    padding: 4rem;
+    padding: 2rem 4rem;
     max-width: 1400px;
     margin: 0 auto;
     width: 100%;
+    margin-bottom: 1rem;
 }
 
 .hero-content {
     display: flex;
     flex-direction: column;
-    gap: 2rem;
+    gap: 1.5rem;
 }
 
 .hero-title {
-    font-size: 3.5rem;
+    font-size: 3rem;
     font-weight: 800;
     line-height: 1.1;
     margin: 0;
@@ -307,15 +328,15 @@ onMounted(() => {
 }
 
 .hero-description {
-    font-size: 1.25rem;
-    line-height: 1.6;
+    font-size: 1.1rem;
+    line-height: 1.5;
     color: rgba(255, 255, 255, 0.8);
     margin: 0;
 }
 
 .typing-container {
-    min-height: 2rem;
-    font-size: 1.1rem;
+    min-height: 1.5rem;
+    font-size: 1rem;
     font-weight: 500;
     color: rgba(255, 255, 255, 0.9);
     font-style: italic;
@@ -339,7 +360,7 @@ onMounted(() => {
 
 .cta-buttons {
     display: flex;
-    margin-top: 1rem;
+    margin-top: 0.5rem;
 }
 
 .primary-btn {
@@ -347,8 +368,8 @@ onMounted(() => {
     border-radius: 12px !important;
     font-weight: 600 !important;
     text-transform: none !important;
-    padding: 0 2.5rem !important;
-    height: 3.5rem !important;
+    padding: 0 2rem !important;
+    height: 3rem !important;
     transition: all 0.3s ease !important;
 }
 
@@ -364,21 +385,26 @@ onMounted(() => {
 /* Features Grid */
 .features-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
     gap: 1.5rem;
-    margin-top: 2rem;
+    margin: 1rem auto 1rem auto;
+    align-items: stretch;
+    max-width: 1000px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .feature-card {
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 16px;
-    padding: 1.5rem;
+    padding: 1rem;
     backdrop-filter: blur(10px);
     transition: all 0.3s ease;
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 0.5rem;
+    height: 100%;
 }
 
 .feature-card:hover {
@@ -389,28 +415,60 @@ onMounted(() => {
 }
 
 .feature-icon {
-    font-size: 2rem;
+    font-size: 1.5rem;
     width: fit-content;
 }
 
 .feature-content {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.4rem;
+    flex: 1;
 }
 
 .feature-title {
-    font-size: 1.1rem;
+    font-size: 1rem;
     font-weight: 600;
     color: #ffffff;
     margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.coming-soon-badge {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: #ffffff;
+    font-size: 0.6rem;
+    font-weight: 600;
+    padding: 0.15rem 0.5rem;
+    border-radius: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    animation: pulse-badge 2s ease-in-out infinite;
+}
+
+@keyframes pulse-badge {
+
+    0%,
+    100% {
+        opacity: 0.8;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scale(1.05);
+    }
 }
 
 .feature-description {
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     color: rgba(255, 255, 255, 0.7);
-    line-height: 1.5;
+    line-height: 1.3;
     margin: 0;
+    flex: 1;
 }
 
 /* Hero Visual */
@@ -601,18 +659,24 @@ onMounted(() => {
     font-size: 0.9rem;
 }
 
+.guide-icon {
+    font-size: 0.9rem;
+}
+
 /* Responsive Design */
 @media (max-width: 1200px) {
     .hero-section {
         grid-template-columns: 1fr;
         text-align: center;
-        gap: 3rem;
-        padding: 3rem 2rem;
+        gap: 2rem;
+        padding: 2rem;
+        margin-bottom: 1rem;
     }
 
     .features-grid {
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(2, 1fr);
         gap: 1rem;
+        margin: 1rem auto;
     }
 
     .cta-buttons {
@@ -622,31 +686,57 @@ onMounted(() => {
 
 @media (max-width: 768px) {
     .hero-title {
-        font-size: 2.5rem;
+        font-size: 2.2rem;
     }
 
     .hero-description {
-        font-size: 1.1rem;
+        font-size: 1rem;
     }
 
     .primary-btn {
         width: 100%;
-        max-width: 300px;
+        max-width: 280px;
+        height: 2.8rem !important;
     }
 
     .features-grid {
         grid-template-columns: 1fr;
         gap: 1rem;
+        margin: 1rem auto;
     }
 
     .feature-card {
-        padding: 1.25rem;
+        padding: 1rem;
         text-align: center;
+        height: 100%;
+        align-items: center;
     }
 
     .feature-icon {
         font-size: 1.5rem;
         align-self: center;
+    }
+
+    .feature-content {
+        align-items: center;
+        text-align: center;
+        width: 100%;
+    }
+
+    .feature-title {
+        justify-content: center;
+        text-align: center;
+        width: 100%;
+    }
+
+    .guide-link {
+        align-self: center !important;
+        margin-top: auto;
+        justify-self: center;
+        display: flex;
+        justify-content: center;
+        width: 100%;
+        text-align: center;
     }
 
     .hero-visual {
@@ -654,62 +744,130 @@ onMounted(() => {
     }
 
     .footer {
-        padding: 1.5rem 2rem;
+        padding: 1rem 2rem;
+        position: relative;
+        bottom: 0;
+        width: 100%;
     }
 
     .footer-content {
         flex-direction: column;
-        gap: 1rem;
+        gap: 0.8rem;
         text-align: center;
     }
 }
 
 @media (max-width: 480px) {
     .hero-section {
-        padding: 2rem 1rem;
+        padding: 1.5rem 1rem;
+        margin-bottom: 0.5rem;
     }
 
     .hero-title {
-        font-size: 2rem;
+        font-size: 1.8rem;
     }
 
     .hero-description {
-        font-size: 1rem;
+        font-size: 0.9rem;
     }
 
     .typing-container {
-        font-size: 1rem;
+        font-size: 0.9rem;
+        min-height: 1.2rem;
+    }
+
+    .features-grid {
+        margin: 0.5rem auto;
     }
 
     .feature-card {
-        padding: 1rem;
+        padding: 0.8rem;
         text-align: center;
+        align-items: center;
     }
 
     .feature-icon {
-        font-size: 1.5rem;
+        font-size: 1.3rem;
         align-self: center;
     }
 
+    .feature-content {
+        align-items: center;
+        text-align: center;
+        width: 100%;
+    }
+
     .feature-title {
-        font-size: 1rem;
+        font-size: 0.9rem;
+        justify-content: center;
+        text-align: center;
+        width: 100%;
     }
 
     .feature-description {
-        font-size: 0.85rem;
+        font-size: 0.8rem;
+        text-align: center;
+    }
+
+    .guide-link {
+        align-self: center !important;
+        margin-top: auto;
+        justify-self: center;
+        display: flex;
+        justify-content: center;
+        width: 100%;
+        text-align: center;
     }
 
     .footer {
-        padding: 1rem;
+        padding: 0.8rem 1rem;
+        position: relative;
+        bottom: 0;
+        width: 100%;
     }
 
     .footer-links {
         flex-direction: column;
-        gap: 0.5rem;
+        gap: 0.4rem;
     }
 
     .footer-separator {
         display: none;
     }
+}
+
+.guide-card {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+    border: 1px solid rgba(102, 126, 234, 0.2);
+}
+
+.guide-card:hover {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.15), rgba(118, 75, 162, 0.15));
+    border-color: rgba(102, 126, 234, 0.3);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.2);
+}
+
+.guide-link {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.8rem;
+    margin-top: auto;
+    padding: 0.3rem 0.6rem;
+    background: rgba(102, 126, 234, 0.1);
+    border-radius: 6px;
+    border: 1px solid rgba(102, 126, 234, 0.2);
+    transition: all 0.3s ease;
+    display: inline-block;
+    width: fit-content;
+    align-self: flex-start;
+}
+
+.guide-link:hover {
+    background: rgba(102, 126, 234, 0.2);
+    border-color: rgba(102, 126, 234, 0.4);
+    color: #ffffff;
+    transform: translateY(-1px);
 }
 </style>
