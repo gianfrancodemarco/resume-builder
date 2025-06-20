@@ -2,16 +2,24 @@
     <v-app>
         <v-main>
             <div class="editor-content" :class="{ 'mobile-view': isMobile }">
-                <div class="editor-col" :style="isMobile ? { width: '100%' } : { width: `${editorWidth}%` }">
-                    <ResumeEditor v-model:resume-data="resumeData" v-model:style="resumeStyle" @save="handleFormSave"
-                        @change="handleFormChange" :is-mobile="isMobile" />
+                <!-- Lateral Menu -->
+                <LateralMenu v-model:active-tab="activeTab" :custom-sections="resumeData.customSections"
+                    :handleShowAll="handleShowAllTooltips" :handleShowTooltipsStart="handleShowTooltipsStart"
+                    :handleShowTooltipsEnd="handleShowTooltipsEnd" :handleZoomIn="handleZoomIn"
+                    :handleZoomOut="handleZoomOut" :handleExportJSON="handleExportJSON"
+                    :handleImportJSON="handleImportJSON" :handleDownloadPDF="handleDownloadPDF"
+                    :handleDownloadHTML="handleDownloadHTML" :handleConvertCV="handleConvertCVButtonClick"
+                    :handleHome="handleHome" @scroll-to-section="handleScrollToSection"
+                    @update:active-tab="activeTab = $event" />
+
+                <div class="editor-col" :style="isMobile ? { width: '100%' } : { width: '35%' }">
+                    <ResumeEditor v-model:resume-data="resumeData" v-model:style="resumeStyle"
+                        v-model:active-tab="activeTab" @save="handleFormSave" @change="handleFormChange"
+                        :is-mobile="isMobile" />
                 </div>
-                <div v-if="!isMobile" class="resize-handle" @mousedown.prevent="startResize"
-                    @touchstart.prevent="startResize" @touchmove.prevent="handleResize" @touchend.prevent="stopResize">
-                </div>
-                <div class="preview-col" :class="{ 'hidden': isMobile }"
-                    :style="!isMobile ? { width: `${100 - editorWidth}%` } : {}">
-                    <div class="preview-container">
+                <div class="preview-col" :class="{ 'hidden': isMobile }" :style="!isMobile ? { width: '65%' } : {}">
+                    <div class="preview-container"
+                        :style="{ transform: `scale(${zoomLevel / 100})`, transformOrigin: 'top center' }">
                         <div class="preview-header"></div>
                         <ResumePreview :resume-data="resumeData" :style="resumeStyle"
                             :sidebar-position="resumeStyle.spacing.sidebarLeft ? 'left' : 'right'" />
@@ -23,11 +31,6 @@
         <!-- Hidden file input for JSON import -->
         <input type="file" ref="fileInput" style="display: none" accept=".json" @change="handleFileUpload" />
 
-        <!-- Collapsible Menu - show on both mobile and desktop -->
-        <CollapsibleMenu :handleExportJSON="handleExportJSON" :handleImportJSON="handleImportJSON"
-            :handleDownloadPDF="handleDownloadPDF" :handleDownloadHTML="handleDownloadHTML"
-            :handleConvertCV="handleConvertCVButtonClick" />
-
         <!-- Convert CV Dialog -->
         <ConvertCVDialog :dialog="showConvertDialog" :models="availableModels" :loading="isConverting"
             :handleConvert="handleConvert" @close="showConvertDialog = false" />
@@ -38,17 +41,19 @@
 </template>
 
 <script setup>
-import CollapsibleMenu from '@/components/EditorPage/CollapsibleMenu.vue'
+import LateralMenu from '@/components/EditorPage/LateralMenu.vue'
 import ConvertCVDialog from '@/components/EditorPage/ConvertCVDialog.vue'
 import ResumeEditor from '@/components/EditorPage/ResumeEditor.vue'
 import ResumePreview from '@/components/EditorPage/ResumePreview.vue'
 import { CVConversionService } from '@/services/CVConversionService'
 import { ExporterService } from '@/services/ExporterService'
 import { ResumeData, ResumeService, ResumeStyleClass } from '@/services/ResumeService'
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, nextTick, watch } from 'vue'
 import { useDisplay } from 'vuetify'
+import { useRouter } from 'vue-router'
 
 const { mobile } = useDisplay()
+const router = useRouter()
 
 // Replace the resumeData ref with the ResumeData factory
 const resumeData = ref(ResumeData.createDefault())
@@ -56,11 +61,15 @@ const resumeData = ref(ResumeData.createDefault())
 // Initialize the style with the class instance
 const resumeStyle = ref(ResumeStyleClass.createDefault())
 
+// Active Tab State
+const activeTab = ref('info')
+
+// Zoom and tooltip state
+const zoomLevel = ref(100)
+const showAllTooltips = ref(false)
+
 const fileInput = ref(null)
 const hasUnsavedChanges = ref(false)
-const editorWidth = ref(35)
-const editorHeight = ref(50)
-const isResizing = ref(false)
 
 const isMobile = computed(() => mobile.value)
 const alertMessage = ref({
@@ -88,31 +97,13 @@ const hideAlert = () => {
 
 // Add event listener for page unload
 onMounted(async () => {
-    // Load available models
     await loadAvailableModels()
-
     window.addEventListener('beforeunload', handleBeforeUnload)
-    window.addEventListener('mousemove', handleResize)
-    window.addEventListener('touchmove', handleResize)
-    window.addEventListener('mouseup', stopResize)
-    window.addEventListener('touchend', stopResize)
-
-    // Set initial scale to 75%
-    const printableArea = document.getElementById('printable-area')
-    if (printableArea) {
-        printableArea.style.transform = 'scale(0.75)'
-        printableArea.style.transformOrigin = 'center top'
-        printableArea.style.margin = '0 auto'
-    }
 })
 
 // Remove event listener when component is destroyed
 onBeforeUnmount(() => {
     window.removeEventListener('beforeunload', handleBeforeUnload)
-    window.removeEventListener('mousemove', handleResize)
-    window.removeEventListener('touchmove', handleResize)
-    window.removeEventListener('mouseup', stopResize)
-    window.removeEventListener('touchend', stopResize)
 })
 
 // Handle beforeunload event
@@ -221,51 +212,6 @@ const handleDownloadHTML = async () => {
     }
 }
 
-// Resize handlers
-const startResize = (e) => {
-    isResizing.value = true
-    e.preventDefault()
-}
-
-const handleResize = (e) => {
-    if (!isResizing.value) return
-
-    const container = document.querySelector('.editor-content')
-    if (!container) return
-
-    // Calculate scale based on editor width - inverse relationship
-    const printableArea = document.getElementById('printable-area')
-    if (printableArea) {
-        const scale = 0.75 * (1 - (editorWidth.value - 35) / 100) // Decrease scale as editor width increases
-        printableArea.style.transform = `scale(${Math.max(0.35, scale)})`
-        printableArea.style.transformOrigin = 'center top'
-    }
-
-    if (isMobile.value) {
-        // Handle vertical resize for mobile
-        const containerRect = container.getBoundingClientRect()
-        const clientY = e.clientY || (e.touches && e.touches[0].clientY)
-
-        if (clientY) {
-            const newHeight = ((clientY - containerRect.top) / containerRect.height) * 100
-            editorHeight.value = Math.min(Math.max(newHeight, 20), 80) // Limit between 20% and 80%
-        }
-    } else {
-        // Handle horizontal resize for desktop
-        const containerRect = container.getBoundingClientRect()
-        const clientX = e.clientX || (e.touches && e.touches[0].clientX)
-
-        if (clientX) {
-            const newWidth = ((clientX - containerRect.left) / containerRect.width) * 100
-            editorWidth.value = Math.max(35, Math.min(newWidth, 50)) // Minimum 35%, maximum 60%
-        }
-    }
-}
-
-const stopResize = () => {
-    isResizing.value = false
-}
-
 // Convert CV Dialog State
 const showConvertDialog = ref(false)
 const availableModels = ref([])
@@ -303,6 +249,67 @@ const handleConvert = async ({ file, apiKey, model }) => {
         isConverting.value = false
     }
 }
+
+const handleScrollToSection = (section) => {
+    // Find the editor content area
+    const editorContent = document.querySelector('.editor-window')
+    if (!editorContent) return
+
+    // Find the target section element using data-section attribute
+    const targetElement = editorContent.querySelector(`[data-section="${section}"]`)
+
+    if (targetElement) {
+        targetElement.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+        })
+    }
+}
+
+const handleShowAllTooltips = () => {
+    // This will be handled by mouse events in the template
+}
+
+const handleShowTooltipsStart = () => {
+    // Force show all tooltips in the lateral menu
+    const tooltipButtons = document.querySelectorAll('.lateral-menu .v-btn')
+    tooltipButtons.forEach(btn => {
+        const tooltip = btn.closest('.v-tooltip')
+        if (tooltip) {
+            // Trigger hover event to show tooltip
+            btn.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }))
+        }
+    })
+}
+
+const handleShowTooltipsEnd = () => {
+    // Force hide all tooltips in the lateral menu
+    const tooltipButtons = document.querySelectorAll('.lateral-menu .v-btn')
+    tooltipButtons.forEach(btn => {
+        const tooltip = btn.closest('.v-tooltip')
+        if (tooltip) {
+            // Trigger mouse leave event to hide tooltip
+            btn.dispatchEvent(new MouseEvent('mouseleave', { bubbles: true }))
+        }
+    })
+}
+
+const handleZoomIn = () => {
+    if (zoomLevel.value < 200) {
+        zoomLevel.value += 25
+    }
+}
+
+const handleZoomOut = () => {
+    if (zoomLevel.value > 50) {
+        zoomLevel.value -= 25
+    }
+}
+
+const handleHome = () => {
+    // Navigate to home page
+    router.push('/')
+}
 </script>
 
 <style scoped>
@@ -318,16 +325,20 @@ const handleConvert = async ({ file, apiKey, model }) => {
     display: flex;
     position: relative;
     overflow: hidden;
-    background-color: #f5f5f5;
+    background: linear-gradient(135deg, rgb(var(--v-theme-background)) 0%, rgb(var(--v-theme-surface)) 100%);
     height: 100vh;
+    width: 100%;
+    max-width: 100vw;
 }
 
 .editor-col {
-    transition: all 0.2s ease;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     flex-shrink: 0;
     height: 100%;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
+    min-width: 0;
+    flex: 1;
 }
 
 .preview-col {
@@ -335,6 +346,9 @@ const handleConvert = async ({ file, apiKey, model }) => {
     height: 100%;
     overflow: auto;
     transition: width 0.2s ease;
+    flex-shrink: 0;
+    min-width: 0;
+    background-color: rgb(var(--v-theme-surface));
 }
 
 .preview-col.hidden {
@@ -344,33 +358,6 @@ const handleConvert = async ({ file, apiKey, model }) => {
     width: 0;
     height: 0;
     overflow: hidden;
-}
-
-.resize-handle {
-    width: 8px;
-    background: transparent;
-    cursor: col-resize;
-    position: relative;
-    z-index: 10;
-    flex-shrink: 0;
-    touch-action: none;
-    transition: background-color 0.2s ease;
-}
-
-.resize-handle:hover,
-.resize-handle:active {
-    background: rgba(0, 0, 0, 0.05);
-}
-
-.resize-handle::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 2px;
-    height: 24px;
-    background: rgba(0, 0, 0, 0.1);
 }
 
 :deep(.v-app-bar) {
@@ -384,30 +371,34 @@ const handleConvert = async ({ file, apiKey, model }) => {
 }
 
 :deep(.v-navigation-drawer) {
-    background-color: #fff !important;
-    border-right: 1px solid rgba(0, 0, 0, 0.06);
+    background-color: rgb(var(--v-theme-surface)) !important;
+    border-right: 1px solid rgb(var(--v-theme-editor-border));
 }
 
 :deep(.v-list-item) {
     min-height: 44px;
-    border-radius: 6px;
-    margin: 2px 8px;
+    border-radius: 8px;
+    margin: 4px 8px;
     transition: all 0.2s ease;
 }
 
 :deep(.v-list-item:hover) {
-    background-color: rgba(var(--v-theme-primary), 0.04);
+    background-color: rgba(var(--v-theme-primary), 0.1);
+}
+
+:deep(.v-list-item--active) {
+    background-color: rgba(var(--v-theme-primary), 0.2);
+    border-left: 3px solid rgb(var(--v-theme-primary));
 }
 
 :deep(.v-list-item-title) {
     font-size: 0.9rem;
     font-weight: 500;
-    color: rgba(0, 0, 0, 0.8);
 }
 
 :deep(.v-icon) {
     font-size: 1.2rem;
-    opacity: 0.8;
+    opacity: 0.9;
 }
 
 .preview-container {
@@ -417,6 +408,7 @@ const handleConvert = async ({ file, apiKey, model }) => {
     display: flex;
     flex-direction: column;
     align-items: center;
+    transition: transform 0.3s ease;
 }
 
 .preview-header {
@@ -434,5 +426,41 @@ const handleConvert = async ({ file, apiKey, model }) => {
     z-index: 1000;
     min-width: 500px;
     max-width: 800px;
+}
+
+.tab-switcher {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    background-color: rgb(var(--v-theme-surface));
+    border-right: 1px solid rgb(var(--v-theme-editor-border));
+    padding: 12px 8px;
+    width: 56px;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: flex-start;
+    padding-top: 20px;
+}
+
+.tab-btn {
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 6px !important;
+    transition: all 0.2s ease;
+    cursor: pointer !important;
+}
+
+.tab-btn.active {
+    background-color: rgba(var(--v-theme-primary), 0.1) !important;
+    color: rgb(var(--v-theme-primary)) !important;
+}
+
+.tab-btn:hover {
+    background-color: rgba(var(--v-theme-primary), 0.05) !important;
+}
+
+/* Zoom transition */
+.preview-container {
+    transition: transform 0.3s ease;
 }
 </style>

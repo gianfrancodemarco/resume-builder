@@ -126,7 +126,6 @@ export default {
   #printable-area {
     margin: auto;
     width: 210mm;
-    padding-bottom: 20px;
     background-color: #f5f5f5;
   }
 }

@@ -1,23 +1,16 @@
 <template>
     <div class="style-editor">
-        <v-tabs v-model="activeTab" color="primary" class="style-tabs mb-4">
-            <v-tab value="colors">
-                <v-icon icon="mdi-palette" class="mr-2" />
-                Colors
-            </v-tab>
-            <v-tab value="typography">
-                <v-icon icon="mdi-format-font" class="mr-2" />
-                Typography
-            </v-tab>
-            <v-tab value="spacing">
-                <v-icon icon="mdi-format-line-spacing" class="mr-2" />
-                Spacing
-            </v-tab>
-        </v-tabs>
-
-        <v-window v-model="activeTab">
-            <v-window-item value="colors">
-                <div class="d-flex flex-column gap-4 pa-4">
+        <!-- Colors Section -->
+        <div class="editor-section" data-section="colors">
+            <div class="section-header">
+                <div class="d-flex align-center w-100">
+                    <span class="section-title">
+                        <v-icon icon="ph-palette" class="mr-2" /> Colors
+                    </span>
+                </div>
+            </div>
+            <div class="section-content">
+                <div class="d-flex flex-column gap-4">
                     <div v-for="(color, key) in colorFields" :key="key" class="color-field">
                         <div class="d-flex align-center justify-space-between mb-2">
                             <span class="text-subtitle-2">{{ color.label }}</span>
@@ -27,7 +20,7 @@
                                     <template v-slot:activator="{ props }">
                                         <div class="color-preview" v-bind="props"
                                             :style="{ backgroundColor: styleData.colors[key] }">
-                                            <v-icon icon="mdi-pencil" size="small" class="edit-icon"></v-icon>
+                                            <v-icon icon="ph-pencil-simple" size="small" class="edit-icon"></v-icon>
                                         </div>
                                     </template>
                                     <v-card class="color-picker-card">
@@ -45,10 +38,20 @@
                         </div>
                     </div>
                 </div>
-            </v-window-item>
+            </div>
+        </div>
 
-            <v-window-item value="typography">
-                <div class="d-flex flex-column gap-4 pa-4">
+        <!-- Typography Section -->
+        <div class="editor-section" data-section="typography">
+            <div class="section-header">
+                <div class="d-flex align-center w-100">
+                    <span class="section-title">
+                        <v-icon icon="ph-text-t" class="mr-2" /> Typography
+                    </span>
+                </div>
+            </div>
+            <div class="section-content">
+                <div class="d-flex flex-column gap-4">
                     <div>
                         <div class="text-subtitle-2 mb-2">Heading Font</div>
                         <v-select v-model="styleData.typography.headingFont" :items="fontOptions" variant="outlined"
@@ -57,7 +60,7 @@
                                 <span :style="{ fontFamily: item.value }">{{ item.value }}</span>
                             </template>
                             <template v-slot:item="{ props: itemProps, item }">
-                                <v-list-item v-bind="itemProps" :style="{ fontFamily: item.value }"/>
+                                <v-list-item v-bind="itemProps" :style="{ fontFamily: item.value }" />
                             </template>
                         </v-select>
                     </div>
@@ -75,43 +78,56 @@
                     </div>
                     <div>
                         <div class="text-subtitle-2 mb-2">Font Sizes</div>
-                        <v-slider v-model="styleData.typography.baseSize" label="Base Size" min="12" max="20" step="1"
-                            thumb-label class="style-slider"></v-slider>
-                        <v-slider v-model="styleData.typography.headingSize" label="Heading Size" min="16" max="32"
-                            step="1" thumb-label class="style-slider"></v-slider>
+                        <div class="slider-container">
+                            <div class="text-subtitle-2">Base Size</div>
+                            <v-slider v-model="styleData.typography.baseSize" min="12" max="20" step="1"
+                                thumb-label></v-slider>
+                        </div>
+                        <div class="slider-container">
+                            <div class="text-subtitle-2">Heading Size</div>
+                            <v-slider v-model="styleData.typography.headingSize" min="16" max="32" step="1"
+                                thumb-label></v-slider>
+                        </div>
                     </div>
                 </div>
-            </v-window-item>
+            </div>
+        </div>
 
-            <v-window-item value="spacing">
-                <div class="d-flex flex-column gap-4 pa-4">
-                    <div>
-                        <div class="text-subtitle-2 mb-2">Section Spacing</div>
-                        <v-slider v-model="styleData.spacing.section" label="Section Gap" min="12" max="48" step="4"
-                            thumb-label class="style-slider"></v-slider>
+        <!-- Spacing Section -->
+        <div class="editor-section" data-section="spacing">
+            <div class="section-header">
+                <div class="d-flex align-center w-100">
+                    <span class="section-title">
+                        <v-icon icon="ph-arrows-out-line-vertical" class="mr-2" /> Spacing
+                    </span>
+                </div>
+            </div>
+            <div class="section-content">
+                <div class="d-flex flex-column gap-4">
+                    <div class="slider-container">
+                        <div class="text-subtitle-2">Section Spacing</div>
+                        <v-slider v-model="styleData.spacing.section" min="12" max="48" step="4" thumb-label></v-slider>
                     </div>
-                    <div>
-                        <div class="text-subtitle-2 mb-2">Content Spacing</div>
-                        <v-slider v-model="styleData.spacing.content" label="Content Gap" min="0" max="24" step="2"
-                            thumb-label class="style-slider"></v-slider>
+                    <div class="slider-container">
+                        <div class="text-subtitle-2">Content Spacing</div>
+                        <v-slider v-model="styleData.spacing.content" min="0" max="24" step="2" thumb-label></v-slider>
                     </div>
-                    <div>
-                        <div class="text-subtitle-2 mb-2">Sidebar Width</div>
-                        <v-slider v-model="styleData.spacing.sidebarWidth" label="Width" min="200" max="400" step="10"
-                            thumb-label class="style-slider"></v-slider>
+                    <div class="slider-container">
+                        <div class="text-subtitle-2">Sidebar Width</div>
+                        <v-slider v-model="styleData.spacing.sidebarWidth" min="200" max="400" step="10"
+                            thumb-label></v-slider>
                     </div>
                     <div>
                         <v-switch v-model="styleData.spacing.sidebarLeft" label="Sidebar on Left" hide-details
                             density="compact" color="primary"></v-switch>
                     </div>
                 </div>
-            </v-window-item>
-        </v-window>
+            </div>
+        </div>
     </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
 import { ResumeStyle2ColumnsV1 } from '@/models/ResumeStyle/ResumeStyle2ColumnsV1'
 
 const props = defineProps({
@@ -122,8 +138,6 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['update:style-data', 'change'])
-
-const activeTab = ref('colors')
 
 const fontOptions = ResumeStyle2ColumnsV1.FONT_OPTIONS
 
@@ -156,36 +170,12 @@ const validateHex = (key) => {
 }
 </script>
 
+<style scoped src="./ResumeEditorStyles.css"></style>
+
 <style scoped>
-.style-editor {
-    padding: 16px;
-}
-
-.style-tabs {
-    position: sticky;
-    top: 0;
-    z-index: 2;
-    background-color: white;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-}
-
-:deep(.v-window) {
-    background: transparent;
-}
-
-:deep(.v-window__container) {
-    height: auto !important;
-}
-
-:deep(.v-window-item) {
-    height: auto !important;
-}
-
 .color-field {
-    background-color: #f8fafc;
     border-radius: 12px;
     padding: 12px 16px;
-    border: 1px solid rgba(0, 0, 0, 0.08);
 }
 
 .color-preview {
@@ -206,99 +196,150 @@ const validateHex = (key) => {
     border-color: rgba(0, 0, 0, 0.16);
 }
 
-.edit-icon {
-    opacity: 0;
-    color: white;
-    transition: opacity 0.2s ease-in-out;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+.color-preview .edit-icon {
+    color: rgba(0, 0, 0, 0.6);
+    opacity: 0.7;
 }
 
 .color-preview:hover .edit-icon {
     opacity: 1;
 }
 
+.color-hex {
+    color: rgb(var(--v-theme-editor-text-secondary));
+    font-family: monospace;
+    font-size: 0.9rem;
+}
+
 .color-picker-card {
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important;
+    max-width: 300px;
+    background-color: rgb(var(--v-theme-surface)) !important;
+    border: 1px solid rgb(var(--v-theme-editor-border)) !important;
+}
+
+.color-input {
+    font-family: monospace;
+}
+
+/* Override Vuetify slider defaults completely */
+:deep(.v-slider) {
+    margin-bottom: 16px;
+    min-height: 40px;
+}
+
+:deep(.v-slider .v-slider-track) {
+    height: 4px !important;
+    border-radius: 2px !important;
 }
 
 :deep(.v-slider .v-slider-track__fill) {
     background-color: rgb(var(--v-theme-primary)) !important;
+    border-radius: 2px !important;
+    opacity: 1 !important;
+    visibility: visible !important;
 }
 
-:deep(.v-slider .v-slider-thumb__surface) {
-    border-color: rgb(var(--v-theme-primary)) !important;
+:deep(.v-slider .v-slider-track__background) {
+    background-color: rgb(var(--v-theme-editor-border)) !important;
+    border-radius: 2px !important;
+    opacity: 1 !important;
+    visibility: visible !important;
 }
 
-:deep(.v-select .v-field) {
-    border-radius: 8px !important;
+/* Force small thumb size */
+:deep(.v-slider .v-slider-thumb) {
+    background-color: rgb(var(--v-theme-primary)) !important;
+    border: 2px solid rgb(var(--v-theme-surface)) !important;
+    width: 12px !important;
+    height: 12px !important;
+    min-width: 12px !important;
+    min-height: 12px !important;
+    max-width: 12px !important;
+    max-height: 12px !important;
+    transform: translate(-50%, -50%) !important;
 }
 
-:deep(.v-select .v-field__outline) {
-    border-color: rgba(0, 0, 0, 0.12) !important;
+:deep(.v-slider .v-slider-thumb::before) {
+    width: 12px !important;
+    height: 12px !important;
+    min-width: 12px !important;
+    min-height: 12px !important;
+    max-width: 12px !important;
+    max-height: 12px !important;
 }
 
-:deep(.v-select .v-field--focused .v-field__outline) {
-    border-color: rgb(var(--v-theme-primary)) !important;
+:deep(.v-slider .v-slider-thumb__label) {
+    background-color: rgb(var(--v-theme-primary)) !important;
+    color: white !important;
+    font-weight: 600 !important;
 }
 
-.color-pickers {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    padding: 16px;
+:deep(.v-slider .v-label) {
+    color: rgb(var(--v-theme-editor-text-primary)) !important;
+    font-weight: 500 !important;
 }
 
-.color-picker-item {
+/* Additional overrides for Vuetify's default styling */
+:deep(.v-slider .v-slider-track__background::before) {
+    background-color: rgb(var(--v-theme-editor-border)) !important;
+    opacity: 1 !important;
+}
+
+:deep(.v-slider .v-slider-track__fill::before) {
+    background-color: rgb(var(--v-theme-primary)) !important;
+    opacity: 1 !important;
+}
+
+/* Style the text labels */
+.text-subtitle-2 {
+    color: rgb(var(--v-theme-editor-text-primary)) !important;
+    font-weight: 500;
+    width: 50%;
+    display: inline-block;
+}
+
+/* Create 50/50 layout for slider containers */
+.slider-container {
     display: flex;
     align-items: center;
     gap: 16px;
+    margin-bottom: 16px;
 }
 
-.color-picker-item label {
-    min-width: 120px;
+.slider-container .text-subtitle-2 {
+    width: 50%;
+    margin-bottom: 0;
+}
+
+.slider-container .v-slider {
+    width: 50%;
+    margin-bottom: 0;
+}
+
+/* Style the switch with better visibility */
+:deep(.v-switch) {
+    margin-bottom: 16px;
+}
+
+:deep(.v-switch .v-label) {
+    color: rgb(var(--v-theme-editor-text-primary)) !important;
     font-weight: 500;
-    color: rgba(0, 0, 0, 0.87);
 }
 
-.color-hex {
-    font-size: 0.9em;
-    color: rgba(0, 0, 0, 0.6);
+:deep(.v-switch .v-selection-control__input) {
+    color: rgb(var(--v-theme-primary)) !important;
 }
 
-:deep(.v-color-picker) {
-    width: 100%;
-    max-width: 200px;
+:deep(.v-switch .v-selection-control__wrapper) {
+    background-color: rgba(0, 0, 0, 0.12) !important;
 }
 
-:deep(.v-color-picker__input) {
-    display: none;
+:deep(.v-switch .v-selection-control--dirty .v-selection-control__wrapper) {
+    background-color: rgb(var(--v-theme-primary)) !important;
 }
 
-.color-input {
-    width: 100%;
-}
-
-:deep(.color-input .v-field__input) {
-    font-size: 0.9em;
-    padding: 0 8px;
-    min-height: 32px;
-}
-
-:deep(.color-input .v-field__outline) {
-    border-color: rgba(0, 0, 0, 0.12);
-}
-
-:deep(.color-input .v-field--focused .v-field__outline) {
-    border-color: rgb(var(--v-theme-primary));
-}
-
-.style-slider {
-    max-width: 340px;
-    width: 100%;
-    margin-left: auto;
-    margin-right: auto;
-    display: block;
+:deep(.v-switch .v-selection-control__thumb) {
+    background-color: white !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 </style>

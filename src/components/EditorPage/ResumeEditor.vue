@@ -1,14 +1,5 @@
 <template>
   <div class="editor-card">
-    <v-tabs v-model="activeTab" color="primary" class="editor-tabs">
-      <v-tab value="info">
-        Info
-      </v-tab>
-      <v-tab value="style">
-        Style
-      </v-tab>
-    </v-tabs>
-
     <v-window v-model="activeTab" class="editor-window">
       <v-window-item value="info">
         <ResumeInfo v-model:resume-data="props.resumeData" :is-mobile="props.isMobile"
@@ -23,7 +14,8 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import './ResumeEditorStyles.css'
+import { ref, watch } from 'vue'
 import ResumeStyle from './ResumeStyle.vue'
 import ResumeInfo from './ResumeInfo.vue'
 
@@ -39,12 +31,26 @@ const props = defineProps({
   isMobile: {
     type: Boolean,
     required: true
+  },
+  activeTab: {
+    type: String,
+    default: 'info'
   }
 })
 
-const emit = defineEmits(['update:resumeData', 'update:style', 'save', 'change', 'preview'])
+const emit = defineEmits(['update:resumeData', 'update:style', 'save', 'change', 'preview', 'update:activeTab'])
 
-const activeTab = ref('info')
+const activeTab = ref(props.activeTab)
+
+// Watch for changes in the activeTab prop
+watch(() => props.activeTab, (newValue) => {
+  activeTab.value = newValue
+})
+
+// Watch for changes in the local activeTab and emit to parent
+watch(activeTab, (newValue) => {
+  emit('update:activeTab', newValue)
+})
 
 const updateStyle = (newStyle) => {
   emit('update:style', newStyle)
@@ -56,5 +62,3 @@ const updateResumeData = (newData) => {
   emit('change')
 }
 </script>
-
-<style scoped src="./ResumeEditorStyles.css"></style>
