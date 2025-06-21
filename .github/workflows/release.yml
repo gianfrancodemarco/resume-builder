@@ -1,0 +1,58 @@
+name: Create Release
+
+on:
+  push:
+    tags:
+      - 'v*' # Trigger on version tags like v1.0.0, v2.1.3, etc.
+
+permissions:
+    contents: read
+    pages: write
+    id-token: write
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        steps:
+          - name: Checkout
+            uses: actions/checkout@v4
+          - name: Setup Node
+            uses: actions/setup-node@v4
+            with:
+              node-version: "20"
+              cache: 'npm'
+          - name: Install dependencies
+            run: npm ci --force
+          - name: Build
+            run: npm run build
+          - name: Setup Pages
+            uses: actions/configure-pages@v4
+          - name: Upload artifact
+            uses: actions/upload-pages-artifact@v3
+            with:
+              path: './dist'
+
+    release:
+        name: Release pushed tag
+        runs-on: ubuntu-latest
+        needs: build
+        steps:
+          - name: Create release
+            env:
+                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                tag: ${{ github.ref_name }}
+            run: |
+                gh release create "$tag" \
+                    --repo="$GITHUB_REPOSITORY" \
+                    --title="${GITHUB_REPOSITORY#*/} ${tag#v}" \
+                    --generate-notes
+
+    deploy:
+        needs: release
+        environment:
+            name: github-pages
+            url: ${{ steps.deployment.outputs.page_url }}
+        runs-on: ubuntu-latest
+        steps:
+          - name: Deploy to GitHub Pages
+            uses: actions/deploy-pages@v4 
