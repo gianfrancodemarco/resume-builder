@@ -1,19 +1,24 @@
 # Resume Builder
 
-A modern, single-page resume builder application built with Vue 3 and Vuetify. Create professional resumes with a beautiful UI and export them as HTML or PDF.
+A modern, single-page resume builder application built with Vue 3 and Vuetify. Create professional resumes with a beautiful UI and export them as HTML, PDF or JSON.
 
 ![Resume Builder Screenshot](screenshot.png)
 
 ## Features
 
 - 🎨 **Modern UI**: Clean and intuitive interface built with Vuetify 3
-- 📝 **Real-time Preview**: See your changes instantly
+- 📝 **Real-time Preview**: See your changes instantly with live preview
 - 🔄 **Dynamic Sections**: Add, remove, and reorder sections as needed
 - 🎯 **Customizable Details**: Flexible detail fields with link support
 - 🎭 **Style Customization**: Customize colors, typography, and layout
-- 💾 **Export Options**: Download as HTML or PDF
+- 💾 **Multiple Export Formats**: Download as HTML, PDF, or JSON
 - 🔒 **Privacy First**: Everything stays in your browser
 - 💾 **Save/Load**: Import and export your resume data as JSON
+- 🤖 **AI CV Conversion**: Convert existing CVs using AI models
+- 🔍 **Zoom Controls**: Zoom in/out for better editing experience
+- 📱 **Mobile Responsive**: Works seamlessly on desktop and mobile devices
+- 🎯 **Section Navigation**: Quick navigation between resume sections
+- 📚 **CV Writing Guide**: Access to comprehensive CV writing resources
 
 ## Getting Started
 
@@ -26,7 +31,7 @@ A modern, single-page resume builder application built with Vue 3 and Vuetify. C
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/resume-builder.git
+   git clone https://github.com/gianfrancodemarco/resume-builder.git
    cd resume-builder
    ```
 
@@ -70,23 +75,45 @@ A modern, single-page resume builder application built with Vue 3 and Vuetify. C
    - Include education history
    - Add graduation marks and thesis information
 
+5. **Custom Sections**
+   - Create additional sections as needed
+   - Organize content in a structured way
+
+### Editor Features
+
+- **Lateral Menu**: Quick access to all sections and export options
+- **Real-time Preview**: See changes instantly in the preview panel
+- **Zoom Controls**: Adjust zoom level for better editing experience
+- **Section Navigation**: Jump to specific sections quickly
+- **Mobile View**: Responsive design that adapts to mobile devices
+
 ### Customizing Style
 
 - Choose from different color schemes
-- Customize typography
+- Customize typography and fonts
 - Adjust spacing and layout
-- Toggle sidebar position
+- Toggle sidebar position (left/right)
+- Modify background colors and borders
 
-### Exporting
+### Exporting Options
 
 - **HTML**: Download a clean HTML version
-- **PDF**: Export as PDF for printing
-- **JSON**: Save your data for later editing
+- **PDF**: Export as PDF for printing and sharing
+- **JSON**: Save your data for later editing and backup
+
+### AI CV Conversion
+
+- Upload existing CV files (PDF, DOC, etc.)
+- Convert to structured resume format using AI
+- Support for multiple AI models
+- Automatic data extraction and formatting
 
 ## Technologies Used
 
 - [Vue 3](https://vuejs.org/) - Progressive JavaScript framework
 - [Vuetify 3](https://vuetifyjs.com/) - Material Design component framework
+- [TipTap](https://tiptap.dev/) - Rich text editor
+- [Phosphor Icons](https://phosphoricons.com/) - Icon library
 
 ## Contributing
 
@@ -104,5 +131,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Acknowledgments
 
-- Icons by [Material Design Icons](https://materialdesignicons.com/)
+- Icons by [Phosphor Icons](https://phosphoricons.com/)
+- CV Writing Guide by [Guido Penta](https://github.com/GuidoPenta/galactic-CV-guide-for-developers)
 - Inspiration from modern resume templates
