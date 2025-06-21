@@ -119,8 +119,7 @@
                     </div>
                     <div>
                         <v-switch v-model="styleData.spacing.sidebarLeft" :disabled="!isSidebarPresent"
-                            label="Sidebar on Left" hide-details
-                            density="compact" color="primary"></v-switch>
+                            label="Sidebar on Left" hide-details density="compact" color="primary"></v-switch>
                     </div>
                 </div>
             </div>
@@ -129,7 +128,7 @@
 </template>
 
 <script setup>
-import { ResumeStyle2ColumnsV1 } from '@/models/ResumeStyle/ResumeStyle2ColumnsV1'
+import { ResumeStyleV1 } from '@/models/ResumeStyle/ResumeStyleV1'
 import { computed } from 'vue'
 
 const props = defineProps({
@@ -141,7 +140,7 @@ const props = defineProps({
 
 const emit = defineEmits(['update:style-data', 'change'])
 
-const fontOptions = ResumeStyle2ColumnsV1.FONT_OPTIONS
+const fontOptions = ResumeStyleV1.FONT_OPTIONS
 
 const colorFields = {
     primary: { label: 'Primary Color' },

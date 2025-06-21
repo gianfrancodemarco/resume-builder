@@ -77,7 +77,7 @@ import FontFamily from '@tiptap/extension-font-family'
 import TextAlign from '@tiptap/extension-text-align'
 import FontSize from '@tiptap/extension-font-size'
 import { Node } from '@tiptap/core'
-import { ResumeStyle2ColumnsV1 } from '@/models/ResumeStyle/ResumeStyle2ColumnsV1'
+import { ResumeStyleV1 } from '@/models/ResumeStyle/ResumeStyleV1'
 
 const LanguageProficiency = Node.create({
     name: 'languageProficiency',
@@ -143,7 +143,7 @@ const LanguageProficiency = Node.create({
     }
 })
 
-const fonts = ResumeStyle2ColumnsV1.FONT_OPTIONS
+const fonts = ResumeStyleV1.FONT_OPTIONS
 const fontSizes = ['8px', '10px', '12px', '14px', '16px', '18px', '20px', '24px', '28px', '32px', '36px', '48px']
 const currentFont = ref(fonts[0])
 const currentColor = ref('#222222')
