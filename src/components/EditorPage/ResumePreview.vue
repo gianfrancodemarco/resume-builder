@@ -12,8 +12,10 @@
           </div>
 
           <div class="content">
-            <h1>{{ resumeData.personal.name || 'Your Name' }}</h1>
-            <h2 class="subtitle">{{ resumeData.personal.title }}</h2>
+            
+           <h1 v-if="resumeData.personal.visible && resumeData.personal.name">{{ resumeData.personal.name }}</h1>
+          <h2 v-if="resumeData.personal.visible && resumeData.personal.title" class="subtitle">{{ resumeData.personal.title }}</h2>
+
 
             <div class="section"
               v-if="resumeData.experiencesVisible && resumeData.experiences && resumeData.experiences.filter(e => e?.visible).length">
