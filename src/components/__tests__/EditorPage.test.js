@@ -10,11 +10,52 @@ import { ResumeService } from '@/services/ResumeService'
 import { ExporterService } from '@/services/ExporterService'
 import EditorPage from '@/views/EditorPage.vue'
 import { flushPromises } from '@vue/test-utils'
+import { vuetify } from '@/test/setup'
+import { ResumeData, ResumeStyleClass } from '@/services/ResumeService'
+
+// Mock child components to focus on EditorPage logic
+vi.mock('@/components/EditorPage/LateralMenu.vue', () => ({
+    default: {
+        name: 'LateralMenu',
+        template: '<div class="lateral-menu-mock">LateralMenu Mock</div>',
+        props: ['activeTab', 'customSections'],
+        emits: ['update:activeTab', 'scroll-to-section']
+    }
+}))
+
+vi.mock('@/components/EditorPage/ResumeEditor.vue', () => ({
+    default: {
+        name: 'ResumeEditor',
+        template: '<div class="resume-editor-mock">ResumeEditor Mock</div>',
+        props: ['resumeData', 'style', 'activeTab', 'isMobile'],
+        emits: ['update:resume-data', 'update:style', 'update:activeTab', 'save', 'change']
+    }
+}))
+
+vi.mock('@/components/EditorPage/ResumePreview.vue', () => ({
+    default: {
+        name: 'ResumePreview',
+        template: '<div class="resume-preview-mock">ResumePreview Mock</div>',
+        props: ['resumeData', 'style', 'sidebarPosition']
+    }
+}))
+
+vi.mock('@/components/EditorPage/ConvertCVDialog.vue', () => ({
+    default: {
+        name: 'ConvertCVDialog',
+        template: '<div class="convert-cv-dialog-mock">ConvertCVDialog Mock</div>',
+        props: ['dialog', 'models', 'loading'],
+        emits: ['close']
+    }
+}))
 
 describe('EditorPage', () => {
     let wrapper
     let router
     let vuetify
+
+    const mockResumeData = ResumeData.createDefault()
+    const mockResumeStyle = ResumeStyleClass.createDefault()
 
     beforeEach(() => {
         // Create a fresh Vuetify instance for each test
@@ -57,9 +98,17 @@ describe('EditorPage', () => {
         vi.spyOn(ResumeService, 'exportToJSON').mockImplementation(() => new Blob(['test']))
         vi.spyOn(ExporterService, 'getFilename').mockImplementation(() => 'test.json')
 
+        // Mock router
+        const mockRouter = {
+            push: vi.fn()
+        }
+
         wrapper = mount(EditorPage, {
             global: {
                 plugins: [router, vuetify],
+                mocks: {
+                    $router: mockRouter
+                },
                 stubs: {
                     'v-app': true,
                     'v-main': true,
@@ -70,9 +119,77 @@ describe('EditorPage', () => {
                     'v-expansion-panel-text': true,
                     'v-tabs': true,
                     'v-tab': true,
-                    'v-slide-group': true
+                    'v-slide-group': true,
+                    'LateralMenu': {
+                        template: '<div class="lateral-menu-mock">LateralMenu Mock</div>',
+                        props: ['activeTab', 'customSections'],
+                        emits: ['update:activeTab', 'scroll-to-section']
+                    },
+                    'ResumeEditor': {
+                        template: '<div class="resume-editor-mock">ResumeEditor Mock</div>',
+                        props: ['resumeData', 'style', 'activeTab', 'isMobile'],
+                        emits: ['update:resume-data', 'update:style', 'update:activeTab', 'save', 'change']
+                    },
+                    'ResumePreview': {
+                        template: '<div class="resume-preview-mock">ResumePreview Mock</div>',
+                        props: ['resumeData', 'style', 'sidebarPosition']
+                    },
+                    'ConvertCVDialog': {
+                        template: '<div class="convert-cv-dialog-mock">ConvertCVDialog Mock</div>',
+                        props: ['dialog', 'models', 'loading'],
+                        emits: ['close']
+                    }
                 }
             }
+        })
+    })
+
+    describe('Component Mounting', () => {
+        it('mounts successfully', () => {
+            expect(wrapper.exists()).toBe(true)
+        })
+
+        it('initializes with default resume data and style', () => {
+            expect(wrapper.vm.resumeData).toBeDefined()
+            expect(wrapper.vm.resumeStyle).toBeDefined()
+        })
+    })
+
+    describe('Zoom Functionality', () => {
+        it('initializes with 100% zoom level', () => {
+            expect(wrapper.vm.zoomLevel).toBe(100)
+        })
+
+        it('increases zoom level when zoom in is called', async () => {
+            const initialZoom = wrapper.vm.zoomLevel
+            wrapper.vm.handleZoomIn()
+            await wrapper.vm.$nextTick()
+
+            expect(wrapper.vm.zoomLevel).toBe(initialZoom + 25)
+        })
+
+        it('decreases zoom level when zoom out is called', async () => {
+            const initialZoom = wrapper.vm.zoomLevel
+            wrapper.vm.handleZoomOut()
+            await wrapper.vm.$nextTick()
+
+            expect(wrapper.vm.zoomLevel).toBe(initialZoom - 25)
+        })
+
+        it('does not increase zoom beyond 200%', async () => {
+            wrapper.vm.zoomLevel = 200
+            wrapper.vm.handleZoomIn()
+            await wrapper.vm.$nextTick()
+
+            expect(wrapper.vm.zoomLevel).toBe(200)
+        })
+
+        it('does not decrease zoom below 50%', async () => {
+            wrapper.vm.zoomLevel = 50
+            wrapper.vm.handleZoomOut()
+            await wrapper.vm.$nextTick()
+
+            expect(wrapper.vm.zoomLevel).toBe(50)
         })
     })
 

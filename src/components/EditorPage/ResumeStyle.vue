@@ -114,12 +114,12 @@
                     </div>
                     <div class="slider-container">
                         <div class="text-subtitle-2">Sidebar Width</div>
-                        <v-slider v-model="styleData.spacing.sidebarWidth" min="200" max="400" step="10"
+                        <v-slider v-model="styleData.spacing.sidebarWidth" min="0" max="400" step="10"
                             thumb-label></v-slider>
                     </div>
                     <div>
-                        <v-switch v-model="styleData.spacing.sidebarLeft" label="Sidebar on Left" hide-details
-                            density="compact" color="primary"></v-switch>
+                        <v-switch v-model="styleData.spacing.sidebarLeft" :disabled="!isSidebarPresent"
+                            label="Sidebar on Left" hide-details density="compact" color="primary"></v-switch>
                     </div>
                 </div>
             </div>
@@ -128,7 +128,8 @@
 </template>
 
 <script setup>
-import { ResumeStyle2ColumnsV1 } from '@/models/ResumeStyle/ResumeStyle2ColumnsV1'
+import { ResumeStyleV1 } from '@/models/ResumeStyle/ResumeStyleV1'
+import { computed } from 'vue'
 
 const props = defineProps({
     styleData: {
@@ -139,7 +140,7 @@ const props = defineProps({
 
 const emit = defineEmits(['update:style-data', 'change'])
 
-const fontOptions = ResumeStyle2ColumnsV1.FONT_OPTIONS
+const fontOptions = ResumeStyleV1.FONT_OPTIONS
 
 const colorFields = {
     primary: { label: 'Primary Color' },
@@ -168,6 +169,10 @@ const validateHex = (key) => {
     props.styleData.colors[key] = cleanValue
     emit('change')
 }
+
+const isSidebarPresent = computed(() => {
+    return props.styleData.spacing.sidebarWidth > 0
+})
 </script>
 
 <style scoped src="./ResumeEditorStyles.css"></style>

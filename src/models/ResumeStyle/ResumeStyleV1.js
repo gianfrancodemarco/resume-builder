@@ -1,4 +1,4 @@
-export class ResumeStyle2ColumnsV1 {
+export class ResumeStyleV1 {
     static VERSION = 1;
     static TEMPLATE_NAME = '2 Columns';
 
@@ -24,19 +24,27 @@ export class ResumeStyle2ColumnsV1 {
     };
 
     static SECTION_TYPES = [
-        { label: 'Text',
-value: 'text' },
-        { label: 'List',
-value: 'list' },
-        { label: 'Languages',
-value: 'languages' },
-        { label: 'Italic Text',
-value: 'italic' }
+        {
+            label: 'Text',
+            value: 'text'
+        },
+        {
+            label: 'List',
+            value: 'list'
+        },
+        {
+            label: 'Languages',
+            value: 'languages'
+        },
+        {
+            label: 'Italic Text',
+            value: 'italic'
+        }
     ]
 
     constructor(data = {}) {
-        this.version = data.version || ResumeStyle2ColumnsV1.VERSION;
-        this.templateName = data.templateName || ResumeStyle2ColumnsV1.TEMPLATE_NAME;
+        this.version = data.version || ResumeStyleV1.VERSION;
+        this.templateName = data.templateName || ResumeStyleV1.TEMPLATE_NAME;
         this.colors = {
             primary: data.colors?.primary || '#08294D',
             text: data.colors?.text || '#08294D',
@@ -66,8 +74,8 @@ value: 'italic' }
     }
 
     static createDefault() {
-        return new ResumeStyle2ColumnsV1({
-            version: ResumeStyle2ColumnsV1.VERSION,
+        return new ResumeStyleV1({
+            version: ResumeStyleV1.VERSION,
             colors: {
                 primary: '#08294D',
                 text: '#08294D',
@@ -89,9 +97,9 @@ value: 'italic' }
             },
             columns: {
                 left: ['personal',
-'education'],
+                    'education'],
                 right: ['experiences',
-'customSections']
+                    'customSections']
             }
         });
     }
@@ -109,9 +117,9 @@ value: 'italic' }
 
     static fromJSON(json) {
         if (!json || typeof json !== 'object') {
-            return new ResumeStyle2ColumnsV1();
+            return new ResumeStyleV1();
         }
-        return new ResumeStyle2ColumnsV1(json);
+        return new ResumeStyleV1(json);
     }
 
     validate() {
@@ -174,6 +182,6 @@ value: 'italic' }
     }
 
     static getVersion() {
-        return ResumeStyle2ColumnsV1.VERSION;
+        return ResumeStyleV1.VERSION;
     }
 } 

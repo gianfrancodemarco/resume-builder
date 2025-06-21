@@ -1,7 +1,7 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest'
 import { ResumeService } from '@/services/ResumeService'
 import { ResumeDataV2 } from '@/models/ResumeData/ResumeDataV2'
-import { ResumeStyle2ColumnsV1 } from '@/models/ResumeStyle/ResumeStyle2ColumnsV1'
+import { ResumeStyleV1 } from '@/models/ResumeStyle/ResumeStyleV1'
 
 describe('ResumeService', () => {
     beforeEach(() => {
@@ -33,7 +33,7 @@ describe('ResumeService', () => {
             const result = await ResumeService.loadFromFile(mockFile)
 
             expect(result.resumeData).toBeInstanceOf(ResumeDataV2)
-            expect(result.resumeStyle).toBeInstanceOf(ResumeStyle2ColumnsV1)
+            expect(result.resumeStyle).toBeInstanceOf(ResumeStyleV1)
             expect(result.resumeData.personal.name).toBe('John Doe')
             expect(result.resumeStyle.colors.primary).toBe('#000000')
         })
@@ -88,7 +88,7 @@ describe('ResumeService', () => {
                     title: 'Software Engineer'
                 }
             })
-            const resumeStyle = new ResumeStyle2ColumnsV1({
+            const resumeStyle = new ResumeStyleV1({
                 colors: {
                     primary: '#000000'
                 }

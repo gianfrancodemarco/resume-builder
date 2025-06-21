@@ -77,7 +77,7 @@ import FontFamily from '@tiptap/extension-font-family'
 import TextAlign from '@tiptap/extension-text-align'
 import FontSize from '@tiptap/extension-font-size'
 import { Node } from '@tiptap/core'
-import { ResumeStyle2ColumnsV1 } from '@/models/ResumeStyle/ResumeStyle2ColumnsV1'
+import { ResumeStyleV1 } from '@/models/ResumeStyle/ResumeStyleV1'
 
 const LanguageProficiency = Node.create({
     name: 'languageProficiency',
@@ -143,7 +143,7 @@ const LanguageProficiency = Node.create({
     }
 })
 
-const fonts = ResumeStyle2ColumnsV1.FONT_OPTIONS
+const fonts = ResumeStyleV1.FONT_OPTIONS
 const fontSizes = ['8px', '10px', '12px', '14px', '16px', '18px', '20px', '24px', '28px', '32px', '36px', '48px']
 const currentFont = ref(fonts[0])
 const currentColor = ref('#222222')
@@ -257,120 +257,4 @@ const addLanguageProficiency = () => {
 }
 </script>
 
-<style scoped>
-.tiptap-toolbar {
-    align-items: center;
-    margin-bottom: 8px;
-    background: #f8f8f8;
-    border: 1px solid #e0e0e0;
-    border-radius: 6px 6px 0 0;
-    padding: 4px 8px;
-}
-
-.tiptap-toolbar button {
-    background: none;
-    border: none;
-    padding: 4px 8px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 1rem;
-    color: #333;
-    transition: background 0.15s;
-}
-
-.tiptap-toolbar button.active {
-    background: #1976d2;
-    color: #fff;
-}
-
-.tiptap-toolbar button:hover {
-    background: #e3e3e3;
-}
-
-.toolbar-separator {
-    width: 1px;
-    height: 20px;
-    background: #e0e0e0;
-    margin: 0 6px;
-    display: inline-block;
-}
-
-.toolbar-select {
-    padding: 2px 6px;
-    border-radius: 4px;
-    border: 1px solid #ccc;
-    font-size: 1rem;
-    margin-right: 4px;
-}
-
-.toolbar-color {
-    width: 28px;
-    height: 28px;
-    border: none;
-    background: none;
-    margin-right: 4px;
-    cursor: pointer;
-}
-
-.tiptap-editor-content {
-    border: 1px solid #e0e0e0;
-    border-radius: 0 0 6px 6px;
-    padding: 12px 24px;
-    background: #fff;
-}
-
-[data-type="language-proficiency"] {
-    position: relative;
-    margin: 16px 0;
-    padding: 8px;
-    border: 1px solid #e0e0e0;
-    border-radius: 4px;
-    background: #f8f8f8;
-    cursor: pointer;
-}
-
-[data-type="language-proficiency"]:hover {
-    background: #f0f0f0;
-}
-
-.delete-language-btn {
-    position: absolute;
-    right: 8px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: none;
-    border: none;
-    color: #666;
-    font-size: 18px;
-    cursor: pointer;
-    padding: 0 4px;
-    border-radius: 4px;
-}
-
-.delete-language-btn:hover {
-    background: #e0e0e0;
-    color: #333;
-}
-
-[data-type="language-proficiency"] .language-proficiency-label {
-    font-size: 0.9em;
-    margin-bottom: 8px;
-    font-weight: 500;
-    color: #333;
-}
-
-[data-type="language-proficiency"] .language-proficiency-bar {
-    height: 8px;
-    background-color: #e0e0e0;
-    border-radius: 4px;
-    overflow: hidden;
-    max-width: 250px;
-}
-
-[data-type="language-proficiency"] .language-proficiency-bar-fill {
-    height: 100%;
-    background-color: #1976d2;
-    border-radius: 4px;
-    transition: width 0.3s ease;
-}
-</style>
+<style src="./TiptapEditor.css"></style>
