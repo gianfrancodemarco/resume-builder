@@ -119,6 +119,273 @@ describe('ResumePreview Style', () => {
         })
     })
 
+    describe('Sidebar Width Functionality', () => {
+        it('applies sidebar width of 0 correctly', async () => {
+            const styleWithZeroSidebar = {
+                ...mockStyle,
+                spacing: {
+                    ...mockStyle.spacing,
+                    sidebarWidth: 0
+                }
+            }
+
+            await wrapper.setProps({ style: styleWithZeroSidebar })
+
+            const previewElement = wrapper.find('.resume-preview')
+            expect(previewElement.attributes('style')).toContain('--sidebar-width: 0px')
+        })
+
+        it('hides sidebar when width is 0', async () => {
+            const styleWithZeroSidebar = {
+                ...mockStyle,
+                spacing: {
+                    ...mockStyle.spacing,
+                    sidebarWidth: 0
+                }
+            }
+
+            await wrapper.setProps({ style: styleWithZeroSidebar })
+
+            const sidebar = wrapper.find('.sidebar')
+            expect(sidebar.exists()).toBe(false)
+        })
+
+        it('shows sidebar when width is greater than 0', async () => {
+            const styleWithSidebar = {
+                ...mockStyle,
+                spacing: {
+                    ...mockStyle.spacing,
+                    sidebarWidth: 200
+                }
+            }
+
+            await wrapper.setProps({ style: styleWithSidebar })
+
+            const sidebar = wrapper.find('.sidebar')
+            expect(sidebar.exists()).toBe(true)
+        })
+
+        it('applies correct sidebar width CSS variable', async () => {
+            const styleWithCustomSidebar = {
+                ...mockStyle,
+                spacing: {
+                    ...mockStyle.spacing,
+                    sidebarWidth: 150
+                }
+            }
+
+            await wrapper.setProps({ style: styleWithCustomSidebar })
+
+            const previewElement = wrapper.find('.resume-preview')
+            expect(previewElement.attributes('style')).toContain('--sidebar-width: 150px')
+        })
+    })
+
+    describe('Sidebar Position Functionality', () => {
+        it('applies sidebar-left class when sidebar is on left', async () => {
+            const styleWithLeftSidebar = {
+                ...mockStyle,
+                spacing: {
+                    ...mockStyle.spacing,
+                    sidebarLeft: true
+                }
+            }
+
+            await wrapper.setProps({
+                style: styleWithLeftSidebar,
+                sidebarPosition: 'left'
+            })
+
+            const container = wrapper.find('.container')
+            expect(container.classes()).toContain('sidebar-left')
+        })
+
+        it('does not apply sidebar-left class when sidebar is on right', async () => {
+            const styleWithRightSidebar = {
+                ...mockStyle,
+                spacing: {
+                    ...mockStyle.spacing,
+                    sidebarLeft: false
+                }
+            }
+
+            await wrapper.setProps({
+                style: styleWithRightSidebar,
+                sidebarPosition: 'right'
+            })
+
+            const container = wrapper.find('.container')
+            expect(container.classes()).not.toContain('sidebar-left')
+        })
+    })
+
+    describe('Custom Sections with Sidebar', () => {
+        it('shows sidebar custom sections when sidebar is present', async () => {
+            const resumeDataWithSidebarSections = {
+                ...mockResumeData,
+                customSections: [
+                    {
+                        title: 'Skills',
+                        content: 'JavaScript, Vue.js, CSS',
+                        position: 'sidebar',
+                        visible: true
+                    }
+                ]
+            }
+
+            const styleWithSidebar = {
+                ...mockStyle,
+                spacing: {
+                    ...mockStyle.spacing,
+                    sidebarWidth: 200
+                }
+            }
+
+            await wrapper.setProps({
+                resumeData: resumeDataWithSidebarSections,
+                style: styleWithSidebar
+            })
+
+            const sidebar = wrapper.find('.sidebar')
+            expect(sidebar.exists()).toBe(true)
+            expect(sidebar.text()).toContain('Skills')
+        })
+
+        it('moves sidebar sections to main content when sidebar width is 0', async () => {
+            const resumeDataWithSidebarSections = {
+                ...mockResumeData,
+                customSections: [
+                    {
+                        title: 'Skills',
+                        content: 'JavaScript, Vue.js, CSS',
+                        position: 'sidebar',
+                        visible: true
+                    }
+                ]
+            }
+
+            const styleWithZeroSidebar = {
+                ...mockStyle,
+                spacing: {
+                    ...mockStyle.spacing,
+                    sidebarWidth: 0
+                }
+            }
+
+            await wrapper.setProps({
+                resumeData: resumeDataWithSidebarSections,
+                style: styleWithZeroSidebar
+            })
+
+            const sidebar = wrapper.find('.sidebar')
+            expect(sidebar.exists()).toBe(false)
+
+            const content = wrapper.find('.content')
+            expect(content.text()).toContain('Skills')
+        })
+    })
+
+    describe('Computed Properties', () => {
+        it('correctly computes isSidebarPresent when sidebar width is 0', async () => {
+            const styleWithZeroSidebar = {
+                ...mockStyle,
+                spacing: {
+                    ...mockStyle.spacing,
+                    sidebarWidth: 0
+                }
+            }
+
+            await wrapper.setProps({ style: styleWithZeroSidebar })
+
+            expect(wrapper.vm.isSidebarPresent).toBe(false)
+        })
+
+        it('correctly computes isSidebarPresent when sidebar width is greater than 0', async () => {
+            const styleWithSidebar = {
+                ...mockStyle,
+                spacing: {
+                    ...mockStyle.spacing,
+                    sidebarWidth: 200
+                }
+            }
+
+            await wrapper.setProps({ style: styleWithSidebar })
+
+            expect(wrapper.vm.isSidebarPresent).toBe(true)
+        })
+
+        it('correctly filters sidebar custom sections', async () => {
+            const resumeDataWithMixedSections = {
+                ...mockResumeData,
+                customSections: [
+                    {
+                        title: 'Skills',
+                        content: 'JavaScript, Vue.js',
+                        position: 'sidebar',
+                        visible: true
+                    },
+                    {
+                        title: 'Experience',
+                        content: '5 years of development',
+                        position: 'main',
+                        visible: true
+                    }
+                ]
+            }
+
+            const styleWithSidebar = {
+                ...mockStyle,
+                spacing: {
+                    ...mockStyle.spacing,
+                    sidebarWidth: 200
+                }
+            }
+
+            await wrapper.setProps({
+                resumeData: resumeDataWithMixedSections,
+                style: styleWithSidebar
+            })
+
+            expect(wrapper.vm.sidebarCustomSections).toHaveLength(1)
+            expect(wrapper.vm.sidebarCustomSections[0].title).toBe('Skills')
+        })
+
+        it('moves all sections to main content when sidebar is not present', async () => {
+            const resumeDataWithMixedSections = {
+                ...mockResumeData,
+                customSections: [
+                    {
+                        title: 'Skills',
+                        content: 'JavaScript, Vue.js',
+                        position: 'sidebar',
+                        visible: true
+                    },
+                    {
+                        title: 'Experience',
+                        content: '5 years of development',
+                        position: 'main',
+                        visible: true
+                    }
+                ]
+            }
+
+            const styleWithZeroSidebar = {
+                ...mockStyle,
+                spacing: {
+                    ...mockStyle.spacing,
+                    sidebarWidth: 0
+                }
+            }
+
+            await wrapper.setProps({
+                resumeData: resumeDataWithMixedSections,
+                style: styleWithZeroSidebar
+            })
+
+            expect(wrapper.vm.mainCustomSections).toHaveLength(2)
+        })
+    })
+
     describe('Style Updates', () => {
         it('updates styles when props change', async () => {
             const newStyle = {
