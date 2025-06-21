@@ -3,12 +3,14 @@
     <div class="resume-preview" :style="resumeStyle">
       <div class="preview-container">
         <div class="container" :class="{ 'sidebar-left': sidebarPosition === 'left' }">
-          <div class="sidebar">
+
+          <div class="sidebar" v-if="isSidebarPresent">
             <template v-for="(section, index) in sidebarCustomSections" :key="index">
               <h2>{{ section.title }}</h2>
               <div v-html="processContent(section.content)"></div>
             </template>
           </div>
+
           <div class="content">
             <h1>{{ resumeData.personal.name || 'Your Name' }}</h1>
             <h2 class="subtitle">{{ resumeData.personal.title }}</h2>
@@ -105,17 +107,21 @@ export default {
         '--heading-size': `${typography.headingSize}px`,
         '--section-spacing': `${spacing.section}px`,
         '--content-spacing': `${spacing.content}px`,
-        '--sidebar-width': `${spacing.sidebarWidth || 280}px`
+        '--sidebar-width': `${spacing.sidebarWidth}px`
       }
     },
     visibleCustomSections() {
       return this.resumeData.customSections.filter(s => s && s.visible !== false)
     },
+    isSidebarPresent() {
+      return this.style.spacing.sidebarWidth > 0
+    },
     sidebarCustomSections() {
       return this.visibleCustomSections.filter(s => s.position === 'sidebar')
     },
     mainCustomSections() {
-      return this.visibleCustomSections.filter(s => s.position === 'main')
+      // If sidebar is not present, show all custom sections in main content
+      return this.visibleCustomSections.filter(s => s.position === 'main' || !this.isSidebarPresent)
     }
   }
 }
@@ -230,6 +236,7 @@ export default {
   padding: 0;
   background: var(--sidebar-color);
   overflow: hidden;
+  min-height: 297mm;
 }
 
 .container.sidebar-left {
@@ -243,7 +250,6 @@ export default {
   background-color: var(--sidebar-color);
   color: #eee;
   font-weight: 400;
-  min-height: 297mm;
   padding: 28px 28px 48px;
   display: flex;
   flex-direction: column;

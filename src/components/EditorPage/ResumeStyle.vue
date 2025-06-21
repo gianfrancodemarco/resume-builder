@@ -114,11 +114,12 @@
                     </div>
                     <div class="slider-container">
                         <div class="text-subtitle-2">Sidebar Width</div>
-                        <v-slider v-model="styleData.spacing.sidebarWidth" min="200" max="400" step="10"
+                        <v-slider v-model="styleData.spacing.sidebarWidth" min="0" max="400" step="10"
                             thumb-label></v-slider>
                     </div>
                     <div>
-                        <v-switch v-model="styleData.spacing.sidebarLeft" label="Sidebar on Left" hide-details
+                        <v-switch v-model="styleData.spacing.sidebarLeft" :disabled="!isSidebarPresent"
+                            label="Sidebar on Left" hide-details
                             density="compact" color="primary"></v-switch>
                     </div>
                 </div>
@@ -129,6 +130,7 @@
 
 <script setup>
 import { ResumeStyle2ColumnsV1 } from '@/models/ResumeStyle/ResumeStyle2ColumnsV1'
+import { computed } from 'vue'
 
 const props = defineProps({
     styleData: {
@@ -168,6 +170,10 @@ const validateHex = (key) => {
     props.styleData.colors[key] = cleanValue
     emit('change')
 }
+
+const isSidebarPresent = computed(() => {
+    return props.styleData.spacing.sidebarWidth > 0
+})
 </script>
 
 <style scoped src="./ResumeEditorStyles.css"></style>

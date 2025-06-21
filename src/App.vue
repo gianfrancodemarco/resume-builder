@@ -5,4 +5,3 @@
 </template>
 
 <style src="./App.css" />
-<style src="./styles/TiptapStyles.css" />
