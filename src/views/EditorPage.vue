@@ -48,7 +48,7 @@ import ResumePreview from '@/components/EditorPage/ResumePreview.vue'
 import { CVConversionService } from '@/services/CVConversionService'
 import { ExporterService } from '@/services/ExporterService'
 import { ResumeData, ResumeService, ResumeStyleClass } from '@/services/ResumeService'
-import { computed, onBeforeUnmount, onMounted, ref, nextTick, watch } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useDisplay } from 'vuetify'
 import { useRouter } from 'vue-router'
 
@@ -56,20 +56,18 @@ const { mobile } = useDisplay()
 const router = useRouter()
 
 // Replace the resumeData ref with the ResumeData factory
-const resumeData = ref(ResumeData.createDefault())
+const resumeData = ref(localStorage.getItem('resumeData') ? JSON.parse(localStorage.getItem('resumeData')) : ResumeData.createDefault())
 
 // Initialize the style with the class instance
-const resumeStyle = ref(ResumeStyleClass.createDefault())
+const resumeStyle = ref(localStorage.getItem('resumeStyle') ? JSON.parse(localStorage.getItem('resumeStyle')) : ResumeStyleClass.createDefault())
 
 // Active Tab State
 const activeTab = ref('info')
 
 // Zoom and tooltip state
 const zoomLevel = ref(100)
-const showAllTooltips = ref(false)
 
 const fileInput = ref(null)
-const hasUnsavedChanges = ref(false)
 
 const isMobile = computed(() => mobile.value)
 const alertMessage = ref({
@@ -97,33 +95,13 @@ const hideAlert = () => {
 
 // Add event listener for page unload
 onMounted(async () => {
+    setInterval(() => {
+        console.log('Saving resume data and style to localStorage')
+        localStorage.setItem('resumeData', JSON.stringify(resumeData.value))
+        localStorage.setItem('resumeStyle', JSON.stringify(resumeStyle.value))
+    }, 1000)
     await loadAvailableModels()
-    window.addEventListener('beforeunload', handleBeforeUnload)
 })
-
-// Remove event listener when component is destroyed
-onBeforeUnmount(() => {
-    window.removeEventListener('beforeunload', handleBeforeUnload)
-})
-
-// Handle beforeunload event
-const handleBeforeUnload = (e) => {
-    if (hasUnsavedChanges.value) {
-        e.preventDefault()
-        e.returnValue = ''
-        return ''
-    }
-}
-
-// Handle form changes
-const handleFormChange = () => {
-    hasUnsavedChanges.value = true
-}
-
-// Handle form save
-const handleFormSave = () => {
-    hasUnsavedChanges.value = false
-}
 
 const downloadPDF = async () => {
     await ExporterService.exportToPDF(resumeData.value, resumeStyle.value)
