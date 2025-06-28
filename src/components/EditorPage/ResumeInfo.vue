@@ -7,18 +7,14 @@
                     <div class="d-flex align-center w-100">
                         <span class="section-title">
                             Personal Information
-                            <v-icon :icon="props.resumeData.personal.visible ? 'ph-eye' : 'ph-eye-slash'" size="small"
-                                class="visibility-icon"
-                                @click.stop="props.resumeData.personal.visible = !props.resumeData.personal.visible" />
                         </span>
                     </div>
                 </div>
                 <div class="section-content">
                     <v-text-field v-model="props.resumeData.personal.name" label="Name" variant="outlined"
-                        density="comfortable" class="mb-2" aria-label="Name"
-                        :disabled="!props.resumeData.personal.visible" />
+                        density="comfortable" class="mb-2" aria-label="Name"/>
                     <v-text-field v-model="props.resumeData.personal.title" label="Title" variant="outlined"
-                        density="comfortable" aria-label="Title" :disabled="!props.resumeData.personal.visible" />
+                        density="comfortable" aria-label="Title"/>
                 </div>
             </div>
 
