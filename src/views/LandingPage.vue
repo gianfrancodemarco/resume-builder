@@ -59,7 +59,6 @@
                             <div class="feature-content">
                                 <h3 class="feature-title">
                                     Professional Templates
-                                    <span class="coming-soon-badge">Coming Soon</span>
                                 </h3>
                                 <p class="feature-description">Choose from multiple templates designed for different
                                     industries</p>

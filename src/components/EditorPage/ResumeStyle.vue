@@ -32,12 +32,12 @@
 
         <!-- Template Change Confirmation Dialog -->
         <v-dialog v-model="showTemplateDialog" max-width="500px" persistent>
-            <v-card class="modal-card">
-                <v-card-title class="modal-title">
+            <v-card>
+                <v-card-title>
                     <v-icon icon="ph-warning" class="mr-2" color="warning" />
                     Change Template?
                 </v-card-title>
-                <v-card-text class="modal-content">
+                <v-card-text>
                     <p>Changing the template will reset all your current style customizations (colors, typography,
                         spacing).</p>
                     <p class="text-subtitle-2 mt-2">Are you sure you want to continue?</p>
