@@ -17,7 +17,7 @@
                         <div class="text-subtitle-2 mb-3">Choose a template</div>
                         <div class="templates-grid">
                             <div v-for="template in templateOptions" :key="template.key" class="template-item"
-                                @click="onTemplateSelect(template.key)">
+                                @click="confirmTemplateChange(template.key)">
                                 <div class="template-preview">
                                     <ResumePreview :resume-data="props.resumeData" :style="template.instance"
                                         :sidebar-position="template.instance.spacing.sidebarLeft ? 'left' : 'right'" />
@@ -29,6 +29,31 @@
                 </div>
             </div>
         </div>
+
+        <!-- Template Change Confirmation Dialog -->
+        <v-dialog v-model="showTemplateDialog" max-width="500px" persistent>
+            <v-card class="modal-card">
+                <v-card-title class="modal-title">
+                    <v-icon icon="ph-warning" class="mr-2" color="warning" />
+                    Change Template?
+                </v-card-title>
+                <v-card-text class="modal-content">
+                    <p>Changing the template will reset all your current style customizations (colors, typography,
+                        spacing).</p>
+                    <p class="text-subtitle-2 mt-2">Are you sure you want to continue?</p>
+                </v-card-text>
+                <v-card-actions class="modal-actions">
+                    <v-spacer></v-spacer>
+                    <v-btn color="grey-darken-1" variant="outlined" @click="showTemplateDialog = false"
+                        class="modal-btn">
+                        Cancel
+                    </v-btn>
+                    <v-btn color="primary" @click="applyTemplateChange" class="modal-btn" prepend-icon="ph-check">
+                        Change Template
+                    </v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
 
         <!-- Colors Section -->
         <div class="editor-section" data-section="colors">
@@ -235,6 +260,52 @@ const isSidebarPresent = computed(() => {
 const templatesExpanded = ref(false)
 const toggleTemplates = () => {
     templatesExpanded.value = !templatesExpanded.value
+}
+
+const showTemplateDialog = ref(false)
+const selectedTemplateKey = ref(null)
+
+const confirmTemplateChange = (templateKey) => {
+    selectedTemplateKey.value = templateKey
+    showTemplateDialog.value = true
+}
+
+const applyTemplateChange = () => {
+    showTemplateDialog.value = false
+    if (selectedTemplateKey.value) {
+        const templateKey = selectedTemplateKey.value
+        onTemplateSelect(templateKey)
+
+        // Show success toaster
+        const template = TemplateService.getTemplate(templateKey)
+        if (template) {
+            showSuccessToaster(`Template "${template.name}" applied successfully!`)
+            emit('change')
+        }
+
+        selectedTemplateKey.value = null
+    }
+}
+
+// Success toaster
+const showSuccessToaster = (message) => {
+    // Create a simple toaster notification
+    const toaster = document.createElement('div')
+    toaster.className = 'success-toaster'
+    toaster.innerHTML = `
+        <div class="toaster-content">
+            <v-icon icon="ph-check-circle" color="success" class="mr-2"></v-icon>
+            <span>${message}</span>
+        </div>
+    `
+    document.body.appendChild(toaster)
+
+    // Remove after 3 seconds
+    setTimeout(() => {
+        if (toaster.parentNode) {
+            toaster.parentNode.removeChild(toaster)
+        }
+    }, 3000)
 }
 </script>
 
@@ -460,5 +531,43 @@ const toggleTemplates = () => {
     font-weight: 500;
     color: rgb(var(--v-theme-editor-text-primary));
     text-align: center;
+}
+
+:deep(.template-accordion .v-expansion-panel-title__overlay) {
+    background: transparent !important;
+}
+
+/* Success toaster styles */
+.success-toaster {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    background: rgb(var(--v-theme-surface));
+    border: 1px solid rgb(var(--v-theme-success));
+    border-radius: 8px;
+    padding: 12px 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    animation: slideInRight 0.3s ease-out;
+    max-width: 300px;
+}
+
+.toaster-content {
+    display: flex;
+    align-items: center;
+    color: rgb(var(--v-theme-on-surface));
+    font-weight: 500;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
 }
 </style>
