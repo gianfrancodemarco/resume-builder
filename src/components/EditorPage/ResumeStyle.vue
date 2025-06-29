@@ -279,33 +279,11 @@ const applyTemplateChange = () => {
         // Show success toaster
         const template = TemplateService.getTemplate(templateKey)
         if (template) {
-            showSuccessToaster(`Template "${template.name}" applied successfully!`)
             emit('change')
         }
 
         selectedTemplateKey.value = null
     }
-}
-
-// Success toaster
-const showSuccessToaster = (message) => {
-    // Create a simple toaster notification
-    const toaster = document.createElement('div')
-    toaster.className = 'success-toaster'
-    toaster.innerHTML = `
-        <div class="toaster-content">
-            <v-icon icon="ph-check-circle" color="success" class="mr-2"></v-icon>
-            <span>${message}</span>
-        </div>
-    `
-    document.body.appendChild(toaster)
-
-    // Remove after 3 seconds
-    setTimeout(() => {
-        if (toaster.parentNode) {
-            toaster.parentNode.removeChild(toaster)
-        }
-    }, 3000)
 }
 </script>
 
