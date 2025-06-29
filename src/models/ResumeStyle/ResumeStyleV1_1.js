@@ -14,7 +14,7 @@ export class ResumeStyleV1_1 extends ResumeStyleV1 {
             sidebarText: data.colors?.sidebarText || '#eeeeee',
             datesTextColor: data.colors?.datesTextColor || '#aaaaaa',
             subtitleTextColor: data.colors?.subtitleTextColor || '#aaaaaa',
-            link: data.colors?.link || '#08294D'
+            link: data.colors?.link || '#ffffff'
         };
 
         this.typography = {

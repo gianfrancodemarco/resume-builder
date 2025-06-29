@@ -90,16 +90,6 @@
     margin-top: var(--content-spacing);
 }
 
-.preview-container {
-    width: 100%;
-    min-height: 100%;
-    margin: 0;
-    background-color: var(--background-color);
-    color: var(--text-color);
-    font-family: var(--body-font);
-    padding: 0;
-}
-
 .container {
     display: flex;
     flex-direction: row-reverse;
