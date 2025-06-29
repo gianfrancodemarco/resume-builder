@@ -1,33 +1,13 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { mount } from '@vue/test-utils'
 import ResumeStyle from '@/components/EditorPage/ResumeStyle.vue'
+import { ResumeStyleClass } from '@/services/ResumeService'
 import { vuetify } from '@/test/setup'
-import { ResumeStyleV1 } from '@/models/ResumeStyle/ResumeStyleV1'
+import { mount } from '@vue/test-utils'
+import { beforeEach, describe, expect, it } from 'vitest'
 
 describe('ResumeStyle', () => {
     let wrapper
 
-    const mockStyleData = {
-        colors: {
-            primary: '#1976D2',
-            text: '#000000',
-            background: '#ffffff',
-            sidebar: '#1976D2',
-            link: '#1976D2'
-        },
-        typography: {
-            headingFont: 'Arial',
-            bodyFont: 'Arial',
-            baseSize: 12,
-            headingSize: 16
-        },
-        spacing: {
-            section: 16,
-            content: 8,
-            sidebarWidth: 280,
-            sidebarLeft: false
-        }
-    }
+    const mockStyleData = ResumeStyleClass.createDefault()
 
     beforeEach(() => {
         wrapper = mount(ResumeStyle, {
@@ -238,7 +218,7 @@ describe('ResumeStyle', () => {
 
         it('has correct font options', () => {
             expect(wrapper.vm.fontOptions).toBeDefined()
-            expect(wrapper.vm.fontOptions).toBe(ResumeStyleV1.FONT_OPTIONS)
+            expect(wrapper.vm.fontOptions).toBe(ResumeStyleClass.FONT_OPTIONS)
         })
     })
 }) 

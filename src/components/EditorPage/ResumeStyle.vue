@@ -146,7 +146,10 @@ const colorFields = {
     primary: { label: 'Primary Color' },
     text: { label: 'Text Color' },
     background: { label: 'Background Color' },
-    sidebar: { label: 'Sidebar Color' },
+    sidebarBackground: { label: 'Sidebar Background Color' },
+    sidebarText: { label: 'Sidebar Text Color' },
+    datesTextColor: { label: 'Dates Text Color' },
+    subtitleTextColor: { label: 'Subtitle Text Color' },
     link: { label: 'Link Color' }
 }
 
