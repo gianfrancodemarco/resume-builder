@@ -353,7 +353,7 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
-import { ResumeData, ResumeStyleClass } from '@/services/ResumeService'
+import { ResumeDataClass, ResumeStyleClass } from '@/services/ResumeService'
 import TiptapEditor from './TiptapEditor.vue'
 
 const props = defineProps({

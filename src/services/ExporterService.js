@@ -17,7 +17,7 @@ export class ExporterService {
     }
 
     static async exportToPDF(resumeData, resumeStyle) {
-        const srcEl = document.getElementById('printable-area').cloneNode(true)
+        const srcEl = document.querySelector('.preview-container #printable-area').cloneNode(true)
         if (!srcEl) return
 
         // Remove any scaling and centering styles

@@ -1,5 +1,60 @@
 <template>
     <div class="style-editor">
+        <!-- Templates Section -->
+        <div class="editor-section" data-section="templates">
+            <div class="section-header" @click="toggleTemplates" style="cursor: pointer;">
+                <div class="d-flex align-center w-100">
+                    <span class="section-title">
+                        <v-icon icon="ph-layout" class="mr-2" /> Templates
+                    </span>
+                    <v-spacer></v-spacer>
+                    <v-icon :icon="templatesExpanded ? 'ph-caret-up' : 'ph-caret-down'" size="small"></v-icon>
+                </div>
+            </div>
+            <div class="section-content" v-show="templatesExpanded">
+                <div class="d-flex flex-column gap-4">
+                    <div>
+                        <div class="text-subtitle-2 mb-3">Choose a template</div>
+                        <div class="templates-grid">
+                            <div v-for="template in templateOptions" :key="template.key" class="template-item"
+                                @click="confirmTemplateChange(template.key)">
+                                <div class="template-preview">
+                                    <ResumePreview :resume-data="props.resumeData" :style="template.instance"
+                                        :sidebar-position="template.instance.spacing.sidebarLeft ? 'left' : 'right'" />
+                                </div>
+                                <div class="template-name">{{ template.name }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Template Change Confirmation Dialog -->
+        <v-dialog v-model="showTemplateDialog" max-width="500px" persistent>
+            <v-card>
+                <v-card-title>
+                    <v-icon icon="ph-warning" class="mr-2" color="warning" />
+                    Change Template?
+                </v-card-title>
+                <v-card-text>
+                    <p>Changing the template will reset all your current style customizations (colors, typography,
+                        spacing).</p>
+                    <p class="text-subtitle-2 mt-2">Are you sure you want to continue?</p>
+                </v-card-text>
+                <v-card-actions class="modal-actions">
+                    <v-spacer></v-spacer>
+                    <v-btn color="grey-darken-1" variant="outlined" @click="showTemplateDialog = false"
+                        class="modal-btn">
+                        Cancel
+                    </v-btn>
+                    <v-btn color="primary" @click="applyTemplateChange" class="modal-btn" prepend-icon="ph-check">
+                        Change Template
+                    </v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+
         <!-- Colors Section -->
         <div class="editor-section" data-section="colors">
             <div class="section-header">
@@ -129,9 +184,15 @@
 
 <script setup>
 import { ResumeStyleV1 } from '@/models/ResumeStyle/ResumeStyleV1'
-import { computed } from 'vue'
+import { TemplateService } from '@/services/TemplateService'
+import ResumePreview from './ResumePreview.vue'
+import { computed, ref } from 'vue'
 
 const props = defineProps({
+    resumeData: {
+        type: Object,
+        required: true
+    },
     styleData: {
         type: Object,
         required: true
@@ -141,6 +202,25 @@ const props = defineProps({
 const emit = defineEmits(['update:style-data', 'change'])
 
 const fontOptions = ResumeStyleV1.FONT_OPTIONS
+
+const templateOptions = computed(() => {
+    const templates = TemplateService.getAllTemplates()
+    return templates.map(template => ({
+        ...template,
+        instance: TemplateService.createTemplateInstance(template.key)
+    }))
+})
+
+const onTemplateSelect = (templateKey) => {
+    if (!templateKey) return
+
+    const templateInstance = TemplateService.createTemplateInstance(templateKey)
+    if (templateInstance) {
+        Object.assign(props.styleData, templateInstance)
+        props.styleData.templateName = templateInstance.templateName
+        emit('update:style-data', props.styleData)
+    }
+}
 
 const colorFields = {
     primary: { label: 'Primary Color' },
@@ -176,6 +256,35 @@ const validateHex = (key) => {
 const isSidebarPresent = computed(() => {
     return props.styleData.spacing.sidebarWidth > 0
 })
+
+const templatesExpanded = ref(false)
+const toggleTemplates = () => {
+    templatesExpanded.value = !templatesExpanded.value
+}
+
+const showTemplateDialog = ref(false)
+const selectedTemplateKey = ref(null)
+
+const confirmTemplateChange = (templateKey) => {
+    selectedTemplateKey.value = templateKey
+    showTemplateDialog.value = true
+}
+
+const applyTemplateChange = () => {
+    showTemplateDialog.value = false
+    if (selectedTemplateKey.value) {
+        const templateKey = selectedTemplateKey.value
+        onTemplateSelect(templateKey)
+
+        // Show success toaster
+        const template = TemplateService.getTemplate(templateKey)
+        if (template) {
+            emit('change')
+        }
+
+        selectedTemplateKey.value = null
+    }
+}
 </script>
 
 <style scoped src="./ResumeEditorStyles.css"></style>
@@ -349,5 +458,94 @@ const isSidebarPresent = computed(() => {
 :deep(.v-switch .v-selection-control__thumb) {
     background-color: white !important;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Template grid styles */
+.templates-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 16px;
+}
+
+.template-item {
+    border: 2px solid rgb(var(--v-theme-editor-border));
+    border-radius: 12px;
+    padding: 16px;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    background-color: rgb(var(--v-theme-surface));
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.template-item:hover {
+    border-color: rgb(var(--v-theme-primary));
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.template-preview {
+    width: 160px;
+    height: 226px;
+    /* A4 ratio: 160 * 1.414 = ~226px */
+    overflow: hidden;
+    border-radius: 8px;
+    background-color: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 12px;
+    position: relative;
+}
+
+.template-preview :deep(.resume-preview) {
+    transform: scale(0.2);
+    transform-origin: top left;
+    height: 100%;
+}
+
+.template-name {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: rgb(var(--v-theme-editor-text-primary));
+    text-align: center;
+}
+
+:deep(.template-accordion .v-expansion-panel-title__overlay) {
+    background: transparent !important;
+}
+
+/* Success toaster styles */
+.success-toaster {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    background: rgb(var(--v-theme-surface));
+    border: 1px solid rgb(var(--v-theme-success));
+    border-radius: 8px;
+    padding: 12px 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    animation: slideInRight 0.3s ease-out;
+    max-width: 300px;
+}
+
+.toaster-content {
+    display: flex;
+    align-items: center;
+    color: rgb(var(--v-theme-on-surface));
+    font-weight: 500;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
 }
 </style>

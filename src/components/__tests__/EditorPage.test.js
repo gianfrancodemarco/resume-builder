@@ -5,13 +5,10 @@ import { createVuetify } from 'vuetify'
 import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
 import { aliases, mdi } from 'vuetify/iconsets/mdi'
-import { ResumeDataV1 } from '@/models/ResumeData/ResumeDataV1'
 import { ResumeService } from '@/services/ResumeService'
 import { ExporterService } from '@/services/ExporterService'
 import EditorPage from '@/views/EditorPage.vue'
-import { flushPromises } from '@vue/test-utils'
-import { vuetify } from '@/test/setup'
-import { ResumeData, ResumeStyleClass } from '@/services/ResumeService'
+import { ResumeDataClass, ResumeStyleClass } from '@/services/ResumeService'
 
 // Mock child components to focus on EditorPage logic
 vi.mock('@/components/EditorPage/LateralMenu.vue', () => ({
@@ -54,7 +51,7 @@ describe('EditorPage', () => {
     let router
     let vuetify
 
-    const mockResumeData = ResumeData.createDefault()
+    const mockResumeData = ResumeDataClass.createDefault()
     const mockResumeStyle = ResumeStyleClass.createDefault()
 
     beforeEach(() => {
@@ -263,7 +260,7 @@ describe('EditorPage', () => {
     describe('Export JSON', () => {
         it('exports resume data as JSON file', async () => {
             // Set resume data
-            wrapper.vm.resumeData = new ResumeDataV1({
+            wrapper.vm.resumeData = new ResumeDataClass({
                 personal: {
                     name: 'Luke Skywalker',
                     title: 'Jedi Knight'
@@ -291,7 +288,7 @@ describe('EditorPage', () => {
 
         it('generates correct filename from resume data', async () => {
             // Set resume data
-            wrapper.vm.resumeData = new ResumeDataV1({
+            wrapper.vm.resumeData = new ResumeDataClass({
                 personal: {
                     name: 'Luke Skywalker',
                     title: 'Jedi Knight'
@@ -310,7 +307,7 @@ describe('EditorPage', () => {
 
         it('generates fallback filename when name/title is missing', async () => {
             // Set resume data with missing name/title
-            wrapper.vm.resumeData = new ResumeDataV1({
+            wrapper.vm.resumeData = new ResumeDataClass({
                 personal: {}
             })
 
