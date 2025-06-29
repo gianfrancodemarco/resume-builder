@@ -38,4 +38,4 @@ export class OneColumnModern extends ResumeStyleV1_1 {
             right: data.columns?.right || []
         };
     }
-} 
+}

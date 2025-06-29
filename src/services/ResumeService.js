@@ -1,20 +1,20 @@
-import { ResumeDataV2 as ResumeData } from '@/models/ResumeData/ResumeDataV2'
+import { ResumeDataV2 as ResumeDataClass } from '@/models/ResumeData/ResumeDataV2'
 import { TwoColumnsBlue as ResumeStyleClass } from '@/models/ResumeStyle/defaultTemplates/TwoColumnsBlue'
 
 // Export the model classes
 // These always point to the latest version of the models
 // Other part of the app should only import from here
-export { ResumeData, ResumeStyleClass }
+export { ResumeDataClass, ResumeStyleClass }
 
 export class ResumeService {
     // Current versions of the models
-    static CURRENT_RESUME_DATA_VERSION = ResumeData.VERSION
+    static CURRENT_RESUME_DATA_VERSION = ResumeDataClass.VERSION
     static CURRENT_RESUME_STYLE_VERSION = ResumeStyleClass.VERSION
 
     /**
      * Loads resume data from a JSON file
      * @param {File} file - The JSON file to load
-     * @returns {Promise<{resumeData: ResumeData, resumeStyle: Object}>} The loaded resume data and style
+     * @returns {Promise<{resumeData: ResumeDataClass, resumeStyle: Object}>} The loaded resume data and style
      * @throws {Error} If the file is invalid or cannot be loaded
      */
     static async loadFromFile(file) {
@@ -28,7 +28,7 @@ export class ResumeService {
                         throw new Error('Invalid resume data format')
                     }
 
-                    const resumeData = ResumeData.fromJSON(data.resumeData)
+                    const resumeData = ResumeDataClass.fromJSON(data.resumeData)
                     const resumeStyle = ResumeStyleClass.fromJSON(data.resumeStyle)
 
                     resolve({ resumeData, resumeStyle })
@@ -47,7 +47,7 @@ export class ResumeService {
 
     /**
      * Exports resume data to a JSON file
-     * @param {ResumeData} resumeData - The resume data to export
+     * @param {ResumeDataClass} resumeData - The resume data to export
      * @param {Object|ResumeStyleClass} resumeStyle - The resume style to export
      * @returns {Blob} The JSON file as a Blob
      */

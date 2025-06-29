@@ -38,37 +38,7 @@ export class ResumeStyleV1_1 extends ResumeStyleV1 {
     }
 
     static createDefault() {
-        return new ResumeStyleV1_1({
-            version: ResumeStyleV1_1.VERSION,
-            colors: {
-                primary: '#08294D',
-                text: '#08294D',
-                background: '#ffffff',
-                sidebarBackground: '#08294D',
-                sidebarText: '#eeeeee',
-                datesTextColor: '#aaaaaa',
-                subtitleTextColor: '#aaaaaa',
-                link: '#ffffff'
-            },
-            typography: {
-                headingFont: 'Helvetica',
-                bodyFont: 'Georgia',
-                baseSize: 16,
-                headingSize: 26
-            },
-            spacing: {
-                section: 24,
-                content: 12,
-                sidebarLeft: false,
-                sidebarWidth: 280
-            },
-            columns: {
-                left: ['personal',
-                    'education'],
-                right: ['experiences',
-                    'customSections']
-            }
-        });
+        return new this();
     }
 
     validate() {

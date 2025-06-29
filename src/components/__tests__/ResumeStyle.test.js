@@ -1,5 +1,5 @@
 import ResumeStyle from '@/components/EditorPage/ResumeStyle.vue'
-import { ResumeStyleClass } from '@/services/ResumeService'
+import { ResumeDataClass, ResumeStyleClass } from '@/services/ResumeService'
 import { vuetify } from '@/test/setup'
 import { mount } from '@vue/test-utils'
 import { beforeEach, describe, expect, it } from 'vitest'
@@ -7,6 +7,7 @@ import { beforeEach, describe, expect, it } from 'vitest'
 describe('ResumeStyle', () => {
     let wrapper
 
+    const mockResumeData = ResumeDataClass.createDefault()
     const mockStyleData = ResumeStyleClass.createDefault()
 
     beforeEach(() => {
@@ -27,6 +28,7 @@ describe('ResumeStyle', () => {
                 }
             },
             props: {
+                resumeData: mockResumeData,
                 styleData: mockStyleData
             }
         })

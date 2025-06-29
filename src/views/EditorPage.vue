@@ -47,7 +47,7 @@ import ResumeEditor from '@/components/EditorPage/ResumeEditor.vue'
 import ResumePreview from '@/components/EditorPage/ResumePreview.vue'
 import { CVConversionService } from '@/services/CVConversionService'
 import { ExporterService } from '@/services/ExporterService'
-import { ResumeData, ResumeService, ResumeStyleClass } from '@/services/ResumeService'
+import { ResumeDataClass, ResumeService, ResumeStyleClass } from '@/services/ResumeService'
 import { computed, onMounted, ref } from 'vue'
 import { useDisplay } from 'vuetify'
 import { useRouter } from 'vue-router'
@@ -55,9 +55,9 @@ import { useRouter } from 'vue-router'
 const { mobile } = useDisplay()
 const router = useRouter()
 
-// Replace the resumeData ref with the ResumeData factory
+// Replace the resumeData ref with the ResumeDataClass factory
 // We use from JSON so that if an older version of the resume data is loaded, it will be converted to the latest version
-const resumeData = ref(localStorage.getItem('resumeData') ? ResumeData.fromJSON(JSON.parse(localStorage.getItem('resumeData'))) : ResumeData.createDefault())
+const resumeData = ref(localStorage.getItem('resumeData') ? ResumeDataClass.fromJSON(JSON.parse(localStorage.getItem('resumeData'))) : ResumeDataClass.createDefault())
 
 // We use from JSON so that if an older version of the resume style is loaded, it will be converted to the latest version
 const resumeStyle = ref(localStorage.getItem('resumeStyle') ? ResumeStyleClass.fromJSON(JSON.parse(localStorage.getItem('resumeStyle'))) : ResumeStyleClass.createDefault())

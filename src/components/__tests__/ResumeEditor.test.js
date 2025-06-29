@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import ResumeEditor from '@/components/EditorPage/ResumeEditor.vue'
 import { vuetify } from '@/test/setup'
-import { ResumeData, ResumeStyleClass } from '@/services/ResumeService'
+import { ResumeDataClass, ResumeStyleClass } from '@/services/ResumeService'
 
 // Mock the child components to avoid complex interactions
 vi.mock('@/components/EditorPage/ResumeInfo.vue', () => ({
@@ -26,7 +26,7 @@ vi.mock('@/components/EditorPage/ResumeStyle.vue', () => ({
 describe('ResumeEditor', () => {
     let wrapper
 
-    const mockResumeData = ResumeData.createDefault()
+    const mockResumeData = ResumeDataClass.createDefault()
     const mockStyle = ResumeStyleClass.createDefault()
 
     beforeEach(() => {
@@ -96,7 +96,7 @@ describe('ResumeEditor', () => {
 
     describe('Data Updates', () => {
         it('emits update:resumeData when resume data changes', async () => {
-            const newResumeData = ResumeData.createDefault()
+            const newResumeData = ResumeDataClass.createDefault()
             newResumeData.personal.name = 'Jane Smith'
 
             await wrapper.setProps({ resumeData: newResumeData })
@@ -130,7 +130,7 @@ describe('ResumeEditor', () => {
 
         it('emits change event when resume data is modified', async () => {
             // Simulate resume data update by calling the updateResumeData method
-            const newResumeData = ResumeData.createDefault()
+            const newResumeData = ResumeDataClass.createDefault()
             newResumeData.personal.name = 'Jane Smith'
 
             wrapper.vm.updateResumeData(newResumeData)
