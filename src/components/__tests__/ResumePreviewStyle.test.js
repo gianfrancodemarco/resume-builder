@@ -71,7 +71,7 @@ describe('ResumePreview Style', () => {
 
         it('applies sidebar color correctly', () => {
             const previewElement = wrapper.find('.resume-preview')
-            expect(previewElement.attributes('style')).toContain('--sidebar-color: #1976D2')
+            expect(previewElement.attributes('style')).toContain('--sidebar-background-color: #1976D2')
         })
 
         it('applies link color correctly', () => {
