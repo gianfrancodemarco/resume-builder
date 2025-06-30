@@ -29,7 +29,7 @@ export class ResumeService {
                     }
 
                     const resumeData = ResumeDataClass.fromJSON(data.resumeData)
-                    const resumeStyle = data.resumeStyle
+                    const resumeStyle = ResumeStyleClass.fromJSON(data.resumeStyle)
 
                     resolve({ resumeData, resumeStyle })
                 } catch (error) {
