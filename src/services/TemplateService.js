@@ -52,6 +52,6 @@ export class TemplateService {
             return null
         }
 
-        return new TemplateClass()
+        return TemplateClass.createDefault()
     }
 } 
