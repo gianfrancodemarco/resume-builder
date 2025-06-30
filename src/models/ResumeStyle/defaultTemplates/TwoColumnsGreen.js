@@ -18,7 +18,7 @@ export class TwoColumnsGreen extends ResumeStyleV1_1 {
             typography: {
                 headingFont: 'Helvetica',
                 bodyFont: 'Georgia',
-                baseSize: 16,
+                baseSize: 14,
                 headingSize: 26
             },
             spacing: {

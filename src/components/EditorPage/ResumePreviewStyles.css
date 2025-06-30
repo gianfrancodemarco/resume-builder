@@ -232,7 +232,7 @@
 }
 
 .content .subtitle {
-    font-size: calc(var(--base-size) * 0.75);
+    font-size: var(--base-size);
     color: var(--subtitle-text-color);
     margin-top: 4px;
 }
@@ -261,7 +261,7 @@
 p,
 li {
     font-family: var(--body-font);
-    font-size: calc(var(--base-size) * 0.75);
+    font-size: var(--base-size);
     line-height: 1.5;
     margin: 0;
     white-space: pre-wrap;
@@ -297,7 +297,7 @@ li {
 }
 
 .resume-preview .custom-section .proficiency-bar-label {
-    font-size: calc(var(--base-size) * 0.75);
+    font-size: var(--base-size);
     line-height: 1.2;
     margin-bottom: 4px;
 }
@@ -334,7 +334,7 @@ li {
 }
 
 .proficiency-bar-label {
-    font-size: calc(var(--base-size) * 0.75);
+    font-size: var(--base-size);
     line-height: 1.2;
 }
 
