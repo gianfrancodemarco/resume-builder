@@ -34,6 +34,7 @@
     flex-shrink: 0;
     min-width: 0;
     background-color: rgb(var(--v-theme-surface));
+    padding: 32px
 }
 
 .preview-col.hidden {
@@ -84,13 +85,6 @@
 :deep(.v-icon) {
     font-size: 1.2rem;
     opacity: 0.9;
-}
-
-.preview-header {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    margin-bottom: 24px;
 }
 
 .alert-message {
