@@ -59,7 +59,7 @@ const router = useRouter()
 const resumeData = ref(localStorage.getItem('resumeData') ? ResumeDataClass.fromJSON(JSON.parse(localStorage.getItem('resumeData'))) : ResumeDataClass.createDefault())
 
 // We use from JSON so that if an older version of the resume style is loaded, it will be converted to the latest version
-const resumeStyle = ref(localStorage.getItem('resumeStyle') ? ResumeStyleClass.fromJSON(JSON.parse(localStorage.getItem('resumeStyle'))) : ResumeStyleClass.createDefault())
+const resumeStyle = ref(localStorage.getItem('resumeStyle') ? JSON.parse(localStorage.getItem('resumeStyle')) : ResumeStyleClass.createDefault())
 
 // Active Tab State
 const activeTab = ref('info')
