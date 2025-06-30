@@ -20,7 +20,6 @@
                 <div class="preview-col" :class="{ 'hidden': isMobile }" :style="!isMobile ? { width: '65%' } : {}">
                     <div class="preview-container"
                         :style="{ transform: `scale(${zoomLevel / 100})`, transformOrigin: 'top center' }">
-                        <div class="preview-header"></div>
                         <ResumePreview :resume-data="resumeData" :style="resumeStyle"
                             :sidebar-position="resumeStyle.spacing.sidebarLeft ? 'left' : 'right'" />
                     </div>

@@ -487,9 +487,8 @@ const applyTemplateChange = () => {
 }
 
 .template-preview {
-    width: 160px;
-    height: 226px;
-    /* A4 ratio: 160 * 1.414 = ~226px */
+    width: 42mm;
+    height: 59mm;
     overflow: hidden;
     border-radius: 8px;
     background-color: white;
