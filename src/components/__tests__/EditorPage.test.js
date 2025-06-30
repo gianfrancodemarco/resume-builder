@@ -221,7 +221,6 @@ describe('EditorPage', () => {
                 }
             }
             const mockResumeStyle = {
-                theme: 'dark',
                 spacing: { sidebarLeft: true }
             }
 
@@ -252,7 +251,6 @@ describe('EditorPage', () => {
             // Verify data was loaded from localStorage
             expect(wrapper.vm.resumeData.personal.name).toBe('Luke Skywalker')
             expect(wrapper.vm.resumeData.personal.title).toBe('Jedi Knight')
-            expect(wrapper.vm.resumeStyle.version).toBe(ResumeStyleClass.VERSION)
             expect(wrapper.vm.resumeStyle.spacing.sidebarLeft).toBe(true)
         })
     })

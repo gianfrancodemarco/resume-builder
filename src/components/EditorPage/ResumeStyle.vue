@@ -183,7 +183,7 @@
 </template>
 
 <script setup>
-import { ResumeStyleV1 } from '@/models/ResumeStyle/ResumeStyleV1'
+import { ResumeStyleV1_1 } from '@/models/ResumeStyle/ResumeStyleV1_1'
 import { TemplateService } from '@/services/TemplateService'
 import ResumePreview from './ResumePreview.vue'
 import { computed, ref } from 'vue'
@@ -201,7 +201,7 @@ const props = defineProps({
 
 const emit = defineEmits(['update:style-data', 'change'])
 
-const fontOptions = ResumeStyleV1.FONT_OPTIONS
+const fontOptions = ResumeStyleV1_1.FONT_OPTIONS
 
 const templateOptions = computed(() => {
     const templates = TemplateService.getAllTemplates()

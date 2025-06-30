@@ -48,13 +48,13 @@ export class ResumeService {
     /**
      * Exports resume data to a JSON file
      * @param {ResumeDataClass} resumeData - The resume data to export
-     * @param {Object|ResumeStyleClass} resumeStyle - The resume style to export
+     * @param {Object} resumeStyle - The resume style to export
      * @returns {Blob} The JSON file as a Blob
      */
     static exportToJSON(resumeData, resumeStyle) {
         const data = {
             resumeData: resumeData.toJSON(),
-            resumeStyle: resumeStyle.toJSON ? resumeStyle.toJSON() : resumeStyle
+            resumeStyle: resumeStyle
         }
         return new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
     }

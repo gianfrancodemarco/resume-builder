@@ -1,7 +1,7 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest'
 import { ResumeService } from '@/services/ResumeService'
 import { ResumeDataV2 } from '@/models/ResumeData/ResumeDataV2'
-import { ResumeStyleV1 } from '@/models/ResumeStyle/ResumeStyleV1'
+import { ResumeStyleV1_1 } from '@/models/ResumeStyle/ResumeStyleV1_1'
 
 describe('ResumeService', () => {
     beforeEach(() => {
@@ -33,7 +33,6 @@ describe('ResumeService', () => {
             const result = await ResumeService.loadFromFile(mockFile)
 
             expect(result.resumeData).toBeInstanceOf(ResumeDataV2)
-            expect(result.resumeStyle).toBeInstanceOf(ResumeStyleV1)
             expect(result.resumeData.personal.name).toBe('John Doe')
             expect(result.resumeStyle.colors.primary).toBe('#000000')
         })
@@ -88,11 +87,7 @@ describe('ResumeService', () => {
                     title: 'Software Engineer'
                 }
             })
-            const resumeStyle = new ResumeStyleV1({
-                colors: {
-                    primary: '#000000'
-                }
-            })
+            const resumeStyle = ResumeStyleV1_1.createDefault()
 
             const blob = ResumeService.exportToJSON(resumeData, resumeStyle)
             expect(blob).toBeInstanceOf(Blob)
@@ -103,7 +98,7 @@ describe('ResumeService', () => {
             reader.onload = () => {
                 const data = JSON.parse(reader.result)
                 expect(data.resumeData.personal.name).toBe('John Doe')
-                expect(data.resumeStyle.colors.primary).toBe('#000000')
+                expect(data.resumeStyle.colors.primary).toBe('#08294D')
             }
             reader.readAsText(blob)
         })

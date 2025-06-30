@@ -1,70 +1,147 @@
-import { ResumeStyleV1 } from './ResumeStyleV1';
-
-export class ResumeStyleV1_1 extends ResumeStyleV1 {
+export class ResumeStyleV1_1 {
     static VERSION = 1.1;
+    static TEMPLATE_NAME = '2 Columns';
 
-    constructor(data = {}) {
-        super(data);
-        this.version = data.version || ResumeStyleV1_1.VERSION;
-        this.colors = {
-            primary: data.colors?.primary || '#08294D',
-            text: data.colors?.text || '#08294D',
-            background: data.colors?.background || '#ffffff',
-            sidebarBackground: data.colors?.sidebarBackground || '#08294D',
-            sidebarText: data.colors?.sidebarText || '#eeeeee',
-            datesTextColor: data.colors?.datesTextColor || '#aaaaaa',
-            subtitleTextColor: data.colors?.subtitleTextColor || '#aaaaaa',
-            link: data.colors?.link || '#ffffff'
-        };
+    static FONT_OPTIONS = [
+        "Arial",
+        "Verdana",
+        "Helvetica",
+        "Georgia",
+        "Times New Roman",
+        "Trebuchet MS",
+        "Tahoma",
+        "Courier New",
+        "Lucida Console",
+        "Palatino Linotype",
+        "Book Antiqua",
+        "Impact",
+        "Gill Sans"
+    ];
 
-        this.typography = {
-            headingFont: data.typography?.headingFont || 'Helvetica',
-            bodyFont: data.typography?.bodyFont || 'Georgia',
-            baseSize: data.typography?.baseSize || 16,
-            headingSize: data.typography?.headingSize || 26
-        };
+    static COLUMN_TYPES = {
+        LEFT: 'left',
+        RIGHT: 'right'
+    };
 
-        this.spacing = {
-            section: data.spacing?.section || 24,
-            content: data.spacing?.content || 12,
-            sidebarLeft: data.spacing?.sidebarLeft ?? false,
-            sidebarWidth: data.spacing?.sidebarWidth || 280
-        };
-
-        this.columns = {
-            left: data.columns?.left || [],
-            right: data.columns?.right || []
-        };
-    }
+    static SECTION_TYPES = [
+        {
+            label: 'Text',
+            value: 'text'
+        },
+        {
+            label: 'List',
+            value: 'list'
+        },
+        {
+            label: 'Languages',
+            value: 'languages'
+        },
+        {
+            label: 'Italic Text',
+            value: 'italic'
+        }
+    ]
 
     static createDefault() {
-        return new this();
+        return {
+            colors: {
+                primary: '#08294D',
+                text: '#08294D',
+                background: '#ffffff',
+                sidebarBackground: '#08294D',
+                sidebarText: '#eeeeee',
+                datesTextColor: '#aaaaaa',
+                subtitleTextColor: '#aaaaaa',
+                link: '#ffffff'
+            },
+            typography: {
+                headingFont: 'Helvetica',
+                bodyFont: 'Georgia',
+                baseSize: 16,
+                headingSize: 26
+            },
+            spacing: {
+                section: 24,
+                content: 12,
+                sidebarLeft: false,
+                sidebarWidth: 280
+            },
+            columns: {
+                left: ['personal', 'education'],
+                right: ['experiences', 'customSections']
+            }
+        };
     }
 
-    validate() {
-        super.validate();
+    static validateJSON(json) {
         const errors = [];
 
         // Validate colors
-        if (!this.colors.sidebarBackground || typeof this.colors.sidebarBackground !== 'string') {
+        if (!json.colors?.primary || typeof json.colors.primary !== 'string') {
+            errors.push('Invalid primary color');
+        }
+        if (!json.colors?.text || typeof json.colors.text !== 'string') {
+            errors.push('Invalid text color');
+        }
+        if (!json.colors?.background || typeof json.colors.background !== 'string') {
+            errors.push('Invalid background color');
+        }
+        if (!json.colors?.sidebarBackground || typeof json.colors.sidebarBackground !== 'string') {
             errors.push('Invalid sidebar background color');
         }
-        if (!this.colors.sidebarText || typeof this.colors.sidebarText !== 'string') {
+        if (!json.colors?.sidebarText || typeof json.colors.sidebarText !== 'string') {
             errors.push('Invalid sidebar text color');
         }
-        if (!this.colors.datesTextColor || typeof this.colors.datesTextColor !== 'string') {
+        if (!json.colors?.datesTextColor || typeof json.colors.datesTextColor !== 'string') {
             errors.push('Invalid dates color');
         }
-        if (!this.colors.subtitleTextColor || typeof this.colors.subtitleTextColor !== 'string') {
+        if (!json.colors?.subtitleTextColor || typeof json.colors.subtitleTextColor !== 'string') {
             errors.push('Invalid subtitle text color');
         }
+        if (!json.colors?.link || typeof json.colors.link !== 'string') {
+            errors.push('Invalid link color');
+        }
+
+        // Validate typography
+        if (!json.typography?.headingFont || typeof json.typography.headingFont !== 'string') {
+            errors.push('Invalid heading font');
+        }
+        if (!json.typography?.bodyFont || typeof json.typography.bodyFont !== 'string') {
+            errors.push('Invalid body font');
+        }
+        if (!json.typography?.baseSize || typeof json.typography.baseSize !== 'number') {
+            errors.push('Invalid base size');
+        }
+        if (!json.typography?.headingSize || typeof json.typography.headingSize !== 'number') {
+            errors.push('Invalid heading size');
+        }
+
+        // Validate spacing
+        if (typeof json.spacing?.section !== 'number') {
+            errors.push('Invalid section spacing');
+        }
+        if (typeof json.spacing?.content !== 'number') {
+            errors.push('Invalid content spacing');
+        }
+        if (typeof json.spacing?.sidebarLeft !== 'boolean') {
+            errors.push('Invalid sidebar position');
+        }
+        if (typeof json.spacing?.sidebarWidth !== 'number') {
+            errors.push('Invalid sidebar width');
+        }
+
+        // Validate columns
+        if (!Array.isArray(json.columns?.left)) {
+            errors.push('Invalid left column configuration');
+        }
+        if (!Array.isArray(json.columns?.right)) {
+            errors.push('Invalid right column configuration');
+        }
+
         return errors;
     }
 
-    static fromJSON(json) {
-        if (!json || typeof json !== 'object') {
-            return new ResumeStyleV1_1();
-        }
-        return new ResumeStyleV1_1(json);
+    static getVersion() {
+        return ResumeStyleV1_1.VERSION;
     }
 } 
