@@ -1,0 +1,8 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+The project is a Vue.JS resume builder.
+Keep Vue.JS components small and tidy.
+If css are too big, move them to a separate file.

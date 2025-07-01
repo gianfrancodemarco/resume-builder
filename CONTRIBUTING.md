@@ -6,6 +6,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 2. Fork the repository
 3. Create your feature branch (`git checkout -b 38-add-some-feature`)
 4. Commit your changes (`git commit -m 'Add some feature'`)
+    4.1 Add/or update tests if needed
 5. Push to the branch (`git push origin 38-add-some-feature`)
 6. Open a Pull Request
 
