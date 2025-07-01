@@ -24,10 +24,12 @@ A modern, single-page resume builder application built with Vue 3 and Vuetify. C
 
 ### Prerequisites
 
-- Node.js (v16 or higher)
-- npm or yarn
+- Node.js (v16 or higher) and npm/yarn, OR
+- Docker and Docker Compose (v2.22.0 or later)
 
 ### Installation
+
+#### Option 1: Local Development
 
 1. Clone the repository:
    ```bash
@@ -51,12 +53,29 @@ A modern, single-page resume builder application built with Vue 3 and Vuetify. C
 
 4. Open your browser and navigate to `http://localhost:5173`
 
+#### Option 2: Docker Development (Recommended)
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/gianfrancodemarco/resume-builder.git
+   cd resume-builder
+   ```
+
+2. Start with Docker Compose Watch:
+   ```bash
+   docker compose up --watch
+   ```
+
+3. Open your browser and navigate to `http://localhost:5173`
+
 ## Technologies Used
 
 - [Vue 3](https://vuejs.org/) - Progressive JavaScript framework
 - [Vuetify 3](https://vuetifyjs.com/) - Material Design component framework
 - [TipTap](https://tiptap.dev/) - Rich text editor
 - [Phosphor Icons](https://phosphoricons.com/) - Icon library
+- [Docker](https://www.docker.com/) - Containerization platform
+- [Docker Compose](https://docs.docker.com/compose/) - File watching and hot reload
 
 ## License
 
