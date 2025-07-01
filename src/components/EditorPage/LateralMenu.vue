@@ -225,7 +225,9 @@ const showAllTooltips = ref(false)
 
 // Theme toggle function
 const toggleTheme = () => {
-    theme.global.name.value = theme.global.current.value.dark ? 'light' : 'dark'
+    const newTheme = theme.global.current.value.dark ? 'light' : 'dark';
+    theme.global.name.value = newTheme;
+    sessionStorage.setItem('theme', newTheme);
 }
 
 // Computed property to safely handle customSections
@@ -308,6 +310,12 @@ onMounted(() => {
     // Add global mouse event listener to hide tooltips when mouse leaves the menu
     document.addEventListener('mouseup', handleShowTooltipsEnd)
     document.addEventListener('mouseleave', handleShowTooltipsEnd)
+
+    // Load theme from session storage
+    const savedTheme = sessionStorage.getItem('theme');
+    if (savedTheme) {
+        theme.global.name.value = savedTheme;
+    }
 })
 
 // Cleanup when component unmounts
