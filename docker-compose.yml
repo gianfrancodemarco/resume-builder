@@ -1,0 +1,28 @@
+services:
+  resume-builder:
+    build: .
+    ports:
+      - "5173:5173"
+    environment:
+      - NODE_ENV=development
+    develop:
+      watch:
+        - action: sync
+          path: ./src
+          target: /app/src
+          ignore:
+            - node_modules/
+            - .DS_Store
+        - action: sync
+          path: ./public
+          target: /app/public
+        - action: sync
+          path: ./index.html
+          target: /app/index.html
+        - action: sync
+          path: ./vite.config.js
+          target: /app/vite.config.js
+        - action: rebuild
+          path: ./package.json
+        - action: rebuild
+          path: ./package-lock.json 
