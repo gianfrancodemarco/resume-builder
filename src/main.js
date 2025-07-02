@@ -11,12 +11,12 @@ import '@mdi/font/css/materialdesignicons.css'
 
 // Phosphor Icons
 import { PhEye, PhEyeSlash, PhPencilSimple, PhCheck, PhTrash, PhPlus, PhTextAlignRight, PhTextAlignLeft, PhArrowUp, PhArrowDown, PhCopy, PhPalette, PhTextT, PhArrowsOutLineVertical, PhGlobe, PhLink, PhX, PhArrowCounterClockwise, PhArrowClockwise, PhTextB, PhTextItalic, PhTextStrikethrough, PhTextUnderline, PhListBullets, PhListNumbers, PhList, PhBracketsCurly, PhUpload, PhFilePdf, PhFileCode, PhFileText, PhLightning, PhUser, PhUserCircle, PhBriefcase, PhGraduationCap, PhPlusCircle, PhTranslate, PhCertificate, PhFolder, PhBookOpen, PhTrophy, PhHeart, PhStar, PhUsers, PhTarget, PhMedal, PhGameController, PhBuildings, PhLightbulb, PhPhone, PhMagnifyingGlassPlus, PhMagnifyingGlassMinus, PhHouse, PhSun, PhMoon, PhCaretUp, PhCaretDown, PhLayout } from '@phosphor-icons/vue'
-
+const savedTheme = localStorage.getItem('theme') || 'dark';
 const vuetify = createVuetify({
     components,
     directives,
     theme: {
-        defaultTheme: 'dark',
+        defaultTheme: savedTheme,
         themes: {
             dark: {
                 dark: true,

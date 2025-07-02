@@ -225,7 +225,9 @@ const showAllTooltips = ref(false)
 
 // Theme toggle function
 const toggleTheme = () => {
-    theme.global.name.value = theme.global.current.value.dark ? 'light' : 'dark'
+    const newTheme = theme.global.current.value.dark ? 'light' : 'dark';
+    theme.global.name.value = newTheme;
+    localStorage.setItem('theme', newTheme);
 }
 
 // Computed property to safely handle customSections
