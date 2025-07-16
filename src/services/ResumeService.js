@@ -31,6 +31,11 @@ export class ResumeService {
                     const resumeData = ResumeDataClass.fromJSON(data.resumeData)
                     const resumeStyle = data.resumeStyle
 
+                    // Ensure customCSS field exists for backward compatibility
+                    if (resumeStyle && resumeStyle.customCSS === undefined) {
+                        resumeStyle.customCSS = ''
+                    }
+
                     resolve({ resumeData, resumeStyle })
                 } catch (error) {
                     reject(new Error(`Error loading file: ${error.message}`))

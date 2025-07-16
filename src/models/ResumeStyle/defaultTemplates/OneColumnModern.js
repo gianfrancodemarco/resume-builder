@@ -30,7 +30,8 @@ export class OneColumnModern extends ResumeStyleV1_1 {
             columns: {
                 left: ['personal', 'education', 'experiences', 'customSections'],
                 right: []
-            }
+            },
+            customCSS: ''
         };
     }
 

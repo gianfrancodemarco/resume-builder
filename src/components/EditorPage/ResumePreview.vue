@@ -90,12 +90,41 @@ export default {
           </div>
         `
       })
+    },
+    updateCustomCSS() {
+      this.removeCustomCSS()
+      if (this.style.customCSS && this.style.customCSS.trim()) {
+        const styleElement = document.createElement('style')
+        styleElement.id = 'resume-custom-css'
+        styleElement.textContent = this.style.customCSS
+        document.head.appendChild(styleElement)
+      }
+    },
+    removeCustomCSS() {
+      const existingStyle = document.getElementById('resume-custom-css')
+      if (existingStyle) {
+        existingStyle.remove()
+      }
+    }
+  },
+  mounted() {
+    this.updateCustomCSS()
+  },
+  beforeUnmount() {
+    this.removeCustomCSS()
+  },
+  watch: {
+    'style.customCSS': {
+      handler() {
+        this.updateCustomCSS()
+      },
+      immediate: true
     }
   },
   computed: {
     resumeStyle() {
-      const { colors, typography, spacing } = this.style
-      return {
+      const { colors, typography, spacing, customCSS } = this.style
+      const baseStyles = {
         '--primary-color': colors.primary,
         '--text-color': colors.text,
         '--background-color': colors.background,
@@ -112,6 +141,10 @@ export default {
         '--content-spacing': `${spacing.content}px`,
         '--sidebar-width': `${spacing.sidebarWidth}px`
       }
+
+      // Custom CSS is handled in mounted hook and watchers
+
+      return baseStyles
     },
     visibleCustomSections() {
       return this.resumeData.customSections.filter(s => s && s.visible !== false)
