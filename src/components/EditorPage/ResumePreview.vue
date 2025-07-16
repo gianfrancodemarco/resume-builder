@@ -79,16 +79,12 @@ export default {
   methods: {
     processContent(content) {
       if (!content) return ''
-      // Replace language proficiency text with bars
+      // Replace language proficiency text with a single bar using a CSS variable
       return content.replace(/\(([^)]+)\)\[BAR:(\d+)\]/g, (match, name, proficiency) => {
-        return `
-          <div class="proficiency-bar-container">
+        return `<div class="proficiency-bar-container">
             <div class="proficiency-bar-label">${name}</div>
-            <div class="proficiency-bar">
-              <div class="proficiency-bar-fill" style="width: ${proficiency}%"></div>
-            </div>
-          </div>
-        `
+            <div class="proficiency-bar" style="--proficiency: ${proficiency}"></div>
+          </div>`
       })
     },
     updateCustomCSS() {

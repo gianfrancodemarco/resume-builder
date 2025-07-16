@@ -138,7 +138,7 @@ export class ResumeDataV2 {
                 },
                 {
                     title: 'Languages',
-                    content: '(Italian)[BAR:100]<br/>(English)[BAR:90]<br/>(Spanish)[BAR:70]',
+                    content: '(Italian)[BAR:100](English)[BAR:90](Spanish)[BAR:70]',
                     visible: true,
                     position: 'sidebar'
                 }

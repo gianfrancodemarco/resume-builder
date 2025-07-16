@@ -31,7 +31,7 @@ export class OneColumnModern extends ResumeStyleV1_1 {
                 left: ['personal', 'education', 'experiences', 'customSections'],
                 right: []
             },
-            customCSS: ''
+            customCSS: `h1, .subtitle {text-align: center}`                
         };
     }
 
