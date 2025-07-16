@@ -79,23 +79,48 @@ export default {
   methods: {
     processContent(content) {
       if (!content) return ''
-      // Replace language proficiency text with bars
+      // Replace language proficiency text with a single bar using a CSS variable
       return content.replace(/\(([^)]+)\)\[BAR:(\d+)\]/g, (match, name, proficiency) => {
-        return `
-          <div class="proficiency-bar-container">
+        return `<div class="proficiency-bar-container">
             <div class="proficiency-bar-label">${name}</div>
-            <div class="proficiency-bar">
-              <div class="proficiency-bar-fill" style="width: ${proficiency}%"></div>
-            </div>
-          </div>
-        `
+            <div class="proficiency-bar" style="--proficiency: ${proficiency}"></div>
+          </div>`
       })
+    },
+    updateCustomCSS() {
+      this.removeCustomCSS()
+      if (this.style.customCSS && this.style.customCSS.trim()) {
+        const styleElement = document.createElement('style')
+        styleElement.id = 'resume-custom-css'
+        styleElement.textContent = this.style.customCSS
+        document.head.appendChild(styleElement)
+      }
+    },
+    removeCustomCSS() {
+      const existingStyle = document.getElementById('resume-custom-css')
+      if (existingStyle) {
+        existingStyle.remove()
+      }
+    }
+  },
+  mounted() {
+    this.updateCustomCSS()
+  },
+  beforeUnmount() {
+    this.removeCustomCSS()
+  },
+  watch: {
+    'style.customCSS': {
+      handler() {
+        this.updateCustomCSS()
+      },
+      immediate: true
     }
   },
   computed: {
     resumeStyle() {
-      const { colors, typography, spacing } = this.style
-      return {
+      const { colors, typography, spacing, customCSS } = this.style
+      const baseStyles = {
         '--primary-color': colors.primary,
         '--text-color': colors.text,
         '--background-color': colors.background,
@@ -112,6 +137,10 @@ export default {
         '--content-spacing': `${spacing.content}px`,
         '--sidebar-width': `${spacing.sidebarWidth}px`
       }
+
+      // Custom CSS is handled in mounted hook and watchers
+
+      return baseStyles
     },
     visibleCustomSections() {
       return this.resumeData.customSections.filter(s => s && s.visible !== false)

@@ -30,7 +30,8 @@ export class TwoColumnsBlue extends ResumeStyleV1_1 {
             columns: {
                 left: ['personal', 'education'],
                 right: ['experiences', 'customSections']
-            }
+            },
+            customCSS: ''
         };
     }
 

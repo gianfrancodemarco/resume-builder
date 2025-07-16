@@ -69,7 +69,8 @@ export class ResumeStyleV1_1 {
             columns: {
                 left: ['personal', 'education'],
                 right: ['experiences', 'customSections']
-            }
+            },
+            customCSS: ''
         };
     }
 
@@ -136,6 +137,11 @@ export class ResumeStyleV1_1 {
         }
         if (!Array.isArray(json.columns?.right)) {
             errors.push('Invalid right column configuration');
+        }
+
+        // Validate customCSS
+        if (json.customCSS !== undefined && typeof json.customCSS !== 'string') {
+            errors.push('Invalid custom CSS');
         }
 
         return errors;
