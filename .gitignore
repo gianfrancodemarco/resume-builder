@@ -2,3 +2,4 @@
 .history
 node_modules
 commit-adjust.sh
+coverage
