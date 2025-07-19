@@ -5,6 +5,7 @@ export class TwoColumnsGreen extends ResumeStyleV1_1 {
 
     static createDefault() {
         return {
+            templateName: 'TwoColumnsGreen',
             colors: {
                 primary: '#27AE60',
                 text: '#2C3E50',
