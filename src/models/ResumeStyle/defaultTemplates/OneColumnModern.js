@@ -5,6 +5,7 @@ export class OneColumnModern extends ResumeStyleV1_1 {
 
     static createDefault() {
         return {
+            templateName: 'OneColumnModern',
             colors: {
                 primary: '#2C3E50',
                 text: '#2C3E50',
@@ -31,7 +32,7 @@ export class OneColumnModern extends ResumeStyleV1_1 {
                 left: ['personal', 'education', 'experiences', 'customSections'],
                 right: []
             },
-            customCSS: `h1, .subtitle {text-align: center}`                
+            customCSS: `h1, .subtitle {text-align: center}`
         };
     }
 

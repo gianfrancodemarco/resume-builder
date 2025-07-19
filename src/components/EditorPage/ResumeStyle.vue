@@ -16,13 +16,18 @@
                     <div>
                         <div class="text-subtitle-2 mb-3">Choose a template</div>
                         <div class="templates-grid">
-                            <div v-for="template in templateOptions" :key="template.key" class="template-item"
+                            <div v-for="template in templateOptions" :key="template.key"
+                                :class="['template-item', { 'template-item-active': isActiveTemplate(template.key) }]"
                                 @click="confirmTemplateChange(template.key)">
                                 <div class="template-preview">
-                                    <ResumePreview :resume-data="props.resumeData" :style="template.instance"
+                                    <TemplateFactory :resume-data="props.resumeData" :style="template.instance"
                                         :sidebar-position="template.instance.spacing.sidebarLeft ? 'left' : 'right'" />
                                 </div>
-                                <div class="template-name">{{ template.name }}</div>
+                                <div class="template-name">
+                                    {{ template.name }}
+                                    <v-icon v-if="isActiveTemplate(template.key)" icon="ph-check-circle" size="small"
+                                        color="primary" class="ml-2" />
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -167,12 +172,12 @@
                         <div class="text-subtitle-2">Content Spacing</div>
                         <v-slider v-model="styleData.spacing.content" min="0" max="24" step="2" thumb-label></v-slider>
                     </div>
-                    <div class="slider-container">
+                    <div class="slider-container" v-if="!isOneColumnTemplate">
                         <div class="text-subtitle-2">Sidebar Width</div>
                         <v-slider v-model="styleData.spacing.sidebarWidth" min="0" max="400" step="10"
                             thumb-label></v-slider>
                     </div>
-                    <div>
+                    <div v-if="!isOneColumnTemplate">
                         <v-switch v-model="styleData.spacing.sidebarLeft" :disabled="!isSidebarPresent"
                             label="Sidebar on Left" hide-details density="compact" color="primary"></v-switch>
                     </div>
@@ -220,7 +225,7 @@
 <script setup>
 import { ResumeStyleV1_1 } from '@/models/ResumeStyle/ResumeStyleV1_1'
 import { TemplateService } from '@/services/TemplateService'
-import ResumePreview from './ResumePreview.vue'
+import TemplateFactory from './templates/TemplateFactory.vue'
 import { computed, ref } from 'vue'
 
 const props = defineProps({
@@ -251,6 +256,10 @@ const onTemplateSelect = (templateKey) => {
 
     const templateInstance = TemplateService.createTemplateInstance(templateKey)
     if (templateInstance) {
+        // Completely replace the style data instead of merging
+        Object.keys(props.styleData).forEach(key => {
+            delete props.styleData[key]
+        })
         Object.assign(props.styleData, templateInstance)
         props.styleData.templateName = templateInstance.templateName
         emit('update:style-data', props.styleData)
@@ -291,6 +300,14 @@ const validateHex = (key) => {
 const isSidebarPresent = computed(() => {
     return props.styleData.spacing.sidebarWidth > 0
 })
+
+const isOneColumnTemplate = computed(() => {
+    return props.styleData.templateName === 'OneColumnModern'
+})
+
+const isActiveTemplate = (templateKey) => {
+    return props.styleData.templateName === templateKey
+}
 
 const templatesExpanded = ref(false)
 const toggleTemplates = () => {
@@ -526,6 +543,17 @@ const handleCustomCSSChange = () => {
     border-color: rgb(var(--v-theme-primary));
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.template-item-active {
+    border-color: rgb(var(--v-theme-primary)) !important;
+    background-color: rgba(var(--v-theme-primary), 0.05) !important;
+    box-shadow: 0 4px 12px rgba(var(--v-theme-primary), 0.2) !important;
+}
+
+.template-item-active:hover {
+    border-color: rgb(var(--v-theme-primary)) !important;
+    background-color: rgba(var(--v-theme-primary), 0.08) !important;
 }
 
 .template-preview {

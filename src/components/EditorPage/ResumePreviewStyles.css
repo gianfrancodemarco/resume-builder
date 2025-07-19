@@ -194,6 +194,11 @@
     white-space: pre-wrap;
 }
 
+/* Single column template content - no sidebar width calculation */
+.content.single-column {
+    width: 100%;
+}
+
 .content h1,
 .content h2,
 .content p,

@@ -44,6 +44,7 @@ export class ResumeStyleV1_1 {
 
     static createDefault() {
         return {
+            templateName: 'TwoColumnsBlue',
             colors: {
                 primary: '#08294D',
                 text: '#08294D',

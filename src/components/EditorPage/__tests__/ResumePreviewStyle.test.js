@@ -1,9 +1,9 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import { mount } from '@vue/test-utils'
-import ResumePreview from '@/components/EditorPage/ResumePreview.vue'
+import TemplateFactory from '@/components/EditorPage/templates/TemplateFactory.vue'
 import { vuetify } from '@/test/setup'
 
-describe('ResumePreview Style', () => {
+describe('TemplateFactory Style', () => {
     let wrapper
 
     const mockResumeData = {
@@ -41,7 +41,7 @@ describe('ResumePreview Style', () => {
     }
 
     beforeEach(() => {
-        wrapper = mount(ResumePreview, {
+        wrapper = mount(TemplateFactory, {
             global: {
                 plugins: [vuetify]
             },
@@ -289,6 +289,7 @@ describe('ResumePreview Style', () => {
         it('correctly computes isSidebarPresent when sidebar width is 0', async () => {
             const styleWithZeroSidebar = {
                 ...mockStyle,
+                templateName: 'TwoColumnsBlue',
                 spacing: {
                     ...mockStyle.spacing,
                     sidebarWidth: 0
@@ -297,7 +298,9 @@ describe('ResumePreview Style', () => {
 
             await wrapper.setProps({ style: styleWithZeroSidebar })
 
-            expect(wrapper.vm.isSidebarPresent).toBe(false)
+            // Access computed properties through the template component
+            const templateComponent = wrapper.findComponent({ name: 'TwoColumnTemplate' })
+            expect(templateComponent.vm.isSidebarPresent).toBe(false)
         })
 
         it('correctly computes isSidebarPresent when sidebar width is greater than 0', async () => {
@@ -311,7 +314,9 @@ describe('ResumePreview Style', () => {
 
             await wrapper.setProps({ style: styleWithSidebar })
 
-            expect(wrapper.vm.isSidebarPresent).toBe(true)
+            // Access computed properties through the template component
+            const templateComponent = wrapper.findComponent({ name: 'TwoColumnTemplate' })
+            expect(templateComponent.vm.isSidebarPresent).toBe(true)
         })
 
         it('correctly filters sidebar custom sections', async () => {
@@ -346,8 +351,10 @@ describe('ResumePreview Style', () => {
                 style: styleWithSidebar
             })
 
-            expect(wrapper.vm.sidebarCustomSections).toHaveLength(1)
-            expect(wrapper.vm.sidebarCustomSections[0].title).toBe('Skills')
+            // Access computed properties through the template component
+            const templateComponent = wrapper.findComponent({ name: 'TwoColumnTemplate' })
+            expect(templateComponent.vm.sidebarCustomSections).toHaveLength(1)
+            expect(templateComponent.vm.sidebarCustomSections[0].title).toBe('Skills')
         })
 
         it('moves all sections to main content when sidebar is not present', async () => {
@@ -371,6 +378,7 @@ describe('ResumePreview Style', () => {
 
             const styleWithZeroSidebar = {
                 ...mockStyle,
+                templateName: 'TwoColumnsBlue',
                 spacing: {
                     ...mockStyle.spacing,
                     sidebarWidth: 0
@@ -382,7 +390,9 @@ describe('ResumePreview Style', () => {
                 style: styleWithZeroSidebar
             })
 
-            expect(wrapper.vm.mainCustomSections).toHaveLength(2)
+            // Access computed properties through the template component
+            const templateComponent = wrapper.findComponent({ name: 'TwoColumnTemplate' })
+            expect(templateComponent.vm.mainCustomSections).toHaveLength(2)
         })
     })
 

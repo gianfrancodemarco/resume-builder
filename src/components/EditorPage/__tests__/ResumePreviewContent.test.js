@@ -1,10 +1,10 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import { mount } from '@vue/test-utils'
-import ResumePreview from '@/components/EditorPage/ResumePreview.vue'
+import TemplateFactory from '@/components/EditorPage/templates/TemplateFactory.vue'
 import { vuetify } from '@/test/setup'
 import { ResumeDataV2 } from '@/models/ResumeData/ResumeDataV2'
 
-describe('ResumePreview Content', () => {
+describe('TemplateFactory Content', () => {
     let wrapper
 
     const mockResumeData = new ResumeDataV2({
@@ -102,7 +102,7 @@ describe('ResumePreview Content', () => {
     }
 
     beforeEach(() => {
-        wrapper = mount(ResumePreview, {
+        wrapper = mount(TemplateFactory, {
             global: {
                 plugins: [vuetify]
             },
