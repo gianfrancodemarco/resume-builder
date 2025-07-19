@@ -7,7 +7,8 @@
       </v-window-item>
 
       <v-window-item value="style">
-        <ResumeStyle v-model:style-data="props.style" :resume-data="props.resumeData" @update:style-data="updateStyle" />
+        <ResumeStyle :style-data="props.style" :resume-data="props.resumeData" @update:style-data="updateStyle"
+          @change="emit('change')" />
       </v-window-item>
     </v-window>
   </div>

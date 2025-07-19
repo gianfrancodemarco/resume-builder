@@ -97,7 +97,8 @@ describe('ResumePreview Content', () => {
             section: 16,
             content: 8,
             sidebarWidth: 280
-        }
+        },
+        customCSS: ''
     }
 
     beforeEach(() => {
@@ -198,6 +199,71 @@ describe('ResumePreview Content', () => {
             expect(wrapper.text()).toContain('Vue.js')
             expect(wrapper.text()).toContain('JavaScript')
             expect(wrapper.text()).toContain('TypeScript')
+        })
+    })
+
+    describe('Custom CSS', () => {
+        it('injects custom CSS into document head when provided', async () => {
+            const styleWithCustomCSS = {
+                ...mockStyle,
+                customCSS: 'h1 { color: red !important; }'
+            }
+            await wrapper.setProps({
+                style: styleWithCustomCSS
+            })
+
+            // Check that the style element is injected into document head
+            const styleElement = document.getElementById('resume-custom-css')
+            expect(styleElement).toBeTruthy()
+            expect(styleElement.textContent).toContain('h1 { color: red !important; }')
+        })
+
+        it('removes custom CSS when no custom CSS is provided', async () => {
+            // First add some custom CSS
+            const styleWithCustomCSS = {
+                ...mockStyle,
+                customCSS: 'h1 { color: red !important; }'
+            }
+            await wrapper.setProps({
+                style: styleWithCustomCSS
+            })
+
+            // Then remove it
+            const styleWithoutCustomCSS = {
+                ...mockStyle,
+                customCSS: ''
+            }
+            await wrapper.setProps({
+                style: styleWithoutCustomCSS
+            })
+
+            // Check that the style element is removed
+            const styleElement = document.getElementById('resume-custom-css')
+            expect(styleElement).toBeNull()
+        })
+
+        it('cleans up custom CSS on component unmount', async () => {
+            const styleWithCustomCSS = {
+                ...mockStyle,
+                customCSS: 'h1 { color: red !important; }'
+            }
+            await wrapper.setProps({
+                style: styleWithCustomCSS
+            })
+
+            // Verify CSS is injected
+            expect(document.getElementById('resume-custom-css')).toBeTruthy()
+
+            // Unmount component
+            await wrapper.unmount()
+
+            // Verify CSS is cleaned up
+            expect(document.getElementById('resume-custom-css')).toBeNull()
+        })
+    })
+
+    describe('Custom Sections Visibility', () => {
+        it('displays all custom section content', () => {
             expect(wrapper.text()).toContain('HTML/CSS')
             expect(wrapper.text()).toContain('Node.js')
             expect(wrapper.text()).toContain('Languages')

@@ -107,7 +107,7 @@ const downloadPDF = async () => {
 }
 
 const downloadHTML = async () => {
-    await ExporterService.exportToHTML(resumeData.value)
+    await ExporterService.exportToHTML(resumeData.value, resumeStyle.value)
 }
 
 const exportJSON = () => {

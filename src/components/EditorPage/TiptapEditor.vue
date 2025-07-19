@@ -93,35 +93,6 @@ const LanguageProficiency = Node.create({
             }
         }
     },
-    parseHTML() {
-        return [
-            {
-                tag: 'div[data-type="language-proficiency"]',
-            },
-        ]
-    },
-    renderHTML({ HTMLAttributes }) {
-        return [
-            'div',
-            { 'data-type': 'language-proficiency' },
-            [
-                'div',
-                { class: 'language-proficiency-label' },
-                HTMLAttributes.name
-            ],
-            [
-                'div',
-                { class: 'language-proficiency-bar' },
-                [
-                    'div',
-                    {
-                        class: 'language-proficiency-bar-fill',
-                        style: `width: ${HTMLAttributes.proficiency}%`
-                    }
-                ]
-            ]
-        ]
-    },
     addNodeView() {
         return ({ node, HTMLAttributes, getPos }) => {
             const dom = document.createElement('div')

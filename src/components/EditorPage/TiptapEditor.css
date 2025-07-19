@@ -176,25 +176,3 @@
     background: #e0e0e0;
     color: #333;
 }
-
-[data-type="proficiency-bar-container"] .proficiency-bar-label {
-    font-size: 0.9em;
-    margin-bottom: 8px;
-    font-weight: 500;
-    color: #333;
-}
-
-[data-type="proficiency-bar-container"] .proficiency-bar {
-    height: 8px;
-    background-color: #e0e0e0;
-    border-radius: 4px;
-    overflow: hidden;
-    max-width: 250px;
-}
-
-[data-type="proficiency-bar-container"] .proficiency-bar-fill {
-    height: 100%;
-    background-color: #1976d2;
-    border-radius: 4px;
-    transition: width 0.3s ease;
-}

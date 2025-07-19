@@ -68,7 +68,7 @@ A modern, single-page resume builder application built with Vue 3 and Vuetify. C
 
 2. Start with Docker Compose Watch:
    ```bash
-   docker compose up --watch
+   docker compose up --build --watch
    ```
 
 3. Open your browser and navigate to `http://localhost:5173`

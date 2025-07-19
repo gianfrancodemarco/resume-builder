@@ -48,6 +48,9 @@ export class ExporterService {
             html {
                 background-color: var(--background-color) !important;
             }
+
+            /* Custom CSS from user */
+            ${resumeStyle.customCSS || ''}
         `
         printWindow.document.head.appendChild(style)
         printWindow.document.body.innerHTML = srcEl.outerHTML
@@ -59,7 +62,7 @@ export class ExporterService {
         })
     }
 
-    static async exportToHTML(resumeData) {
+    static async exportToHTML(resumeData, resumeStyle) {
         const srcEl = document.getElementById('printable-area')
         if (!srcEl) return
 
@@ -117,6 +120,9 @@ export class ExporterService {
 
         ${localCSS}
         ${externalCSS}
+
+        /* Custom CSS from user */
+        ${resumeStyle.customCSS || ''}
       `
         printWindow.document.head.appendChild(styleTag)
 

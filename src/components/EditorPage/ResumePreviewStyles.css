@@ -330,7 +330,7 @@ li {
 /*** Proficiency Bars ***/
 
 .proficiency-bar-container {
-    display: block;
+    display: contents;
 }
 
 .proficiency-bar-label {
@@ -340,15 +340,14 @@ li {
 
 .proficiency-bar {
     height: 8px;
-    background-color: #526A82;
     border-radius: 4px;
-    overflow: hidden;
+    width: 100%;
     max-width: 250px;
     margin-bottom: 8px;
-}
-
-.proficiency-bar-fill {
-    height: 100%;
-    background-color: #fff;
-    border-radius: 4px;
+    border: 1px solid #526A82;
+    background: linear-gradient(to right,
+            #fff 0%,
+            #fff calc(var(--proficiency, 0) * 1%),
+            #526A82 calc(var(--proficiency, 0) * 1%),
+            #526A82 100%);
 }

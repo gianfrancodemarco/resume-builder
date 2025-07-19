@@ -199,7 +199,7 @@ export class CVConversionService {
         } catch (error) {
             console.error('Error fetching models:', error)
             // Fallback to hardcoded models if API fails
-            return this.getDefaultModels()
+            throw new Error('Error fetching models: ' + error.message)
         }
     }
 
