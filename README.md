@@ -2,9 +2,14 @@
 
 A modern, single-page resume builder application built with Vue 3 and Vuetify. Create professional resumes with a beautiful UI and export them as HTML, PDF or JSON.
 
-![Resume Builder Screenshot](screenshot.png)
+## Disclaimer
+
+*This project is a work in progress and is provided "as is" without any warranties or guarantees. The developers are not responsible for any issues or damages that may arise from using this software. This application is developed using AI for code generation, embracing a "vibe coding" approach to enhance speed and efficiency. Users are encouraged to contribute to the project and report any bugs or issues they encounter. Please use this application at your own risk.*
+
 
 ## Features
+
+![Resume Builder Screenshot](screenshot.png)
 
 - 🎨 **Modern UI**: Clean and intuitive interface built with Vuetify 3
 - 📝 **Real-time Preview**: See your changes instantly with live preview
