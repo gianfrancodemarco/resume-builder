@@ -48,6 +48,14 @@ export default {
       const templateName = this.style.templateName || 'TwoColumnsBlue'
       return TEMPLATE_COMPONENTS[templateName] || TwoColumnTemplate
     }
+  },
+  beforeUnmount() {
+    // Ensure child components are properly unmounted
+    this.$nextTick(() => {
+      // Force cleanup of any remaining custom CSS
+      const remainingStyles = document.querySelectorAll('style[id^="resume-custom"]')
+      remainingStyles.forEach(style => style.remove())
+    })
   }
 }
 </script> 

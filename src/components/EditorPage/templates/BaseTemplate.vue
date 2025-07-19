@@ -66,6 +66,10 @@ export default {
   beforeUnmount() {
     this.removeCustomCSS()
   },
+  unmounted() {
+    // Ensure cleanup happens even if beforeUnmount doesn't trigger
+    this.removeCustomCSS()
+  },
   watch: {
     'style.customCSS': {
       handler() {
