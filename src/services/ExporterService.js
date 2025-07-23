@@ -54,7 +54,12 @@ export class ExporterService {
             });
         }
         // Remove debug output
-        const filename = this.getFilename(resumeData, 'txt');
+        let filename;
+        try {
+            filename = this.getFilename(resumeData, 'txt');
+        } catch (e) {
+            filename = 'resume.txt'; // fallback if personal info is missing
+        }
         const blob = new Blob([txt.trim()], { type: 'text/plain' });
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
