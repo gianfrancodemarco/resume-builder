@@ -2,6 +2,70 @@ import { ResumeService } from './ResumeService'
 
 export class ExporterService {
     /**
+     * Export resume as plain text (.txt)
+     * @param {ResumeData} resumeData - The resume data
+     * @returns {Promise<void>}
+     */
+    static async exportToTXT(resumeData) {
+        let txt = '';
+        // Personal Info
+        if (resumeData.personal) {
+            if (resumeData.personal.name) txt += `${resumeData.personal.name}\n`;
+            if (resumeData.personal.title) txt += `${resumeData.personal.title}\n`;
+            txt += '\n';
+        }
+        // Experiences
+        if (Array.isArray(resumeData.experiences) && resumeData.experiences.length > 0) {
+            txt += (resumeData.experiencesSectionName || 'Employment History') + '\n';
+            resumeData.experiences.forEach(exp => {
+                if (exp.title || exp.company) {
+                    txt += `${exp.title || ''}`;
+                    if (exp.company) txt += ` - ${exp.company}`;
+                    txt += '\n';
+                }
+                if (exp.period) txt += `${exp.period}\n`;
+                if (exp.description) txt += `\n${exp.description}\n`;
+                txt += '\n';
+            });
+        }
+        // Education
+        if (Array.isArray(resumeData.education) && resumeData.education.length > 0) {
+            txt += (resumeData.educationSectionName || 'Education') + '\n';
+            resumeData.education.forEach(edu => {
+                if (edu.degree || edu.school) {
+                    txt += `${edu.degree || ''}`;
+                    if (edu.school) txt += ` - ${edu.school}`;
+                    txt += '\n';
+                }
+                if (edu.period) txt += `${edu.period}\n`;
+                if (edu.mark) txt += `${edu.mark}\n`;
+                if (edu.thesis) txt += `${edu.thesis}\n`;
+                if (edu.description) txt += `${edu.description}\n`;
+                txt += '\n';
+            });
+        }
+        // Custom Sections (sidebar and main)
+        if (Array.isArray(resumeData.customSections)) {
+            resumeData.customSections.forEach(section => {
+                if (section.title && section.content) {
+                    txt += `${section.title}\n`;
+                    txt += this.htmlToText(section.content) + '\n\n';
+                }
+            });
+        }
+        // Remove debug output
+        const filename = this.getFilename(resumeData, 'txt');
+        const blob = new Blob([txt.trim()], { type: 'text/plain' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+    }
+    /**
      * Gets a filename for the resume based on personal info
      * @param {ResumeData} resumeData - The resume data containing personal info
      * @param {string} extension - The file extension to use
@@ -145,4 +209,12 @@ export class ExporterService {
             printWindow.close()
         }, 0)
     }
-} 
+
+    static htmlToText(html) {
+        // Simple HTML to text conversion
+        if (!html) return '';
+        let tmp = document.createElement('div');
+        tmp.innerHTML = html;
+        return tmp.innerText.replace(/\n{2,}/g, '\n').trim();
+    }
+}

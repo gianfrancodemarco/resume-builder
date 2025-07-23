@@ -155,6 +155,13 @@
             </v-tooltip>
             <v-tooltip location="right" :model-value="showAllTooltips">
                 <template v-slot:activator="{ props: tooltipProps }">
+                    <v-btn v-bind="tooltipProps" icon="ph-article-nytimes" color="grey" variant="text" class="menu-btn"
+                        @click="handleDownloadTXT" />
+                </template>
+                Download TXT
+            </v-tooltip>
+            <v-tooltip location="right" :model-value="showAllTooltips">
+                <template v-slot:activator="{ props: tooltipProps }">
                     <v-btn v-bind="tooltipProps" icon="ph-file-text" color="grey" variant="text" class="menu-btn"
                         @click="handleConvertCV" />
                 </template>
@@ -213,6 +220,7 @@ const props = defineProps({
     handleImportJSON: Function,
     handleDownloadPDF: Function,
     handleDownloadHTML: Function,
+    handleDownloadTXT: Function,
     handleConvertCV: Function,
     handleHome: Function
 })
@@ -342,6 +350,7 @@ const handleExportJSON = () => props.handleExportJSON && props.handleExportJSON(
 const handleImportJSON = () => props.handleImportJSON && props.handleImportJSON()
 const handleDownloadPDF = () => props.handleDownloadPDF && props.handleDownloadPDF()
 const handleDownloadHTML = () => props.handleDownloadHTML && props.handleDownloadHTML()
+const handleDownloadTXT = () => props.handleDownloadTXT && props.handleDownloadTXT()
 const handleConvertCV = () => props.handleConvertCV && props.handleConvertCV()
 const handleHome = () => props.handleHome && props.handleHome()
 

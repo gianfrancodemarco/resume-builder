@@ -3,12 +3,14 @@
         <v-main>
             <div class="editor-content" :class="{ 'mobile-view': isMobile }">
                 <!-- Lateral Menu -->
+
                 <LateralMenu v-model:active-tab="activeTab" :custom-sections="resumeData.customSections"
                     :handleShowAll="handleShowAllTooltips" :handleShowTooltipsStart="handleShowTooltipsStart"
                     :handleShowTooltipsEnd="handleShowTooltipsEnd" :handleZoomIn="handleZoomIn"
                     :handleZoomOut="handleZoomOut" :handleExportJSON="handleExportJSON"
                     :handleImportJSON="handleImportJSON" :handleDownloadPDF="handleDownloadPDF"
-                    :handleDownloadHTML="handleDownloadHTML" :handleConvertCV="handleConvertCVButtonClick"
+                    :handleDownloadHTML="handleDownloadHTML" :handleDownloadTXT="handleDownloadTXT"
+                    :handleConvertCV="handleConvertCVButtonClick"
                     :handleHome="handleHome" @scroll-to-section="handleScrollToSection"
                     @update:active-tab="activeTab = $event" />
 
@@ -286,6 +288,39 @@ const handleZoomOut = () => {
 const handleHome = () => {
     // Navigate to home page
     router.push('/')
+}
+
+// Placeholder for form change handler
+const handleFormChange = () => {
+    console.log('Form change handler is not yet implemented.');
+};
+
+const handleFormSave = () => {
+    console.log('Form save handler is not yet implemented.');
+};
+
+// TXT Export logic
+const downloadTXT = async () => {
+    await ExporterService.exportToTXT(resumeData.value)
+}
+
+const handleDownloadTXT = async () => {
+    if (window.sa_event) {
+        window.sa_event('download_txt');
+    }
+    try {
+        console.log('Attempting to download TXT...');
+        logResumeData();
+        await downloadTXT();
+        showAlert('TXT Generated', 'Your resume has been generated as TXT.', 'success');
+    } catch (error) {
+        console.error('Error generating TXT:', error);
+        showAlert('TXT Generation Failed', 'Failed to generate TXT. Please try again.', 'error');
+    }
+}
+
+const logResumeData = () => {
+    console.log('Resume Data:', resumeData.value)
 }
 </script>
 
