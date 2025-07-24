@@ -16,7 +16,7 @@ A modern, single-page resume builder application built with Vue 3 and Vuetify. C
 - 🔄 **Dynamic Sections**: Add, remove, and reorder sections as needed
 - 🎯 **Customizable Details**: Flexible detail fields with link support
 - 🎭 **Style Customization**: Customize colors, typography, and layout
-- 💾 **Multiple Export Formats**: Download as HTML, PDF, or JSON
+- 💾 **Multiple Export Formats**: Download as HTML, PDF, JSON or TXT (plain text)
 - 🔒 **Privacy First**: Everything stays in your browser
 - 💾 **Save/Load**: Import and export your resume data as JSON
 - 🤖 **AI CV Conversion**: Convert existing CVs using AI models

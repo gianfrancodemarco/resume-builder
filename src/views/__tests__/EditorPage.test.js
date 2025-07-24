@@ -101,6 +101,7 @@ describe('EditorPage', () => {
         vi.spyOn(ExporterService, 'getFilename').mockImplementation(() => 'test.json')
         vi.spyOn(ExporterService, 'exportToPDF').mockImplementation(() => Promise.resolve())
         vi.spyOn(ExporterService, 'exportToHTML').mockImplementation(() => Promise.resolve())
+        vi.spyOn(ExporterService, 'exportToTXT').mockImplementation(() => Promise.resolve())
 
         // Mock CVConversionService methods
         vi.spyOn(CVConversionService, 'fetchAvailableModels').mockImplementation(() => Promise.resolve(['model1', 'model2']))
@@ -485,6 +486,61 @@ describe('EditorPage', () => {
             expect(consoleSpy).toHaveBeenCalledWith('Error generating HTML:', expect.any(Error))
 
             consoleSpy.mockRestore()
+        })
+    })
+
+    describe('TXT Export', () => {
+        it('exports resume as TXT successfully', async () => {
+            // Trigger TXT export
+            await wrapper.vm.handleDownloadTXT()
+
+            // Verify ExporterService.exportToTXT was called
+            expect(ExporterService.exportToTXT).toHaveBeenCalledWith(
+                wrapper.vm.resumeData
+            )
+
+            // Verify sa_event was called
+            expect(window.sa_event).toHaveBeenCalledWith('download_txt')
+        })
+
+        it('handles TXT export error', async () => {
+            // Mock ExporterService to throw error
+            vi.spyOn(ExporterService, 'exportToTXT').mockImplementation(() => {
+                throw new Error('TXT generation failed')
+            })
+
+            // Mock console.error to avoid noise in tests
+            const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => { })
+
+            // Trigger TXT export
+            await wrapper.vm.handleDownloadTXT()
+
+            // Verify error was logged
+            expect(consoleSpy).toHaveBeenCalledWith('Error generating TXT:', expect.any(Error))
+
+            consoleSpy.mockRestore()
+        })
+
+        it('passes correct resume data to TXT export', async () => {
+            // Set specific resume data
+            const testResumeData = new ResumeDataClass({
+                personal: {
+                    name: 'Luke Skywalker',
+                    title: 'Jedi Knight'
+                },
+                experiences: [{
+                    title: 'Jedi Knight',
+                    company: 'Rebel Alliance',
+                    period: '2019-2023'
+                }]
+            })
+            wrapper.vm.resumeData = testResumeData
+
+            // Trigger TXT export
+            await wrapper.vm.handleDownloadTXT()
+
+            // Verify ExporterService.exportToTXT was called with correct data
+            expect(ExporterService.exportToTXT).toHaveBeenCalledWith(testResumeData)
         })
     })
 
