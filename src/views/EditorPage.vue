@@ -292,11 +292,11 @@ const handleHome = () => {
 
 // Placeholder for form change handler
 const handleFormChange = () => {
-    console.log('Form change handler is not yet implemented.');
+    // Form change handler (currently not implemented)
 };
 
 const handleFormSave = () => {
-    console.log('Form save handler is not yet implemented.');
+    // Form save handler (currently not implemented)
 };
 
 // TXT Export logic
@@ -309,18 +309,13 @@ const handleDownloadTXT = async () => {
         window.sa_event('download_txt');
     }
     try {
-        console.log('Attempting to download TXT...');
-        logResumeData();
+        // Call the downloadTXT function to generate and download the TXT file
         await downloadTXT();
         showAlert('TXT Generated', 'Your resume has been generated as TXT.', 'success');
     } catch (error) {
         console.error('Error generating TXT:', error);
         showAlert('TXT Generation Failed', 'Failed to generate TXT. Please try again.', 'error');
     }
-}
-
-const logResumeData = () => {
-    console.log('Resume Data:', resumeData.value)
 }
 </script>
 
