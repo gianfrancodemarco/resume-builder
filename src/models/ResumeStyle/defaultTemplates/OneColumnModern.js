@@ -24,7 +24,7 @@ export class OneColumnModern extends ResumeStyleV1_1 {
             },
             spacing: {
                 section: 20,
-                content: 8,
+                content: 20,
                 sidebarLeft: false,
                 sidebarWidth: 0 // No sidebar for one-column
             },
@@ -32,7 +32,7 @@ export class OneColumnModern extends ResumeStyleV1_1 {
                 left: ['personal', 'education', 'experiences', 'customSections'],
                 right: []
             },
-            customCSS: `h1, .subtitle {text-align: center}`
+            customCSS: ``
         };
     }
 

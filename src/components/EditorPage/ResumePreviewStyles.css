@@ -158,13 +158,11 @@
 
 .sidebar div {
     margin-bottom: 6px;
-    font-size: 0.9em;
     word-wrap: break-word;
 }
 
 .sidebar p {
     margin: 0 0 4px;
-    font-size: 0.85em;
     line-height: 1.4;
     font-weight: 100;
     word-wrap: break-word;

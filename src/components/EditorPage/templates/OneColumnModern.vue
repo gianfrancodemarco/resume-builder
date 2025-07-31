@@ -1,46 +1,54 @@
 <template>
   <BaseTemplate v-bind="$props">
-    <div class="preview-container">
-      <div class="container single-column">
-        <div class="content single-column centered">
-          <h1>{{ resumeData.personal.name || 'Your Name' }}</h1>
-          <h2 class="subtitle">{{ resumeData.personal.title }}</h2>
+    <div class="ocm-resume">
+      <!-- Header -->
+      <div class="ocm-header">
+        <div class="ocm-name">{{ resumeData.personal.name || 'Your Name' }}</div>
+        <div class="ocm-title">{{ resumeData.personal.title }}</div>
+      </div>
 
-          <div class="section"
-            v-if="resumeData.experiencesVisible && resumeData.experiences && resumeData.experiences.filter(e => e?.visible).length">
-            <h2>{{ resumeData.experiencesSectionName }}</h2>
-            <div v-for="(e, i) in resumeData.experiences" :key="i">
-              <template v-if="e?.visible">
-                <p class="job-title">{{ e.title }} - {{ e.company }}</p>
-                <p class="date">{{ e.period }}</p>
-                <p class="job-desc" v-html="processContent(e.description)"></p>
-              </template>
-            </div>
+      <!-- Experience -->
+      <div class="ocm-section" v-if="resumeData.experiencesVisible && resumeData.experiences && resumeData.experiences.filter(e => e?.visible).length">
+        <div class="ocm-left-col">{{ resumeData.experiencesSectionName }}</div>
+        <div class="ocm-right-col">
+          <div v-for="(e, i) in resumeData.experiences" :key="i">
+            <template v-if="e?.visible">
+              <div class="ocm-experience-item">
+                <div class="ocm-job-title">{{ e.title }} | {{ e.period }}</div>
+                <div class="ocm-company">{{ e.company }}</div>
+                <div class="ocm-job-desc" v-html="processContent(e.description)"></div>
+              </div>
+            </template>
           </div>
-
-          <div class="section"
-            v-if="resumeData.educationVisible && resumeData.education && resumeData.education.filter(e => e?.visible).length">
-            <h2>{{ resumeData.educationSectionName }}</h2>
-            <div v-for="(ed, i) in resumeData.education" :key="i">
-              <template v-if="ed?.visible">
-                <p class="job-title">{{ ed.degree }} - {{ ed.school }}</p>
-                <div>
-                  <p class="date">{{ ed.period }}</p>
-                  <p class="graduation-mark">{{ ed.mark }}</p>
-                </div>
-                <p class="thesis" v-html="processContent(ed.thesis)"></p>
-              </template>
-            </div>
-          </div>
-
-          <template v-for="(section, index) in allCustomSections" :key="index">
-            <div class="section">
-              <h2>{{ section.title }}</h2>
-              <div v-html="processContent(section.content)"></div>
-            </div>
-          </template>
         </div>
       </div>
+
+      <!-- Education -->
+      <div class="ocm-section" v-if="resumeData.educationVisible && resumeData.education && resumeData.education.filter(e => e?.visible).length">
+        <div class="ocm-left-col">{{ resumeData.educationSectionName }}</div>
+        <div class="ocm-right-col">
+          <div v-for="(ed, i) in resumeData.education" :key="i">
+            <template v-if="ed?.visible">
+              <div class="ocm-education-item">
+                <div class="ocm-degree">{{ ed.school }} | {{ ed.period }}</div>
+                <div class="ocm-school">{{ ed.degree }}</div>
+                <div class="ocm-achievements" v-if="ed.mark">{{ ed.mark }}</div>
+                <div class="ocm-thesis" v-if="ed.thesis" v-html="processContent(ed.thesis)"></div>
+              </div>
+            </template>
+          </div>
+        </div>
+      </div>
+
+      <!-- Custom Sections -->
+      <template v-for="(section, index) in allCustomSections" :key="index">
+        <div class="ocm-section">
+          <div class="ocm-left-col">{{ section.title }}</div>
+          <div class="ocm-right-col">
+            <div v-html="processContent(section.content)"></div>
+          </div>
+        </div>
+      </template>
     </div>
   </BaseTemplate>
 </template>
@@ -53,7 +61,6 @@ export default {
   components: { BaseTemplate },
   extends: BaseTemplate,
   computed: {
-    // For OneColumnModern, show all custom sections in main content
     allCustomSections() {
       return this.visibleCustomSections
     }
@@ -62,23 +69,135 @@ export default {
 </script>
 
 <style scoped>
-.single-column {
-  flex-direction: column !important;
-}
-
-.centered {
-  text-align: center;
+.ocm-resume {
+  background: var(--background-color);
+  color: var(--text-color);
+  font-family: var(--body-font);
+  font-size: var(--base-size);
   max-width: 800px;
   margin: 0 auto;
-  padding: 32px 48px 64px;
+  padding: 40px;
+  border: 1px solid var(--text-color);
 }
 
-.centered h1,
-.centered .subtitle {
-  text-align: center;
+/* Header */
+.ocm-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: var(--section-spacing);
+  padding-bottom: var(--content-spacing);
+  border-bottom: 1px solid var(--text-color);
 }
 
-.centered .section {
-  text-align: left;
+.ocm-name {
+  font-family: var(--heading-font);
+  font-size: var(--heading-size);
+  color: var(--primary-color);
+  font-weight: bold;
+}
+
+.ocm-title {
+  font-family: var(--heading-font);
+  font-size: calc(var(--heading-size) * 0.75);
+  color: var(--subtitle-text-color);
+  font-weight: bold;
+}
+
+/* Section */
+.ocm-section {
+  display: flex;
+  margin-bottom: var(--section-spacing);
+  padding-bottom: var(--content-spacing);
+  border-bottom: 1px solid var(--text-color);
+}
+
+.ocm-section:last-of-type {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.ocm-left-col {
+  width: 25%;
+  font-family: var(--heading-font);
+  font-size: calc(var(--base-size));
+  color: var(--primary-color);
+  font-weight: bold;
+  text-transform: uppercase;
+  padding-right: 20px;
+}
+
+.ocm-right-col {
+  width: 75%;
+}
+
+/* Experience */
+.ocm-experience-item {
+  margin-bottom: var(--content-spacing);
+}
+
+.ocm-job-title {
+  font-family: var(--heading-font);
+  font-size: var(--base-size);
+  font-weight: bold;
+  margin-bottom: 2px;
+}
+
+.ocm-company {
+  font-size: var(--base-size);
+  margin-bottom: 5px;
+}
+
+.ocm-job-desc {
+  font-size: calc(var(--base-size) * 0.9);
+  line-height: 1.4;
+}
+
+/* Education */
+.ocm-education-item {
+  margin-bottom: var(--content-spacing);
+}
+
+.ocm-degree {
+  font-family: var(--heading-font);
+  font-size: var(--base-size);
+  font-weight: bold;
+  margin-bottom: 2px;
+}
+
+.ocm-school {
+  font-size: var(--base-size);
+  margin-bottom: 5px;
+}
+
+.ocm-achievements {
+  font-size: calc(var(--base-size) * 0.9);
+  margin-bottom: 2px;
+}
+
+.ocm-thesis {
+  font-size: calc(var(--base-size) * 0.9);
+  line-height: 1.4;
+  margin-top: 5px;
+}
+
+/* Override any inherited styles */
+.ocm-resume * {
+  white-space: normal;
+}
+
+@media print {
+  .ocm-resume {
+    margin: 0;
+    padding: 15mm;
+    border: none;
+    box-shadow: none;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
 }
 </style> 
