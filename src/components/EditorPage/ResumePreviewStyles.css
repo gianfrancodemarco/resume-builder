@@ -354,3 +354,7 @@ li {
             #526A82 calc(var(--proficiency, 0) * 1%),
             #526A82 100%);
 }
+
+.job-title {
+    font-weight: 600;
+}
