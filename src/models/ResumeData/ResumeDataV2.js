@@ -17,6 +17,7 @@ export class ResumeDataV2 {
         }));
         this.experiencesVisible = data.experiencesVisible ?? true;
         this.experiencesSectionName = data.experiencesSectionName || 'Employment History';
+        this.experiencesOrder = data.experiencesOrder ?? -2;
         this.education = (data.education || []).map(edu => ({
             degree: edu.degree || '',
             school: edu.school || '',
@@ -27,11 +28,13 @@ export class ResumeDataV2 {
         }));
         this.educationVisible = data.educationVisible ?? true;
         this.educationSectionName = data.educationSectionName || 'Education';
+        this.educationOrder = data.educationOrder ?? -1;
         this.customSections = (data.customSections || []).map(section => ({
             title: section.title || '',
             content: section.content || '',
             visible: section.visible ?? true,
-            position: section.position || 'main' // 'main' or 'sidebar'
+            position: section.position || 'main', // 'main' or 'sidebar'
+            order: section.order
         }));
     }
 
@@ -55,7 +58,7 @@ export class ResumeDataV2 {
             visible: true
         };
     }
-    
+
     static getNewCustomSection() {
         return {
             title: 'New Section',
@@ -91,6 +94,7 @@ export class ResumeDataV2 {
             ],
             experiencesVisible: true,
             experiencesSectionName: 'Employment History',
+            experiencesOrder: -2,
             education: [
                 {
                     degree: 'Master in Computer Science',
@@ -111,6 +115,7 @@ export class ResumeDataV2 {
             ],
             educationVisible: true,
             educationSectionName: 'Education',
+            educationOrder: -1,
             customSections: [
                 {
                     title: 'About Me',
@@ -153,9 +158,11 @@ export class ResumeDataV2 {
             experiences: this.experiences,
             experiencesVisible: this.experiencesVisible,
             experiencesSectionName: this.experiencesSectionName,
+            experiencesOrder: this.experiencesOrder,
             education: this.education,
             educationVisible: this.educationVisible,
             educationSectionName: this.educationSectionName,
+            educationOrder: this.educationOrder,
             customSections: this.customSections
         };
     }

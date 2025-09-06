@@ -122,6 +122,31 @@ export default {
     },
     visibleCustomSections() {
       return this.resumeData.customSections.filter(s => s && s.visible !== false)
+    },
+    orderedSections() {
+      const sections = []
+      if (this.resumeData.experiencesVisible && this.resumeData.experiences && this.resumeData.experiences.filter(e => e?.visible).length) {
+        sections.push({
+          type: 'experiences',
+          order: this.resumeData.experiencesOrder
+        })
+      }
+      if (this.resumeData.educationVisible && this.resumeData.education && this.resumeData.education.filter(e => e?.visible).length) {
+        sections.push({
+          type: 'education',
+          order: this.resumeData.educationOrder
+        })
+      }
+      this.visibleCustomSections.forEach((section, index) => {
+        const originalIndex = this.resumeData.customSections.indexOf(section)
+        sections.push({
+          type: 'custom',
+          order: section.order ?? originalIndex,
+          data: section,
+        })
+      })
+      sections.sort((a, b) => a.order - b.order)
+      return sections
     }
   }
 }

@@ -10,9 +10,8 @@
                     :handleZoomOut="handleZoomOut" :handleExportJSON="handleExportJSON"
                     :handleImportJSON="handleImportJSON" :handleDownloadPDF="handleDownloadPDF"
                     :handleDownloadHTML="handleDownloadHTML" :handleDownloadTXT="handleDownloadTXT"
-                    :handleConvertCV="handleConvertCVButtonClick"
-                    :handleHome="handleHome" @scroll-to-section="handleScrollToSection"
-                    @update:active-tab="activeTab = $event" />
+                    :handleConvertCV="handleConvertCVButtonClick" :handleHome="handleHome"
+                    @scroll-to-section="handleScrollToSection" @update:active-tab="activeTab = $event" />
 
                 <div class="editor-col" :style="isMobile ? { width: '100%' } : { width: '35%' }">
                     <ResumeEditor v-model:resume-data="resumeData" v-model:style="resumeStyle"

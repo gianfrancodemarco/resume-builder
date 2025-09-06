@@ -7,45 +7,45 @@
         <div class="ocm-title">{{ resumeData.personal.title }}</div>
       </div>
 
-      <!-- Experience -->
-      <div class="ocm-section" v-if="resumeData.experiencesVisible && resumeData.experiences && resumeData.experiences.filter(e => e?.visible).length">
-        <div class="ocm-left-col">{{ resumeData.experiencesSectionName }}</div>
-        <div class="ocm-right-col">
-          <div v-for="(e, i) in resumeData.experiences" :key="i">
-            <template v-if="e?.visible">
-              <div class="ocm-experience-item">
-                <div class="ocm-job-title">{{ e.title }} | {{ e.period }}</div>
-                <div class="ocm-company">{{ e.company }}</div>
-                <div class="ocm-job-desc" v-html="processContent(e.description)"></div>
-              </div>
-            </template>
-          </div>
-        </div>
-      </div>
-
-      <!-- Education -->
-      <div class="ocm-section" v-if="resumeData.educationVisible && resumeData.education && resumeData.education.filter(e => e?.visible).length">
-        <div class="ocm-left-col">{{ resumeData.educationSectionName }}</div>
-        <div class="ocm-right-col">
-          <div v-for="(ed, i) in resumeData.education" :key="i">
-            <template v-if="ed?.visible">
-              <div class="ocm-education-item">
-                <div class="ocm-degree">{{ ed.school }} | {{ ed.period }}</div>
-                <div class="ocm-school">{{ ed.degree }}</div>
-                <div class="ocm-achievements" v-if="ed.mark">{{ ed.mark }}</div>
-                <div class="ocm-thesis" v-if="ed.thesis" v-html="processContent(ed.thesis)"></div>
-              </div>
-            </template>
-          </div>
-        </div>
-      </div>
-
-      <!-- Custom Sections -->
-      <template v-for="(section, index) in allCustomSections" :key="index">
-        <div class="ocm-section">
-          <div class="ocm-left-col">{{ section.title }}</div>
+      <template v-for="(section, index) in orderedSections" :key="index">
+        <!-- Experience -->
+        <div class="ocm-section" v-if="section.type === 'experiences'">
+          <div class="ocm-left-col">{{ resumeData.experiencesSectionName }}</div>
           <div class="ocm-right-col">
-            <div v-html="processContent(section.content)"></div>
+            <div v-for="(e, i) in resumeData.experiences" :key="i">
+              <template v-if="e?.visible">
+                <div class="ocm-experience-item">
+                  <div class="ocm-job-title">{{ e.title }} | {{ e.period }}</div>
+                  <div class="ocm-company">{{ e.company }}</div>
+                  <div class="ocm-job-desc" v-html="processContent(e.description)"></div>
+                </div>
+              </template>
+            </div>
+          </div>
+        </div>
+
+        <!-- Education -->
+        <div class="ocm-section" v-if="section.type === 'education'">
+          <div class="ocm-left-col">{{ resumeData.educationSectionName }}</div>
+          <div class="ocm-right-col">
+            <div v-for="(ed, i) in resumeData.education" :key="i">
+              <template v-if="ed?.visible">
+                <div class="ocm-education-item">
+                  <div class="ocm-degree">{{ ed.school }} | {{ ed.period }}</div>
+                  <div class="ocm-school">{{ ed.degree }}</div>
+                  <div class="ocm-achievements" v-if="ed.mark">{{ ed.mark }}</div>
+                  <div class="ocm-thesis" v-if="ed.thesis" v-html="processContent(ed.thesis)"></div>
+                </div>
+              </template>
+            </div>
+          </div>
+        </div>
+
+        <!-- Custom Sections -->
+        <div class="ocm-section" v-if="section.type === 'custom'">
+          <div class="ocm-left-col">{{ section.data.title }}</div>
+          <div class="ocm-right-col">
+            <div v-html="processContent(section.data.content)"></div>
           </div>
         </div>
       </template>
@@ -60,11 +60,6 @@ export default {
   name: 'OneColumnModern',
   components: { BaseTemplate },
   extends: BaseTemplate,
-  computed: {
-    allCustomSections() {
-      return this.visibleCustomSections
-    }
-  }
 }
 </script>
 
