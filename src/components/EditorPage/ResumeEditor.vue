@@ -10,6 +10,10 @@
         <ResumeStyle :style-data="props.style" :resume-data="props.resumeData" @update:style-data="updateStyle"
           @change="emit('change')" />
       </v-window-item>
+
+      <v-window-item value="ai">
+        <AIHub @update:resume-data="updateResumeData" />
+      </v-window-item>
     </v-window>
   </div>
 </template>
@@ -19,6 +23,7 @@ import './ResumeEditorStyles.css'
 import { ref, watch } from 'vue'
 import ResumeStyle from './ResumeStyle.vue'
 import ResumeInfo from './ResumeInfo.vue'
+import AIHub from './AIHub.vue'
 
 const props = defineProps({
   resumeData: {

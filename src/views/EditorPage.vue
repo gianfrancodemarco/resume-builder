@@ -10,8 +10,8 @@
                     :handleZoomOut="handleZoomOut" :handleExportJSON="handleExportJSON"
                     :handleImportJSON="handleImportJSON" :handleDownloadPDF="handleDownloadPDF"
                     :handleDownloadHTML="handleDownloadHTML" :handleDownloadTXT="handleDownloadTXT"
-                    :handleConvertCV="handleConvertCVButtonClick" :handleHome="handleHome"
-                    @scroll-to-section="handleScrollToSection" @update:active-tab="activeTab = $event" />
+                    :handleHome="handleHome" @scroll-to-section="handleScrollToSection"
+                    @update:active-tab="activeTab = $event" />
 
                 <div class="editor-col" :style="isMobile ? { width: '100%' } : { width: '35%' }">
                     <ResumeEditor v-model:resume-data="resumeData" v-model:style="resumeStyle"
@@ -31,10 +31,6 @@
         <!-- Hidden file input for JSON import -->
         <input type="file" ref="fileInput" style="display: none" accept=".json" @change="handleFileUpload" />
 
-        <!-- Convert CV Dialog -->
-        <ConvertCVDialog :dialog="showConvertDialog" :models="availableModels" :loading="isConverting"
-            :handleConvert="handleConvert" @close="showConvertDialog = false" />
-
         <v-alert v-model="alertMessage.show" :type="alertMessage.type" :title="alertMessage.title"
             :text="alertMessage.message" closable @click:close="hideAlert" class="alert-message" timeout="3000" />
     </v-app>
@@ -42,10 +38,8 @@
 
 <script setup>
 import LateralMenu from '@/components/EditorPage/LateralMenu.vue'
-import ConvertCVDialog from '@/components/EditorPage/ConvertCVDialog.vue'
 import ResumeEditor from '@/components/EditorPage/ResumeEditor.vue'
 import TemplateFactory from '@/components/EditorPage/templates/TemplateFactory.vue'
-import { CVConversionService } from '@/services/CVConversionService'
 import { ExporterService } from '@/services/ExporterService'
 import { ResumeDataClass, ResumeService, ResumeStyleClass } from '@/services/ResumeService'
 import { computed, onMounted, ref } from 'vue'
@@ -100,7 +94,6 @@ onMounted(async () => {
         localStorage.setItem('resumeData', JSON.stringify(resumeData.value))
         localStorage.setItem('resumeStyle', JSON.stringify(resumeStyle.value))
     }, 1000)
-    await loadAvailableModels()
 })
 
 const downloadPDF = async () => {
@@ -187,44 +180,6 @@ const handleDownloadHTML = async () => {
     } catch (error) {
         console.error('Error generating HTML:', error)
         showAlert('HTML Generation Failed', 'Failed to generate HTML. Please try again.', 'error')
-    }
-}
-
-// Convert CV Dialog State
-const showConvertDialog = ref(false)
-const availableModels = ref([])
-const isConverting = ref(false)
-
-const loadAvailableModels = async () => {
-    try {
-        availableModels.value = await CVConversionService.fetchAvailableModels()
-    } catch (error) {
-        console.error('Error fetching models:', error)
-        availableModels.value = []
-    }
-}
-
-const handleConvertCVButtonClick = () => {
-    if (window.sa_event) {
-        window.sa_event('convert_cv_button_click')
-    }
-    showConvertDialog.value = true
-}
-
-const handleConvert = async ({ file, apiKey, model }) => {
-    if (window.sa_event) {
-        window.sa_event('convert_cv')
-    }
-    isConverting.value = true
-    try {
-        const newResumeData = await CVConversionService.convertCV(file, apiKey, model)
-        resumeData.value = newResumeData
-        showAlert('CV successfully converted!', 'Your CV has been successfully converted.', 'success')
-        showConvertDialog.value = false
-    } catch (error) {
-        showAlert('Error converting CV', error, 'error')
-    } finally {
-        isConverting.value = false
     }
 }
 

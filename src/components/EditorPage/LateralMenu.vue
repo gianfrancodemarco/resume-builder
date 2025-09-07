@@ -18,86 +18,96 @@
                 </template>
                 Style
             </v-tooltip>
+            <v-tooltip location="right" :model-value="showAllTooltips">
+                <template v-slot:activator="{ props: tooltipProps }">
+                    <v-btn v-bind="tooltipProps" icon="ph-sparkle" :color="activeTab === 'ai' ? 'purple' : 'grey'"
+                        variant="text" class="menu-btn ai-hub-button" @click="activeTab = 'ai'"
+                        :class="{ 'active': activeTab === 'ai' }" />
+                </template>
+                AI Hub
+            </v-tooltip>
         </div>
-
-        <!-- Divider -->
-        <div class="menu-divider"></div>
 
         <!-- Section Navigation -->
-        <div class="menu-section">
-            <!-- Info sections -->
-            <template v-if="activeTab === 'info'">
-                <v-tooltip location="right" :model-value="showAllTooltips">
-                    <template v-slot:activator="{ props: tooltipProps }">
-                        <v-btn v-bind="tooltipProps" icon="ph-user-circle"
-                            :color="currentSection === 'personal' ? 'primary' : 'grey'" variant="text" class="menu-btn"
-                            @click="scrollToSection('personal')" :class="{ 'active': currentSection === 'personal' }" />
-                    </template>
-                    Personal Info
-                </v-tooltip>
-                <v-tooltip location="right" :model-value="showAllTooltips">
-                    <template v-slot:activator="{ props: tooltipProps }">
-                        <v-btn v-bind="tooltipProps" icon="ph-briefcase"
-                            :color="currentSection === 'experience' ? 'primary' : 'grey'" variant="text"
-                            class="menu-btn" @click="scrollToSection('experience')"
-                            :class="{ 'active': currentSection === 'experience' }" />
-                    </template>
-                    Experience
-                </v-tooltip>
-                <v-tooltip location="right" :model-value="showAllTooltips">
-                    <template v-slot:activator="{ props: tooltipProps }">
-                        <v-btn v-bind="tooltipProps" icon="ph-graduation-cap"
-                            :color="currentSection === 'education' ? 'primary' : 'grey'" variant="text" class="menu-btn"
-                            @click="scrollToSection('education')"
-                            :class="{ 'active': currentSection === 'education' }" />
-                    </template>
-                    Education
-                </v-tooltip>
-
-                <!-- Custom Sections -->
-                <template v-for="(section, index) in (customSections || [])" :key="`custom-${index}`">
-                    <v-tooltip location="right" :model-value="showAllTooltips" v-if="section && section.title">
+        <template v-if="activeTab === 'info' || activeTab === 'style'">
+            <div class="menu-divider"></div>
+            <div class="menu-section scrollable-section">
+                <!-- Info sections -->
+                <template v-if="activeTab === 'info'">
+                    <v-tooltip location="right" :model-value="showAllTooltips">
                         <template v-slot:activator="{ props: tooltipProps }">
-                            <v-btn v-bind="tooltipProps" :icon="getCustomSectionIcon(section)"
-                                :color="currentSection === `custom-${index}` ? 'primary' : 'grey'" variant="text"
-                                class="menu-btn" @click="scrollToSection(`custom-${index}`)"
-                                :class="{ 'active': currentSection === `custom-${index}` }" />
+                            <v-btn v-bind="tooltipProps" icon="ph-user-circle"
+                                :color="currentSection === 'personal' ? 'primary' : 'grey'" variant="text"
+                                class="menu-btn" @click="scrollToSection('personal')"
+                                :class="{ 'active': currentSection === 'personal' }" />
                         </template>
-                        {{ section.title }}
+                        Personal Info
+                    </v-tooltip>
+                    <v-tooltip location="right" :model-value="showAllTooltips">
+                        <template v-slot:activator="{ props: tooltipProps }">
+                            <v-btn v-bind="tooltipProps" icon="ph-briefcase"
+                                :color="currentSection === 'experience' ? 'primary' : 'grey'" variant="text"
+                                class="menu-btn" @click="scrollToSection('experience')"
+                                :class="{ 'active': currentSection === 'experience' }" />
+                        </template>
+                        Experience
+                    </v-tooltip>
+                    <v-tooltip location="right" :model-value="showAllTooltips">
+                        <template v-slot:activator="{ props: tooltipProps }">
+                            <v-btn v-bind="tooltipProps" icon="ph-graduation-cap"
+                                :color="currentSection === 'education' ? 'primary' : 'grey'" variant="text"
+                                class="menu-btn" @click="scrollToSection('education')"
+                                :class="{ 'active': currentSection === 'education' }" />
+                        </template>
+                        Education
+                    </v-tooltip>
+
+                    <!-- Custom Sections -->
+                    <template v-for="(section, index) in (customSections || [])" :key="`custom-${index}`">
+                        <v-tooltip location="right" :model-value="showAllTooltips" v-if="section && section.title">
+                            <template v-slot:activator="{ props: tooltipProps }">
+                                <v-btn v-bind="tooltipProps" :icon="getCustomSectionIcon(section)"
+                                    :color="currentSection === `custom-${index}` ? 'primary' : 'grey'" variant="text"
+                                    class="menu-btn" @click="scrollToSection(`custom-${index}`)"
+                                    :class="{ 'active': currentSection === `custom-${index}` }" />
+                            </template>
+                            {{ section.title }}
+                        </v-tooltip>
+                    </template>
+                </template>
+
+                <!-- Style sections -->
+                <template v-if="activeTab === 'style'">
+                    <v-tooltip location="right" :model-value="showAllTooltips">
+                        <template v-slot:activator="{ props: tooltipProps }">
+                            <v-btn v-bind="tooltipProps" icon="ph-palette"
+                                :color="currentSection === 'colors' ? 'primary' : 'grey'" variant="text"
+                                class="menu-btn" @click="scrollToSection('colors')"
+                                :class="{ 'active': currentSection === 'colors' }" />
+                        </template>
+                        Colors
+                    </v-tooltip>
+                    <v-tooltip location="right" :model-value="showAllTooltips">
+                        <template v-slot:activator="{ props: tooltipProps }">
+                            <v-btn v-bind="tooltipProps" icon="ph-text-t"
+                                :color="currentSection === 'typography' ? 'primary' : 'grey'" variant="text"
+                                class="menu-btn" @click="scrollToSection('typography')"
+                                :class="{ 'active': currentSection === 'typography' }" />
+                        </template>
+                        Typography
+                    </v-tooltip>
+                    <v-tooltip location="right" :model-value="showAllTooltips">
+                        <template v-slot:activator="{ props: tooltipProps }">
+                            <v-btn v-bind="tooltipProps" icon="ph-arrows-out-line-vertical"
+                                :color="currentSection === 'spacing' ? 'primary' : 'grey'" variant="text"
+                                class="menu-btn" @click="scrollToSection('spacing')"
+                                :class="{ 'active': currentSection === 'spacing' }" />
+                        </template>
+                        Spacing
                     </v-tooltip>
                 </template>
-            </template>
-
-            <!-- Style sections -->
-            <template v-if="activeTab === 'style'">
-                <v-tooltip location="right" :model-value="showAllTooltips">
-                    <template v-slot:activator="{ props: tooltipProps }">
-                        <v-btn v-bind="tooltipProps" icon="ph-palette"
-                            :color="currentSection === 'colors' ? 'primary' : 'grey'" variant="text" class="menu-btn"
-                            @click="scrollToSection('colors')" :class="{ 'active': currentSection === 'colors' }" />
-                    </template>
-                    Colors
-                </v-tooltip>
-                <v-tooltip location="right" :model-value="showAllTooltips">
-                    <template v-slot:activator="{ props: tooltipProps }">
-                        <v-btn v-bind="tooltipProps" icon="ph-text-t"
-                            :color="currentSection === 'typography' ? 'primary' : 'grey'" variant="text"
-                            class="menu-btn" @click="scrollToSection('typography')"
-                            :class="{ 'active': currentSection === 'typography' }" />
-                    </template>
-                    Typography
-                </v-tooltip>
-                <v-tooltip location="right" :model-value="showAllTooltips">
-                    <template v-slot:activator="{ props: tooltipProps }">
-                        <v-btn v-bind="tooltipProps" icon="ph-arrows-out-line-vertical"
-                            :color="currentSection === 'spacing' ? 'primary' : 'grey'" variant="text" class="menu-btn"
-                            @click="scrollToSection('spacing')" :class="{ 'active': currentSection === 'spacing' }" />
-                    </template>
-                    Spacing
-                </v-tooltip>
-            </template>
-        </div>
-
+            </div>
+        </template>
         <!-- Divider -->
         <div class="menu-divider"></div>
 
@@ -159,13 +169,6 @@
                         @click="handleDownloadTXT" />
                 </template>
                 Download TXT
-            </v-tooltip>
-            <v-tooltip location="right" :model-value="showAllTooltips">
-                <template v-slot:activator="{ props: tooltipProps }">
-                    <v-btn v-bind="tooltipProps" icon="ph-file-text" color="grey" variant="text" class="menu-btn"
-                        @click="handleConvertCV" />
-                </template>
-                Convert CV
             </v-tooltip>
         </div>
 
@@ -415,15 +418,27 @@ const getCustomSectionIcon = (section) => {
     align-items: center;
     justify-content: flex-start;
     padding-top: 20px;
-    gap: 8px;
     position: relative;
     z-index: 10;
     backdrop-filter: blur(10px);
     height: 100vh;
+    overflow-y: hidden;
+    /* Prevent scrolling on the main container */
+}
+
+.scrollable-section {
     overflow-y: auto;
-    overflow-x: hidden;
+    max-height: calc(100vh - 400px);
+    /* Adjust as needed */
     scrollbar-width: none;
+    /* For Firefox */
     -ms-overflow-style: none;
+    /* For Internet Explorer and Edge */
+}
+
+.scrollable-section::-webkit-scrollbar {
+    display: none;
+    /* For Chrome, Safari, and Opera */
 }
 
 .lateral-menu::-webkit-scrollbar {
@@ -468,6 +483,22 @@ const getCustomSectionIcon = (section) => {
     background-color: rgba(var(--v-theme-primary), 0.2) !important;
     color: rgb(var(--v-theme-primary)) !important;
     transform: scale(1.05);
+}
+
+.ai-hub-button :deep(svg) {
+    fill: rgb(var(--v-theme-secondary)) !important;
+    animation: spark-animation 4s infinite alternate;
+}
+
+@keyframes spark-animation {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1.2);
+        opacity: 0.8;
+    }
 }
 
 /* Mobile responsiveness */
