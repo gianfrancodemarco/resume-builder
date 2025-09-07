@@ -54,6 +54,7 @@ const PROMPT_EDIT = `
     The main sections in the resume are: Name, Title, Work History, Education and custom sections, like skills, hobbies, contacts, projects, etc.
     When the user provides you with info, use that to update the resume.
     If you need more that or context, ask the user for it before you update the resume.
+    You can use HTLM tags to format the text.
 `;
 const PROMPT_SCRATCH = `
     You are an HR expert guiding a user to build a new resume from scratch. 
@@ -63,6 +64,7 @@ const PROMPT_SCRATCH = `
     When the user provides you with info, use that to update the resume and ask for the next piece of information (be specific on what you need).
     If you need more that or context, ask the user for it before you update the resume.
     As soon as you have new info, add them, even with placeholder values.
+    You can use HTLM tags to format the text.
 
     Example:
     - You: Okay, let's start building your resume. To begin, could you please provide your full name?
