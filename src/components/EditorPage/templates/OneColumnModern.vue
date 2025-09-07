@@ -1,55 +1,55 @@
 <template>
-  <BaseTemplate v-bind="$props">
-    <div class="ocm-resume">
-      <!-- Header -->
+  <BaseTemplate v-bind="$props" rootClass="ocm-resume">
+    <template #header="{ resumeData }">
       <div class="ocm-header">
         <div class="ocm-name">{{ resumeData.personal.name || 'Your Name' }}</div>
         <div class="ocm-title">{{ resumeData.personal.title }}</div>
       </div>
+    </template>
 
-      <template v-for="(section, index) in orderedSections" :key="index">
-        <!-- Experience -->
-        <div class="ocm-section" v-if="section.type === 'experiences'">
-          <div class="ocm-left-col">{{ resumeData.experiencesSectionName }}</div>
-          <div class="ocm-right-col">
-            <div v-for="(e, i) in resumeData.experiences" :key="i">
-              <template v-if="e?.visible">
-                <div class="ocm-experience-item">
-                  <div class="ocm-job-title">{{ e.title }} | {{ e.period }}</div>
-                  <div class="ocm-company">{{ e.company }}</div>
-                  <div class="ocm-job-desc" v-html="processContent(e.description)"></div>
-                </div>
-              </template>
-            </div>
+    <template #experiences="{ resumeData, processContent }">
+      <div class="ocm-section">
+        <div class="ocm-left-col">{{ resumeData.experiencesSectionName }}</div>
+        <div class="ocm-right-col">
+          <div v-for="(e, i) in resumeData.experiences" :key="i">
+            <template v-if="e?.visible">
+              <div class="ocm-experience-item">
+                <div class="ocm-job-title">{{ e.title }} | {{ e.period }}</div>
+                <div class="ocm-company">{{ e.company }}</div>
+                <div class="ocm-job-desc" v-html="processContent(e.description)"></div>
+              </div>
+            </template>
           </div>
         </div>
+      </div>
+    </template>
 
-        <!-- Education -->
-        <div class="ocm-section" v-if="section.type === 'education'">
-          <div class="ocm-left-col">{{ resumeData.educationSectionName }}</div>
-          <div class="ocm-right-col">
-            <div v-for="(ed, i) in resumeData.education" :key="i">
-              <template v-if="ed?.visible">
-                <div class="ocm-education-item">
-                  <div class="ocm-degree">{{ ed.school }} | {{ ed.period }}</div>
-                  <div class="ocm-school">{{ ed.degree }}</div>
-                  <div class="ocm-achievements" v-if="ed.mark">{{ ed.mark }}</div>
-                  <div class="ocm-thesis" v-if="ed.thesis" v-html="processContent(ed.thesis)"></div>
-                </div>
-              </template>
-            </div>
+    <template #education="{ resumeData, processContent }">
+      <div class="ocm-section">
+        <div class="ocm-left-col">{{ resumeData.educationSectionName }}</div>
+        <div class="ocm-right-col">
+          <div v-for="(ed, i) in resumeData.education" :key="i">
+            <template v-if="ed?.visible">
+              <div class="ocm-education-item">
+                <div class="ocm-degree">{{ ed.school }} | {{ ed.period }}</div>
+                <div class="ocm-school">{{ ed.degree }}</div>
+                <div class="ocm-achievements" v-if="ed.mark">{{ ed.mark }}</div>
+                <div class="ocm-thesis" v-if="ed.thesis" v-html="processContent(ed.thesis)"></div>
+              </div>
+            </template>
           </div>
         </div>
+      </div>
+    </template>
 
-        <!-- Custom Sections -->
-        <div class="ocm-section" v-if="section.type === 'custom'">
-          <div class="ocm-left-col">{{ section.data.title }}</div>
-          <div class="ocm-right-col">
-            <div v-html="processContent(section.data.content)"></div>
-          </div>
+    <template #custom="{ section, processContent }">
+      <div class="ocm-section">
+        <div class="ocm-left-col">{{ section.title }}</div>
+        <div class="ocm-right-col">
+          <div v-html="processContent(section.content)"></div>
         </div>
-      </template>
-    </div>
+      </div>
+    </template>
   </BaseTemplate>
 </template>
 
@@ -63,7 +63,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style>
 .ocm-resume {
   background: var(--background-color);
   color: var(--text-color);
@@ -195,4 +195,4 @@ export default {
     print-color-adjust: exact;
   }
 }
-</style> 
+</style>

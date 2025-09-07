@@ -1,8 +1,19 @@
 <template>
   <div id="printable-area">
     <div class="resume-preview" :style="resumeStyle">
-      <!-- Template-specific content will be overridden -->
-      <slot />
+      <slot name="layout">
+        <div :class="rootClass || ''">
+          <slot name="header" :resumeData="resumeData"></slot>
+          <template v-for="(section, index) in orderedSections" :key="index">
+            <slot name="render-section" :section="section">
+              <slot :name="section.type" v-if="['experiences', 'education', 'custom'].includes(section.type)" 
+                    :resumeData="resumeData" 
+                    :processContent="processContent" 
+                    :section="section.type === 'custom' ? section.data : undefined"></slot>
+            </slot>
+          </template>
+        </div>
+      </slot>
     </div>
   </div>
 </template>
@@ -27,6 +38,10 @@ export default {
       type: String,
       default: 'right',
       validator: (value) => ['left', 'right'].includes(value)
+    },
+    rootClass: {
+      type: String,
+      default: ''
     }
   },
   methods: {
