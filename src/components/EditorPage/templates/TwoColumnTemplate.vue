@@ -4,7 +4,7 @@
       <div class="preview-container">
         <div class="container" :class="{ 'sidebar-left': sidebarPosition === 'left' }">
           <div class="sidebar" v-if="isSidebarPresent">
-            <template v-for="(section, index) in sidebarCustomSections" :key="index">
+            <template v-for="(section, index) in sidebarCustomSections" :key="getSidebarSectionKey(section)">
               <h2>{{ section.title }}</h2>
               <div v-html="processContent(section.content)"></div>
             </template>
@@ -14,7 +14,7 @@
             <h1>{{ resumeData.personal.name || 'Your Name' }}</h1>
             <h2 class="subtitle">{{ resumeData.personal.title }}</h2>
 
-            <template v-for="(section, index) in orderedMainSections" :key="index">
+            <template v-for="(section, index) in orderedMainSections" :key="getMainSectionKey(section)">
               <div class="section" v-if="section.type === 'experiences'">
                 <h2>{{ resumeData.experiencesSectionName }}</h2>
                 <div v-for="(e, i) in resumeData.experiences" :key="i">
@@ -65,7 +65,10 @@ export default {
       return this.style.spacing.sidebarWidth > 0
     },
     sidebarCustomSections() {
-      return this.visibleCustomSections.filter(s => s.position === 'sidebar')
+      // Keep sidebar custom sections ordered consistently with the global section ordering
+      return this.orderedSections
+        .filter(s => s.type === 'custom' && s.data.position === 'sidebar')
+        .map(s => s.data)
     },
     orderedMainSections() {
       return this.orderedSections.filter(s => {
@@ -74,6 +77,19 @@ export default {
         }
         return true
       })
+    }
+  },
+  methods: {
+    getSidebarSectionKey(section) {
+      const idx = this.resumeData.customSections.indexOf(section)
+      return `sidebar-custom-${idx}`
+    },
+    getMainSectionKey(section) {
+      if (section.type === 'custom') {
+        const idx = this.resumeData.customSections.indexOf(section.data)
+        return `main-custom-${idx}`
+      }
+      return `main-${section.type}`
     }
   }
 }
