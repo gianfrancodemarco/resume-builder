@@ -12,7 +12,7 @@
       </v-window-item>
 
       <v-window-item value="ai">
-        <AIHub @update:resume-data="updateResumeData" />
+        <AIHub :resume-data="props.resumeData" @update:resume-data="updateResumeData" />
       </v-window-item>
     </v-window>
   </div>

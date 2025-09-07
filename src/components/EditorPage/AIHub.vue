@@ -15,12 +15,19 @@
         <div class="editor-section">
             <v-tabs v-model="activeTab">
                 <v-tab value="convert-cv">Convert CV</v-tab>
+                <v-tab value="ai-generation">AI Generation</v-tab>
             </v-tabs>
             <v-window v-model="activeTab">
                 <v-window-item value="convert-cv">
                     <div class="section-content">
                         <ConvertCV @update:resumeData="handleUpdateResumeData" :api-key="apiKey"
                             :model="selectedModel" />
+                    </div>
+                </v-window-item>
+                <v-window-item value="ai-generation">
+                    <div class="section-content">
+                        <AIGeneration :resume-info="props.resumeData" @update:resume-info="handleUpdateResumeData"
+                            :api-key="apiKey" :model="selectedModel" />
                     </div>
                 </v-window-item>
             </v-window>
@@ -31,7 +38,15 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue'
 import ConvertCV from './ConvertCV.vue'
+import AIGeneration from './AIGeneration.vue'
 import { CVConversionService } from '@/services/CVConversionService'
+
+const props = defineProps({
+    resumeData: {
+        type: Object,
+        required: true
+    }
+})
 
 const emit = defineEmits(['update:resumeData'])
 const activeTab = ref('convert-cv')
