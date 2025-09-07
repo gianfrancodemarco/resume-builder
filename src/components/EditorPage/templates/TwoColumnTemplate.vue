@@ -77,6 +77,11 @@ export default {
         }
         return true
       })
+    },
+    mainCustomSections() {
+      return this.orderedMainSections
+        .filter(s => s.type === 'custom')
+        .map(s => s.data)
     }
   },
   methods: {
