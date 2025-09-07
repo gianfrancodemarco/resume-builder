@@ -32,17 +32,23 @@
                 </v-tooltip>
             </div>
         </div>
-        <button v-if="history.length === 0 && !isLoading" @click="startGuidedGeneration" class="start-button"
-            :disabled="isLoading">
-            Start Guided Generation
-        </button>
+        <div v-if="history.length === 0 && !isLoading" class="initial-actions">
+            <v-btn @click="editExistingResume" class="start-button" :disabled="isLoading">
+                Edit Your Resume
+            </v-btn>
+            <v-btn @click="startFromScratch" class="start-button" :disabled="isLoading">
+                Start from Scratch
+            </v-btn>
+        </div>
     </div>
 </template>
 
 <script>
 import AIGenerationService from "../../services/AIGenerationService";
+import { ResumeDataV2 } from '@/models/ResumeData/ResumeDataV2';
 
-const INITIAL_PROMPT = "You are an HR expert in resume creation. Your goal is to help the user improve their resume. Start by asking them what they want to improve.";
+const INITIAL_PROMPT_EDIT = "You are an HR expert in resume creation. Your goal is to help the user improve their existing resume. Start by asking them what they want to improve or change.";
+const INITIAL_PROMPT_SCRATCH = "You are an HR expert guiding a user to build a new resume from scratch. Your goal is to ask for one piece of information at a time to build a complete resume. Proactively ask for the following fields in this order: Name, Title, Work History, Education, Skills, and Hobbies. Start by asking for the user's full name. When the user provides you with info, use that to update the resume and ask for the next piece of information (be specific on what you need)";
 
 export default {
     name: "AIGeneration",
@@ -123,12 +129,12 @@ export default {
         formatMessage(text) {
             return text.replace(/\n/g, '<br>');
         },
-        async startGuidedGeneration() {
+        async startConversation(prompt, resumeData) {
             if (this.isLoading) return;
             this.isLoading = true;
 
             try {
-                const response = await AIGenerationService.generate(this.resumeInfo, INITIAL_PROMPT, this.apiKey, this.model);
+                const response = await AIGenerationService.generate(resumeData, prompt, this.apiKey, this.model);
                 const assistantMessage = {
                     sender: "assistant",
                     text: response.answer,
@@ -140,13 +146,21 @@ export default {
                 console.error("Error generating AI response:", error);
                 const errorMessage = {
                     sender: "assistant",
-                    text: "Sorry, I encountered an error. Please try again.",
+                    text: `Sorry, I encountered an error: ${error.message}`,
                 };
                 this.history.push(errorMessage);
             } finally {
                 this.isLoading = false;
                 this.saveHistory();
             }
+        },
+        startFromScratch() {
+            const newResume = new ResumeDataV2();
+            this.$emit("update:resumeInfo", newResume);
+            this.startConversation(INITIAL_PROMPT_SCRATCH, newResume);
+        },
+        editExistingResume() {
+            this.startConversation(INITIAL_PROMPT_EDIT, this.resumeInfo);
         },
         handleEnter(event) {
             if (!event.shiftKey) {
