@@ -47,8 +47,31 @@
 import AIGenerationService from "../../services/AIGenerationService";
 import { ResumeDataV2 } from '@/models/ResumeData/ResumeDataV2';
 
-const INITIAL_PROMPT_EDIT = "You are an HR expert in resume creation. Your goal is to help the user improve their existing resume. Start by asking them what they want to improve or change.";
-const INITIAL_PROMPT_SCRATCH = "You are an HR expert guiding a user to build a new resume from scratch. Your goal is to ask for one piece of information at a time to build a complete resume. Proactively ask for the following fields in this order: Name, Title, Work History, Education, Skills, and Hobbies. Start by asking for the user's full name. When the user provides you with info, use that to update the resume and ask for the next piece of information (be specific on what you need)";
+const PROMPT_EDIT = `
+    You are an HR expert guiding a user to improve their existing resume. 
+    Your goal is to help the user improve their existing resume. 
+    Start by asking them what they want to improve or change.
+    The main sections in the resume are: Name, Title, Work History, Education and custom sections, like skills, hobbies, contacts, projects, etc.
+    When the user provides you with info, use that to update the resume.
+    If you need more that or context, ask the user for it before you update the resume.
+`;
+const PROMPT_SCRATCH = `
+    You are an HR expert guiding a user to build a new resume from scratch. 
+    Your goal is to ask for one piece of information at a time to build a complete resume. 
+    Proactively ask for the following fields in this order: Name, Title, Work History, Education, Skills, and Hobbies. 
+    Start by asking for the user's full name. If you already have the name, go on with the next field. Ask it specifically.
+    When the user provides you with info, use that to update the resume and ask for the next piece of information (be specific on what you need).
+    If you need more that or context, ask the user for it before you update the resume.
+    As soon as you have new info, add them, even with placeholder values.
+
+    Example:
+    - You: Okay, let's start building your resume. To begin, could you please provide your full name?
+    - User: John Doe
+    - You: Great! Now, could you please provide your title?
+    - User: Software Engineer at Google
+    - You: Perfect! Now, could you please provide your work history?
+    - User: ...  
+`;
 
 export default {
     name: "AIGeneration",
@@ -71,6 +94,7 @@ export default {
             userInput: "",
             history: [],
             isLoading: false,
+            activePrompt: null,
         };
     },
     created() {
@@ -78,20 +102,28 @@ export default {
     },
     methods: {
         loadHistory() {
-            const savedHistory = localStorage.getItem("ai-generation-history");
-            if (savedHistory) {
-                this.history = JSON.parse(savedHistory);
+            const savedState = localStorage.getItem("ai-generation-state");
+            if (savedState) {
+                const state = JSON.parse(savedState);
+                this.history = state.history || [];
+                this.activePrompt = state.activePrompt || null;
             }
         },
         saveHistory() {
-            localStorage.setItem("ai-generation-history", JSON.stringify(this.history));
+            const state = {
+                history: this.history,
+                activePrompt: this.activePrompt,
+            };
+            localStorage.setItem("ai-generation-state", JSON.stringify(state));
         },
         clearHistory() {
             this.history = [];
-            localStorage.removeItem("ai-generation-history");
+            this.activePrompt = null;
+            localStorage.removeItem("ai-generation-state");
+            localStorage.removeItem("ai-generation-history"); // for migration
         },
         async sendMessage() {
-            if (!this.userInput.trim() || this.isLoading) return;
+            if (!this.userInput.trim() || this.isLoading || !this.activePrompt) return;
 
             const userMessage = { sender: "user", text: this.userInput };
             this.history.push(userMessage);
@@ -100,7 +132,7 @@ export default {
             this.isLoading = true;
 
             try {
-                const response = await AIGenerationService.generate(this.resumeInfo, currentInput, this.apiKey, this.model);
+                const response = await AIGenerationService.generate(this.resumeInfo, this.history, this.apiKey, this.model, this.activePrompt);
                 const assistantMessage = {
                     sender: "assistant",
                     text: response.answer,
@@ -124,6 +156,8 @@ export default {
             const checkpoint = this.history[index];
             if (checkpoint && checkpoint.resumeInfo) {
                 this.$emit("update:resumeInfo", checkpoint.resumeInfo);
+                this.history = this.history.slice(0, index + 1);
+                this.saveHistory();
             }
         },
         formatMessage(text) {
@@ -132,9 +166,10 @@ export default {
         async startConversation(prompt, resumeData) {
             if (this.isLoading) return;
             this.isLoading = true;
+            this.activePrompt = prompt;
 
             try {
-                const response = await AIGenerationService.generate(resumeData, prompt, this.apiKey, this.model);
+                const response = await AIGenerationService.generate(resumeData, [], this.apiKey, this.model, prompt);
                 const assistantMessage = {
                     sender: "assistant",
                     text: response.answer,
@@ -157,10 +192,10 @@ export default {
         startFromScratch() {
             const newResume = new ResumeDataV2();
             this.$emit("update:resumeInfo", newResume);
-            this.startConversation(INITIAL_PROMPT_SCRATCH, newResume);
+            this.startConversation(PROMPT_SCRATCH, newResume);
         },
         editExistingResume() {
-            this.startConversation(INITIAL_PROMPT_EDIT, this.resumeInfo);
+            this.startConversation(PROMPT_EDIT, this.resumeInfo);
         },
         handleEnter(event) {
             if (!event.shiftKey) {
