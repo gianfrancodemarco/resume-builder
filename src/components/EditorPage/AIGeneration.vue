@@ -3,9 +3,12 @@
         <div v-if="history.length > 0 || isLoading" class="chat-history">
             <div v-for="(message, index) in history" :key="index" :class="['message', message.sender]">
                 <p v-html="formatMessage(message.text)"></p>
-                <button v-if="message.resumeInfo" @click="restoreCheckpoint(index)" class="restore-button">
-                    Restore this version
-                </button>
+                <v-tooltip v-if="message.resumeInfo" text="Restore this version" location="top">
+                    <template v-slot:activator="{ props }">
+                        <v-btn v-bind="props" icon="ph-clock-counter-clockwise" @click="restoreCheckpoint(index)"
+                            class="restore-button" variant="text" size="x-small"></v-btn>
+                    </template>
+                </v-tooltip>
             </div>
             <div v-if="isLoading" class="message assistant">
                 <p><i>Generating...</i></p>
@@ -13,12 +16,20 @@
         </div>
         <div v-if="history.length > 0" class="chat-input-container">
             <div class="chat-input">
-                <textarea v-model="userInput" @keyup.enter="sendMessage" placeholder="Type your message..."
-                    rows="1"></textarea>
-                <button @click="sendMessage" :disabled="isLoading || !userInput.trim()">Send</button>
-            </div>
-            <div class="controls">
-                <button v-if="history.length > 0" @click="clearHistory" class="clear-button">Clear History</button>
+                <v-textarea v-model="userInput" @keydown.enter="handleEnter" placeholder="Type your message..." rows="2"
+                    auto-grow variant="filled" class="chat-textarea" hide-details></v-textarea>
+                <v-tooltip text="Send Message">
+                    <template v-slot:activator="{ props }">
+                        <v-btn v-bind="props" icon="ph-paper-plane-right" @click="sendMessage"
+                            :disabled="isLoading || !userInput.trim()" variant="text" class="send-button"></v-btn>
+                    </template>
+                </v-tooltip>
+                <v-tooltip text="Clear History">
+                    <template v-slot:activator="{ props }">
+                        <v-btn v-bind="props" icon="ph-trash" @click="clearHistory" variant="text" color="error"
+                            class="clear-button"></v-btn>
+                    </template>
+                </v-tooltip>
             </div>
         </div>
         <button v-if="history.length === 0 && !isLoading" @click="startGuidedGeneration" class="start-button"
@@ -135,6 +146,12 @@ export default {
             } finally {
                 this.isLoading = false;
                 this.saveHistory();
+            }
+        },
+        handleEnter(event) {
+            if (!event.shiftKey) {
+                event.preventDefault();
+                this.sendMessage();
             }
         },
     },
