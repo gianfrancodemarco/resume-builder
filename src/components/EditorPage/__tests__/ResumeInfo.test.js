@@ -225,10 +225,11 @@ describe('ResumeInfo', () => {
                 { title: 'Languages', content: 'English, Spanish', visible: true, position: 'main' }
             ]
             await wrapper.vm.$nextTick()
-            wrapper.vm.moveCustomSection(1, 'up')
+            wrapper.vm.moveSection({ type: 'custom', originalIndex: 1 }, 'up')
             await wrapper.vm.$nextTick()
-            expect(wrapper.props('resumeData').customSections[0].title).toBe('Languages')
-            expect(wrapper.props('resumeData').customSections[1].title).toBe('Skills')
+            const orderedCustom = wrapper.vm.orderedSections.filter(s => s.type === 'custom')
+            expect(orderedCustom[0].data.title).toBe('Languages')
+            expect(orderedCustom[1].data.title).toBe('Skills')
         })
 
         it('moves custom section down', async () => {
@@ -237,10 +238,11 @@ describe('ResumeInfo', () => {
                 { title: 'Languages', content: 'English, Spanish', visible: true, position: 'main' }
             ]
             await wrapper.vm.$nextTick()
-            wrapper.vm.moveCustomSection(0, 'down')
+            wrapper.vm.moveSection({ type: 'custom', originalIndex: 0 }, 'down')
             await wrapper.vm.$nextTick()
-            expect(wrapper.props('resumeData').customSections[0].title).toBe('Languages')
-            expect(wrapper.props('resumeData').customSections[1].title).toBe('Skills')
+            const orderedCustom = wrapper.vm.orderedSections.filter(s => s.type === 'custom')
+            expect(orderedCustom[0].data.title).toBe('Languages')
+            expect(orderedCustom[1].data.title).toBe('Skills')
         })
 
         it('clones custom section', async () => {

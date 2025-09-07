@@ -1,14 +1,14 @@
 <template>
-  <BaseTemplate v-bind="$props">
-    <div class="ocm-resume">
-      <!-- Header -->
+  <BaseTemplate v-bind="$props" rootClass="ocm-resume">
+    <template #header="{ resumeData }">
       <div class="ocm-header">
         <div class="ocm-name">{{ resumeData.personal.name || 'Your Name' }}</div>
         <div class="ocm-title">{{ resumeData.personal.title }}</div>
       </div>
+    </template>
 
-      <!-- Experience -->
-      <div class="ocm-section" v-if="resumeData.experiencesVisible && resumeData.experiences && resumeData.experiences.filter(e => e?.visible).length">
+    <template #experiences="{ resumeData, processContent }">
+      <div class="ocm-section">
         <div class="ocm-left-col">{{ resumeData.experiencesSectionName }}</div>
         <div class="ocm-right-col">
           <div v-for="(e, i) in resumeData.experiences" :key="i">
@@ -22,9 +22,10 @@
           </div>
         </div>
       </div>
+    </template>
 
-      <!-- Education -->
-      <div class="ocm-section" v-if="resumeData.educationVisible && resumeData.education && resumeData.education.filter(e => e?.visible).length">
+    <template #education="{ resumeData, processContent }">
+      <div class="ocm-section">
         <div class="ocm-left-col">{{ resumeData.educationSectionName }}</div>
         <div class="ocm-right-col">
           <div v-for="(ed, i) in resumeData.education" :key="i">
@@ -39,17 +40,16 @@
           </div>
         </div>
       </div>
+    </template>
 
-      <!-- Custom Sections -->
-      <template v-for="(section, index) in allCustomSections" :key="index">
-        <div class="ocm-section">
-          <div class="ocm-left-col">{{ section.title }}</div>
-          <div class="ocm-right-col">
-            <div v-html="processContent(section.content)"></div>
-          </div>
+    <template #custom="{ section, processContent }">
+      <div class="ocm-section">
+        <div class="ocm-left-col">{{ section.title }}</div>
+        <div class="ocm-right-col">
+          <div v-html="processContent(section.content)"></div>
         </div>
-      </template>
-    </div>
+      </div>
+    </template>
   </BaseTemplate>
 </template>
 
@@ -60,15 +60,10 @@ export default {
   name: 'OneColumnModern',
   components: { BaseTemplate },
   extends: BaseTemplate,
-  computed: {
-    allCustomSections() {
-      return this.visibleCustomSections
-    }
-  }
 }
 </script>
 
-<style scoped>
+<style>
 .ocm-resume {
   background: var(--background-color);
   color: var(--text-color);
@@ -200,4 +195,4 @@ export default {
     print-color-adjust: exact;
   }
 }
-</style> 
+</style>
