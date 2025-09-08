@@ -173,4 +173,74 @@ export class ResumeDataV2 {
         }
         return new ResumeDataV2(json);
     }
+
+    static getResumeSchema() {
+        return {
+            type: 'object',
+            properties: {
+                version: { type: 'number' },
+                personal: {
+                    type: 'object',
+                    properties: {
+                        name: { type: 'string' },
+                        title: { type: 'string' },
+                        visible: { type: 'boolean' }
+                    },
+                    additionalProperties: false,
+                    required: ['name', 'title', 'visible']
+                },
+                experiences: {
+                    type: 'array',
+                    items: {
+                        type: 'object',
+                        properties: {
+                            title: { type: 'string' },
+                            company: { type: 'string' },
+                            period: { type: 'string' },
+                            description: { type: 'string' },
+                            visible: { type: 'boolean' }
+                        },
+                        additionalProperties: false,
+                        required: ['title', 'company', 'period', 'description', 'visible']
+                    }
+                },
+                experiencesVisible: { type: 'boolean' },
+                experiencesSectionName: { type: 'string' },
+                education: {
+                    type: 'array',
+                    items: {
+                        type: 'object',
+                        properties: {
+                            degree: { type: 'string' },
+                            school: { type: 'string' },
+                            period: { type: 'string' },
+                            mark: { type: 'string' },
+                            thesis: { type: 'string' },
+                            visible: { type: 'boolean' }
+                        },
+                        additionalProperties: false,
+                        required: ['degree', 'school', 'period', 'mark', 'thesis', 'visible']
+                    }
+                },
+                educationVisible: { type: 'boolean' },
+                educationSectionName: { type: 'string' },
+                customSections: {
+                    type: 'array',
+                    items: {
+                        type: 'object',
+                        properties: {
+                            title: { type: 'string' },
+                            content: { type: 'string' },
+                            visible: { type: 'boolean' },
+                            position: { type: 'string', enum: ['main', 'sidebar'] }
+                        },
+                        additionalProperties: false,
+                        required: ['title', 'content', 'visible', 'position']
+                    }
+                }
+            },
+            additionalProperties: false,
+            required: ['version', 'personal', 'experiences', 'education', 'customSections', 'experiencesVisible', 'educationVisible', 'experiencesSectionName', 'educationSectionName']
+        }
+    }
 } 

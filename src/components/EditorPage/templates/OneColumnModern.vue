@@ -73,6 +73,8 @@ export default {
   margin: 0 auto;
   padding: 40px;
   border: 1px solid var(--text-color);
+  min-height: 297mm;
+  box-sizing: border-box;
 }
 
 /* Header */

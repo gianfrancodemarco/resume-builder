@@ -487,16 +487,16 @@ const getCustomSectionIcon = (section) => {
 
 .ai-hub-button :deep(svg) {
     fill: rgb(var(--v-theme-secondary)) !important;
-    animation: spark-animation 4s infinite alternate;
+    animation: tilt-animation 1s infinite alternate;
 }
 
-@keyframes spark-animation {
+@keyframes tilt-animation {
     0% {
-        transform: scale(1);
+        transform: rotate(-5deg);
         opacity: 1;
     }
     100% {
-        transform: scale(1.2);
+        transform: rotate(5deg);
         opacity: 0.8;
     }
 }
