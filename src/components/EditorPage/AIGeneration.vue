@@ -145,6 +145,10 @@ export default {
         async sendMessage() {
             if (!this.userInput.trim() || this.isLoading || !this.activePrompt) return;
 
+            if (window.sa_event) {
+                window.sa_event("ai_send_message");
+            }
+
             const userMessage = { sender: "user", text: this.userInput };
             this.history.push(userMessage);
             const currentInput = this.userInput;
@@ -210,11 +214,17 @@ export default {
             }
         },
         startFromScratch() {
+            if (window.sa_event) {
+                window.sa_event("ai_start_from_scratch");
+            }
             const newResume = new ResumeDataV2();
             this.$emit("update:resumeInfo", newResume);
             this.startConversation(PROMPT_SCRATCH, newResume);
         },
         editExistingResume() {
+            if (window.sa_event) {
+                window.sa_event("ai_edit_existing_resume");
+            }
             this.startConversation(PROMPT_EDIT, this.resumeInfo);
         },
         handleEnter(event) {
