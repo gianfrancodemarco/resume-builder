@@ -10,7 +10,7 @@ import * as directives from 'vuetify/directives'
 import '@mdi/font/css/materialdesignicons.css'
 
 // Phosphor Icons
-import { PhEye, PhEyeSlash, PhPencilSimple, PhCheck, PhTrash, PhPlus, PhTextAlignRight, PhTextAlignLeft, PhArrowUp, PhArrowDown, PhCopy, PhPalette, PhTextT, PhArrowsOutLineVertical, PhGlobe, PhLink, PhX, PhArrowCounterClockwise, PhArrowClockwise, PhTextB, PhTextItalic, PhTextStrikethrough, PhTextUnderline, PhListBullets, PhListNumbers, PhList, PhBracketsCurly, PhUpload, PhFilePdf, PhFileCode, PhFileText, PhLightning, PhUser, PhUserCircle, PhBriefcase, PhGraduationCap, PhPlusCircle, PhTranslate, PhCertificate, PhFolder, PhBookOpen, PhTrophy, PhHeart, PhStar, PhUsers, PhTarget, PhMedal, PhGameController, PhBuildings, PhLightbulb, PhPhone, PhMagnifyingGlassPlus, PhMagnifyingGlassMinus, PhHouse, PhSun, PhMoon, PhCaretUp, PhCaretDown, PhLayout, PhArticleNyTimes, PhSparkle, PhPaperPlaneRight, PhClockCounterClockwise } from '@phosphor-icons/vue'
+import { PhEye, PhEyeSlash, PhPencilSimple, PhCheck, PhTrash, PhPlus, PhTextAlignRight, PhTextAlignLeft, PhArrowUp, PhArrowDown, PhCopy, PhPalette, PhTextT, PhArrowsOutLineVertical, PhGlobe, PhLink, PhX, PhArrowCounterClockwise, PhArrowClockwise, PhTextB, PhTextItalic, PhTextStrikethrough, PhTextUnderline, PhListBullets, PhListNumbers, PhList, PhBracketsCurly, PhUpload, PhFilePdf, PhFileCode, PhFileText, PhLightning, PhUser, PhUserCircle, PhBriefcase, PhGraduationCap, PhPlusCircle, PhTranslate, PhCertificate, PhFolder, PhBookOpen, PhTrophy, PhHeart, PhStar, PhUsers, PhTarget, PhMedal, PhGameController, PhBuildings, PhLightbulb, PhPhone, PhMagnifyingGlassPlus, PhMagnifyingGlassMinus, PhHouse, PhSun, PhMoon, PhCaretUp, PhCaretDown, PhLayout, PhArticleNyTimes, PhSparkle, PhPaperPlaneRight, PhClockCounterClockwise, PhMicrophone, PhStop } from '@phosphor-icons/vue'
 const savedTheme = localStorage.getItem('theme') || 'dark';
 const vuetify = createVuetify({
     components,
@@ -177,7 +177,9 @@ const vuetify = createVuetify({
                         'ph-article-nytimes': PhArticleNyTimes,
                         'ph-sparkle': PhSparkle,
                         'ph-paper-plane-right': PhPaperPlaneRight,
-                        'ph-clock-counter-clockwise': PhClockCounterClockwise
+                        'ph-clock-counter-clockwise': PhClockCounterClockwise,
+                        'ph-microphone': PhMicrophone,
+                        'ph-stop': PhStop
                     }
                     const IconComponent = iconMap[props.icon]
                     return IconComponent ? h(IconComponent, { ...props, icon: undefined }) : null
