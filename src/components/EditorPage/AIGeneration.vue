@@ -17,19 +17,36 @@
         <div v-if="history.length > 0" class="chat-input-container">
             <div class="chat-input">
                 <v-textarea v-model="userInput" @keydown.enter="handleEnter" placeholder="Type your message..." rows="2"
-                    auto-grow variant="filled" class="chat-textarea" hide-details></v-textarea>
-                <v-tooltip text="Send Message">
-                    <template v-slot:activator="{ props }">
-                        <v-btn v-bind="props" icon="ph-paper-plane-right" @click="sendMessage"
-                            :disabled="isLoading || !userInput.trim()" variant="text" class="send-button"></v-btn>
+                    auto-grow variant="solo" class="chat-textarea" hide-details rounded>
+                    <template v-slot:append-inner>
+                        <v-tooltip :text="recordButtonTooltip">
+                            <template v-slot:activator="{ props }">
+                                <v-btn v-bind="props" :icon="isRecording ? 'ph-stop' : 'ph-microphone'"
+                                    @click="toggleRecording" :disabled="isLoading || !openaiApiKey"
+                                    :color="isRecording ? 'red' : 'editor-text-muted'" variant="text"
+                                    class="record-button" size="small"></v-btn>
+                            </template>
+                        </v-tooltip>
+                        <v-tooltip text="Send Message">
+                            <template v-slot:activator="{ props }">
+                                <v-btn v-bind="props" icon="ph-paper-plane-right" @click="sendMessage"
+                                    :disabled="isLoading || !userInput.trim()" variant="text" class="send-button"
+                                    color="editor-text-muted" size="small"></v-btn>
+                            </template>
+                        </v-tooltip>
                     </template>
-                </v-tooltip>
+                </v-textarea>
+            </div>
+            <div class="chat-actions">
                 <v-tooltip text="Clear History">
                     <template v-slot:activator="{ props }">
                         <v-btn v-bind="props" icon="ph-trash" @click="clearHistory" variant="text" color="error"
                             class="clear-button"></v-btn>
                     </template>
                 </v-tooltip>
+            </div>
+            <div v-if="isTranscribing" class="transcribing-indicator">
+                <p><i>Transcribing...</i></p>
             </div>
         </div>
         <div v-if="history.length === 0 && !isLoading" class="initial-actions">
@@ -45,6 +62,7 @@
 
 <script>
 import AIGenerationService from "../../services/AIGenerationService";
+import TranscriptionService from "../../services/TranscriptionService";
 import { ResumeDataV2 } from '@/models/ResumeData/ResumeDataV2';
 
 const PROMPT_EDIT = `
@@ -100,13 +118,21 @@ export default {
             type: Object,
             required: true,
         },
-        apiKey: {
+        generationApiKey: {
             type: String,
             required: true,
         },
-        model: {
+        generationModel: {
             type: String,
             required: true,
+        },
+        openaiApiKey: {
+            type: String,
+            required: true,
+        },
+        transcriptionLanguage: {
+            type: String,
+            default: null,
         }
     },
     data() {
@@ -115,7 +141,19 @@ export default {
             history: [],
             isLoading: false,
             activePrompt: null,
+            isRecording: false,
+            isTranscribing: false,
+            mediaRecorder: null,
+            audioChunks: [],
         };
+    },
+    computed: {
+        recordButtonTooltip() {
+            if (!this.openaiApiKey) {
+                return "OpenAI API key is required for transcription.";
+            }
+            return this.isRecording ? "Stop Recording" : "Start Recording";
+        },
     },
     created() {
         this.loadHistory();
@@ -141,6 +179,60 @@ export default {
             this.activePrompt = null;
             localStorage.removeItem("ai-generation-state");
             localStorage.removeItem("ai-generation-history"); // for migration
+            this.stopRecording();
+        },
+        async toggleRecording() {
+            if (this.isRecording) {
+                await this.stopRecording();
+            } else {
+                await this.startRecording();
+            }
+        },
+        async startRecording() {
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                alert("Your browser does not support audio recording.");
+                return;
+            }
+
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                this.mediaRecorder = new MediaRecorder(stream);
+                this.audioChunks = [];
+
+                this.mediaRecorder.ondataavailable = event => {
+                    this.audioChunks.push(event.data);
+                };
+
+                this.mediaRecorder.onstop = async () => {
+                    const audioBlob = new Blob(this.audioChunks, { type: 'audio/webm' });
+                    stream.getTracks().forEach(track => track.stop());
+                    await this.transcribeAudio(audioBlob);
+                };
+
+                this.mediaRecorder.start();
+                this.isRecording = true;
+            } catch (error) {
+                console.error("Error starting recording:", error);
+                alert("Could not start audio recording. Please check microphone permissions.");
+            }
+        },
+        async stopRecording() {
+            if (this.mediaRecorder && this.isRecording) {
+                this.mediaRecorder.stop();
+                this.isRecording = false;
+            }
+        },
+        async transcribeAudio(audioBlob) {
+            this.isTranscribing = true;
+            try {
+                const transcription = await TranscriptionService.transcribe(audioBlob, this.openaiApiKey, this.transcriptionLanguage);
+                this.userInput = transcription;
+            } catch (error) {
+                console.error("Error transcribing audio:", error);
+                alert("Could not transcribe audio. Please try again.");
+            } finally {
+                this.isTranscribing = false;
+            }
         },
         async sendMessage() {
             if (!this.userInput.trim() || this.isLoading || !this.activePrompt) return;
@@ -156,7 +248,7 @@ export default {
             this.isLoading = true;
 
             try {
-                const response = await AIGenerationService.generate(this.resumeInfo, this.history, this.apiKey, this.model, this.activePrompt);
+                const response = await AIGenerationService.generate(this.resumeInfo, this.history, this.generationApiKey, this.generationModel, this.activePrompt);
                 const assistantMessage = {
                     sender: "assistant",
                     text: response.answer,
@@ -193,7 +285,7 @@ export default {
             this.activePrompt = prompt;
 
             try {
-                const response = await AIGenerationService.generate(resumeData, [], this.apiKey, this.model, prompt);
+                const response = await AIGenerationService.generate(resumeData, [], this.generationApiKey, this.generationModel, prompt);
                 const assistantMessage = {
                     sender: "assistant",
                     text: response.answer,
@@ -233,6 +325,9 @@ export default {
                 this.sendMessage();
             }
         },
+    },
+    unmounted() {
+        this.stopRecording();
     },
 };
 </script>

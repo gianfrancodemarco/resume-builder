@@ -51,24 +51,17 @@
 
 .chat-input-container {
     display: flex;
-    align-items: flex-end;
+    flex-direction: column;
     gap: 0.5rem;
     padding: 1rem;
     border-top: 1px solid rgb(var(--v-theme-editor-border));
     background-color: transparent;
+    align-items: center;
 }
 
 .chat-input {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    flex-grow: 1;
-    resize: none;
-    border: 1px solid rgb(var(--v-theme-border));
-    border-radius: 6px;
-    padding: 0.5rem;
-    background-color: rgb(var(--v-theme-surface));
-    color: rgb(var(--v-theme-on-surface));
+    width: 100%;
+    max-width: 800px;
 }
 
 .chat-textarea {
@@ -77,11 +70,27 @@
 
 .chat-textarea :deep(.v-field__field) {
     box-shadow: none !important;
-    background-color: rgb(var(--v-theme-editor-field-bg)) !important;
+}
+
+.chat-textarea :deep(.v-field) {
+    box-shadow: none !important;
+    border: 1px solid rgb(var(--v-theme-editor-field-border));
+}
+
+.chat-textarea :deep(.v-field__append-inner) {
+    display: flex;
+    align-items: center;
+    padding-top: 0;
+}
+
+.chat-textarea :deep(textarea) {
+    padding-top: 12px;
+    padding-bottom: 12px;
 }
 
 .send-button,
-.clear-button {
+.clear-button,
+.record-button {
     align-self: center;
 }
 
@@ -122,6 +131,13 @@
     opacity: 1;
 }
 
+.transcribing-indicator {
+    width: 100%;
+    text-align: center;
+    padding: 0.5rem 0;
+    color: rgba(var(--v-theme-on-surface), 0.6);
+}
+
 .initial-actions {
     display: flex;
     flex-direction: column;
@@ -153,4 +169,10 @@
 .start-button:disabled {
     cursor: not-allowed;
     opacity: 0.7;
+}
+
+.chat-actions {
+    display: flex;
+    justify-content: center;
+    width: 100%;
 }
