@@ -1,19 +1,14 @@
 <template>
   <div id="printable-area">
     <div class="resume-preview" :style="resumeStyle">
-      <slot name="layout">
-        <div :class="rootClass || ''">
-          <slot name="header" :resumeData="resumeData"></slot>
-          <template v-for="(section, index) in orderedSections" :key="index">
-            <slot name="render-section" :section="section">
-              <slot :name="section.type" v-if="['experiences', 'education', 'custom'].includes(section.type)" 
-                    :resumeData="resumeData" 
-                    :processContent="processContent" 
-                    :section="section.type === 'custom' ? section.data : undefined"></slot>
-            </slot>
-          </template>
-        </div>
-      </slot>
+      <div :class="rootClass || ''">
+        <slot name="layout" :resumeData="resumeData" :orderedSections="orderedSections" :processContent="processContent">
+          <!--
+            The content from the specific template (e.g., OneColumnModern) will be injected here,
+            inside the div that has the rootClass applied.
+          -->
+        </slot>
+      </div>
     </div>
   </div>
 </template>
@@ -135,33 +130,31 @@ export default {
 
       return baseStyles
     },
-    visibleCustomSections() {
-      return this.resumeData.customSections.filter(s => s && s.visible !== false)
-    },
     orderedSections() {
-      const sections = []
-      if (this.resumeData.experiencesVisible && this.resumeData.experiences && this.resumeData.experiences.filter(e => e?.visible).length) {
-        sections.push({
-          type: 'experiences',
-          order: this.resumeData.experiencesOrder
-        })
-      }
-      if (this.resumeData.educationVisible && this.resumeData.education && this.resumeData.education.filter(e => e?.visible).length) {
-        sections.push({
-          type: 'education',
-          order: this.resumeData.educationOrder
-        })
-      }
-      this.visibleCustomSections.forEach((section, index) => {
-        const originalIndex = this.resumeData.customSections.indexOf(section)
-        sections.push({
-          type: 'custom',
-          order: section.order ?? originalIndex,
-          data: section,
-        })
-      })
-      sections.sort((a, b) => a.order - b.order)
-      return sections
+      const sectionOrder = [
+        { key: 'work', title: 'Work Experience' },
+        { key: 'education', title: 'Education' },
+        { key: 'projects', title: 'Projects' },
+        { key: 'skills', title: 'Skills' },
+        { key: 'awards', title: 'Awards' },
+        { key: 'volunteer', title: 'Volunteer' },
+        { key: 'publications', title: 'Publications' },
+        { key: 'languages', title: 'Languages' },
+        { key: 'interests', title: 'Interests' },
+        { key: 'references', title: 'References' }
+      ];
+
+      const sections = [];
+      sectionOrder.forEach(sectionInfo => {
+        if (this.resumeData[sectionInfo.key] && this.resumeData[sectionInfo.key].length > 0) {
+          sections.push({
+            type: sectionInfo.key,
+            title: sectionInfo.title,
+            items: this.resumeData[sectionInfo.key]
+          });
+        }
+      });
+      return sections;
     }
   }
 }

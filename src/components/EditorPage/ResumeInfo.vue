@@ -1,372 +1,305 @@
 <template>
     <div>
         <div class="editor-sections">
-            <!-- Personal Section -->
-            <div class="editor-section" data-section="personal">
+            <!-- Basics Section -->
+            <div class="editor-section" data-section="basics">
                 <div class="section-header">
                     <div class="d-flex align-center w-100">
                         <span class="section-title">
-                            Personal Information
+                            Basics
                         </span>
                     </div>
                 </div>
                 <div class="section-content">
-                    <v-text-field v-model="props.resumeData.personal.name" label="Name" variant="outlined"
-                        density="comfortable" class="mb-2" aria-label="Name" />
-                    <v-text-field v-model="props.resumeData.personal.title" label="Title" variant="outlined"
-                        density="comfortable" aria-label="Title" />
+                    <v-text-field v-model="props.resumeData.basics.name" label="Name" variant="outlined"
+                        density="comfortable" class="mb-2" />
+                    <v-text-field v-model="props.resumeData.basics.label" label="Label" variant="outlined"
+                        density="comfortable" class="mb-2" />
+                    <v-text-field v-model="props.resumeData.basics.email" label="Email" variant="outlined"
+                        density="comfortable" class="mb-2" />
+                    <v-text-field v-model="props.resumeData.basics.phone" label="Phone" variant="outlined"
+                        density="comfortable" class="mb-2" />
+                    <v-text-field v-model="props.resumeData.basics.url" label="Website" variant="outlined"
+                        density="comfortable" class="mb-2" />
+                    <v-textarea v-model="props.resumeData.basics.summary" label="Summary" variant="outlined"
+                        density="comfortable" />
                 </div>
             </div>
 
-            <div v-for="(section, index) in orderedSections" :key="section.type + (section.originalIndex || '')">
-                <!-- Experience Section -->
-                <div v-if="section.type === 'experience'" class="editor-section" data-section="experience">
-                    <div class="section-header">
-                        <div class="d-flex align-center w-100">
-                            <span class="section-title">
-                                {{ props.resumeData.experiencesSectionName }}
-                                <v-tooltip location="top">
-                                    <template v-slot:activator="{ props: iconProps }">
-                                        <v-icon v-bind="iconProps" icon="ph-pencil-simple" size="small"
-                                            class="edit-icon" @click.stop="openExperienceSectionModal" />
-                                    </template>
-                                    Edit section
-                                </v-tooltip>
-                                <v-icon :icon="props.resumeData.experiencesVisible ? 'ph-eye' : 'ph-eye-slash'"
-                                    size="small" class="visibility-icon"
-                                    @click.stop="props.resumeData.experiencesVisible = !props.resumeData.experiencesVisible" />
-                            </span>
-                            <div class="section-actions ml-auto">
-                                <v-tooltip location="top">
-                                    <template v-slot:activator="{ props: iconProps }">
-                                        <v-icon v-bind="iconProps" icon="ph-arrow-up" size="small" class="move-icon"
-                                            :class="{ 'v-icon--disabled': index === 0 }"
-                                            @click.stop="moveSection({ type: 'experience' }, 'up')"
-                                            :disabled="index === 0" />
-                                    </template>
-                                    Move section up
-                                </v-tooltip>
-                                <v-tooltip location="top">
-                                    <template v-slot:activator="{ props: iconProps }">
-                                        <v-icon v-bind="iconProps" icon="ph-arrow-down" size="small" class="move-icon"
-                                            :class="{ 'v-icon--disabled': index === orderedSections.length - 1 }"
-                                            @click.stop="moveSection({ type: 'experience' }, 'down')"
-                                            :disabled="index === orderedSections.length - 1" />
-                                    </template>
-                                    Move section down
-                                </v-tooltip>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="section-content">
-                        <div v-for="(exp, expIndex) in props.resumeData.experiences" :key="expIndex"
-                            class="experience-item">
-                            <div class="item-header">
-                                <span class="item-title">{{ exp.title }} - {{ exp.company }}</span>
-                                <div class="item-actions">
-                                    <v-icon
-                                        :icon="props.resumeData.experiences[expIndex].visible ? 'ph-eye' : 'ph-eye-slash'"
-                                        size="small" class="visibility-icon"
-                                        @click.stop="props.resumeData.experiences[expIndex].visible = !props.resumeData.experiences[expIndex].visible" />
-                                    <v-tooltip location="top">
-                                        <template v-slot:activator="{ props: iconProps }">
-                                            <v-icon v-bind="iconProps" icon="ph-pencil-simple" size="small"
-                                                class="edit-icon" @click.stop="openExperienceModal(expIndex)" />
-                                        </template>
-                                        Edit experience
-                                    </v-tooltip>
-                                    <v-tooltip location="top">
-                                        <template v-slot:activator="{ props: iconProps }">
-                                            <v-icon v-bind="iconProps"
-                                                :icon="deleteConfirmState[`exp-${expIndex}`] ? 'ph-check' : 'ph-delete'"
-                                                size="small" class="delete-icon"
-                                                :class="{ 'v-icon--disabled': !props.resumeData.experiencesVisible }"
-                                                @click.stop="removeExp(expIndex)"
-                                                :disabled="!props.resumeData.experiencesVisible" />
-                                        </template>
-                                        {{ deleteConfirmState[`exp-${expIndex}`] ? 'Confirm delete' : "Delete experience" }}
-                                    </v-tooltip>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="d-flex justify-center">
-                            <v-btn color="primary" @click="addExp" aria-label="Add Experience"
-                                :disabled="!props.resumeData.experiencesVisible" prepend-icon="ph-plus">Add
-                                Experience</v-btn>
-                        </div>
+            <!-- Work Section -->
+            <div class="editor-section" data-section="work">
+                <div class="section-header">
+                    <div class="d-flex align-center w-100">
+                        <span class="section-title">Work Experience</span>
                     </div>
                 </div>
-
-                <!-- Education Section -->
-                <div v-if="section.type === 'education'" class="editor-section" data-section="education">
-                    <div class="section-header">
-                        <div class="d-flex align-center w-100">
-                            <span class="section-title">
-                                {{ props.resumeData.educationSectionName }}
-                                <v-tooltip location="top">
-                                    <template v-slot:activator="{ props: iconProps }">
-                                        <v-icon v-bind="iconProps" icon="ph-pencil-simple" size="small"
-                                            class="edit-icon" @click.stop="openEducationSectionModal" />
-                                    </template>
-                                    Edit section
-                                </v-tooltip>
-                                <v-icon :icon="props.resumeData.educationVisible ? 'ph-eye' : 'ph-eye-slash'"
-                                    size="small" class="visibility-icon"
-                                    @click.stop="props.resumeData.educationVisible = !props.resumeData.educationVisible" />
-                            </span>
-                            <div class="section-actions ml-auto">
-                                <v-tooltip location="top">
-                                    <template v-slot:activator="{ props: iconProps }">
-                                        <v-icon v-bind="iconProps" icon="ph-arrow-up" size="small" class="move-icon"
-                                            :class="{ 'v-icon--disabled': index === 0 }"
-                                            @click.stop="moveSection({ type: 'education' }, 'up')"
-                                            :disabled="index === 0" />
-                                    </template>
-                                    Move section up
-                                </v-tooltip>
-                                <v-tooltip location="top">
-                                    <template v-slot:activator="{ props: iconProps }">
-                                        <v-icon v-bind="iconProps" icon="ph-arrow-down" size="small" class="move-icon"
-                                            :class="{ 'v-icon--disabled': index === orderedSections.length - 1 }"
-                                            @click.stop="moveSection({ type: 'education' }, 'down')"
-                                            :disabled="index === orderedSections.length - 1" />
-                                    </template>
-                                    Move section down
-                                </v-tooltip>
+                <div class="section-content">
+                    <div v-for="(workItem, index) in props.resumeData.work" :key="index" class="item-container">
+                        <div class="item-header">
+                            <span class="item-title">{{ workItem.position }} at {{ workItem.name }}</span>
+                            <div class="item-actions">
+                                <v-icon icon="ph-pencil-simple" size="small" class="edit-icon"
+                                    @click="openWorkModal(index)" />
+                                <v-icon icon="ph-delete" size="small" class="delete-icon"
+                                    @click="removeWorkItem(index)" />
                             </div>
                         </div>
                     </div>
-                    <div class="section-content">
-                        <div v-for="(edu, eduIndex) in props.resumeData.education" :key="eduIndex"
-                            class="education-item">
-                            <div class="item-header">
-                                <span class="item-title">{{ edu.degree }} - {{ edu.school }}</span>
-                                <div class="item-actions">
-                                    <v-icon
-                                        :icon="props.resumeData.education[eduIndex].visible ? 'ph-eye' : 'ph-eye-slash'"
-                                        size="small" class="visibility-icon"
-                                        @click.stop="props.resumeData.education[eduIndex].visible = !props.resumeData.education[eduIndex].visible" />
-                                    <v-tooltip location="top">
-                                        <template v-slot:activator="{ props: iconProps }">
-                                            <v-icon v-bind="iconProps" icon="ph-pencil-simple" size="small"
-                                                class="edit-icon" @click.stop="openEducationModal(eduIndex)" />
-                                        </template>
-                                        Edit education
-                                    </v-tooltip>
-                                    <v-tooltip location="top">
-                                        <template v-slot:activator="{ props: iconProps }">
-                                            <v-icon v-bind="iconProps"
-                                                :icon="deleteConfirmState[`edu-${eduIndex}`] ? 'ph-check' : 'ph-delete'"
-                                                size="small" class="delete-icon"
-                                                :class="{ 'v-icon--disabled': !props.resumeData.educationVisible }"
-                                                @click.stop="removeEdu(eduIndex)"
-                                                :disabled="!props.resumeData.educationVisible" />
-                                        </template>
-                                        {{ deleteConfirmState[`edu-${eduIndex}`] ? 'Confirm delete' : "Delete education"
-                                        }}
-                                    </v-tooltip>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="d-flex justify-center">
-                            <v-btn color="primary" @click="addEdu" aria-label="Add Education"
-                                :disabled="!props.resumeData.educationVisible" prepend-icon="ph-plus">Add
-                                Education</v-btn>
-                        </div>
+                    <div class="d-flex justify-center mt-4">
+                        <v-btn color="primary" prepend-icon="ph-plus" @click="openWorkModal()">Add Work</v-btn>
                     </div>
                 </div>
+            </div>
 
-                <!-- Custom Sections -->
-                <div v-if="section.type === 'custom'" class="editor-section"
-                    :data-section="`custom-${section.originalIndex}`">
-                    <div class="section-header">
-                        <div class="custom-section-title-row">
-                            <div class="section-title">{{ section.data.title }}</div>
-                            <div class="section-actions">
-                                <v-tooltip location="top">
-                                    <template v-slot:activator="{ props: iconProps }">
-                                        <v-icon v-bind="iconProps" icon="ph-pencil-simple" size="small"
-                                            class="edit-icon"
-                                            @click.stop="openCustomSectionModal(section.originalIndex)" />
-                                    </template>
-                                    Edit section
-                                </v-tooltip>
-                                <v-tooltip location="top">
-                                    <template v-slot:activator="{ props: iconProps }">
-                                        <v-icon v-bind="iconProps"
-                                            :icon="props.resumeData.customSections[section.originalIndex].visible ? 'ph-eye' : 'ph-eye-slash'"
-                                            size="small" class="visibility-icon"
-                                            @click.stop="props.resumeData.customSections[section.originalIndex].visible = !props.resumeData.customSections[section.originalIndex].visible" />
-                                    </template>
-                                    {{ props.resumeData.customSections[section.originalIndex].visible ? 'Hide section' :
-                                        'Show section'
-                                    }}
-                                </v-tooltip>
-                                <v-tooltip location="top">
-                                    <template v-slot:activator="{ props: iconProps }">
-                                        <v-icon v-bind="iconProps"
-                                            :icon="props.resumeData.customSections[section.originalIndex].position === 'sidebar' ? 'ph-format-align-right' : 'ph-format-align-left'"
-                                            size="small" class="position-icon"
-                                            @click.stop="toggleSectionPosition(section.originalIndex)" />
-                                    </template>
-                                    {{
-                                        getPositionTooltipText(props.resumeData.customSections[section.originalIndex].position)
-                                    }}
-                                </v-tooltip>
-                                <v-tooltip location="top">
-                                    <template v-slot:activator="{ props: iconProps }">
-                                        <v-icon v-bind="iconProps" icon="ph-arrow-up" size="small" class="move-icon"
-                                            :class="{ 'v-icon--disabled': index === 0 }"
-                                            @click.stop="moveSection({ type: 'custom', originalIndex: section.originalIndex }, 'up')"
-                                            :disabled="index === 0" />
-                                    </template>
-                                    Move section up
-                                </v-tooltip>
-                                <v-tooltip location="top">
-                                    <template v-slot:activator="{ props: iconProps }">
-                                        <v-icon v-bind="iconProps" icon="ph-arrow-down" size="small" class="move-icon"
-                                            :class="{ 'v-icon--disabled': index === orderedSections.length - 1 }"
-                                            @click.stop="moveSection({ type: 'custom', originalIndex: section.originalIndex }, 'down')"
-                                            :disabled="index === orderedSections.length - 1" />
-                                    </template>
-                                    Move section down
-                                </v-tooltip>
-                                <v-tooltip location="top">
-                                    <template v-slot:activator="{ props: iconProps }">
-                                        <v-icon v-bind="iconProps"
-                                            :icon="deleteConfirmState[section.originalIndex] ? 'ph-check' : 'ph-delete'"
-                                            size="small" class="delete-icon"
-                                            :class="{ 'v-icon--disabled': !props.resumeData.customSections[section.originalIndex].visible }"
-                                            @click.stop="removeCustomSection(section.originalIndex)"
-                                            :disabled="!props.resumeData.customSections[section.originalIndex].visible" />
-                                    </template>
-                                    {{ deleteConfirmState[section.originalIndex] ? 'Confirm delete' : 'Delete section'
-                                    }}
-                                </v-tooltip>
-                                <v-tooltip location="top">
-                                    <template v-slot:activator="{ props: iconProps }">
-                                        <v-icon v-bind="iconProps" icon="ph-content-copy" size="small"
-                                            class="clone-icon"
-                                            :class="{ 'v-icon--disabled': !props.resumeData.customSections[section.originalIndex].visible }"
-                                            @click.stop="cloneCustomSection(section.originalIndex)"
-                                            :disabled="!props.resumeData.customSections[section.originalIndex].visible" />
-                                    </template>
-                                    Clone section
-                                </v-tooltip>
+            <!-- Education Section -->
+            <div class="editor-section" data-section="education">
+                <div class="section-header">
+                    <div class="d-flex align-center w-100">
+                        <span class="section-title">Education</span>
+                    </div>
+                </div>
+                <div class="section-content">
+                    <div v-for="(educationItem, index) in props.resumeData.education" :key="index"
+                        class="item-container">
+                        <div class="item-header">
+                            <span class="item-title">{{ educationItem.studyType }} at {{ educationItem.institution
+                                }}</span>
+                            <div class="item-actions">
+                                <v-icon icon="ph-pencil-simple" size="small" class="edit-icon"
+                                    @click="openEducationModal(index)" />
+                                <v-icon icon="ph-delete" size="small" class="delete-icon"
+                                    @click="removeEducationItem(index)" />
                             </div>
                         </div>
                     </div>
-                    <div class="custom-section-preview" v-html="section.data.content"></div>
+                    <div class="d-flex justify-center mt-4">
+                        <v-btn color="primary" prepend-icon="ph-plus" @click="openEducationModal()">Add
+                            Education</v-btn>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Skills Section -->
+            <div class="editor-section" data-section="skills">
+                <div class="section-header">
+                    <div class="d-flex align-center w-100">
+                        <span class="section-title">Skills</span>
+                    </div>
+                </div>
+                <div class="section-content">
+                    <div v-for="(skill, index) in props.resumeData.skills" :key="index" class="item-container">
+                        <div class="item-header">
+                            <span class="item-title">{{ skill.name }}</span>
+                            <div class="item-actions">
+                                <v-icon icon="ph-pencil-simple" size="small" class="edit-icon"
+                                    @click="openSkillModal(index)" />
+                                <v-icon icon="ph-delete" size="small" class="delete-icon" @click="removeSkill(index)" />
+                            </div>
+                        </div>
+                        <div class="item-content">
+                            <v-chip v-for="keyword in skill.keywords" :key="keyword" size="small" class="mr-2 mb-2">{{
+                                keyword }}</v-chip>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-center mt-4">
+                        <v-btn color="primary" prepend-icon="ph-plus" @click="openSkillModal()">Add Skill</v-btn>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Projects Section -->
+            <div class="editor-section" data-section="projects">
+                <div class="section-header">
+                    <span class="section-title">Projects</span>
+                </div>
+                <div class="section-content">
+                    <div v-for="(project, index) in props.resumeData.projects" :key="index" class="item-container">
+                        <div class="item-header">
+                            <span class="item-title">{{ project.name }}</span>
+                            <div class="item-actions">
+                                <v-icon icon="ph-pencil-simple" size="small" class="edit-icon"
+                                    @click="openProjectModal(index)" />
+                                <v-icon icon="ph-delete" size="small" class="delete-icon"
+                                    @click="removeProject(index)" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-center mt-4">
+                        <v-btn color="primary" prepend-icon="ph-plus" @click="openProjectModal()">Add Project</v-btn>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Awards Section -->
+            <div class="editor-section" data-section="awards">
+                <div class="section-header">
+                    <span class="section-title">Awards</span>
+                </div>
+                <div class="section-content">
+                    <div v-for="(award, index) in props.resumeData.awards" :key="index" class="item-container">
+                        <div class="item-header">
+                            <span class="item-title">{{ award.title }}</span>
+                            <div class="item-actions">
+                                <v-icon icon="ph-pencil-simple" size="small" class="edit-icon"
+                                    @click="openAwardModal(index)" />
+                                <v-icon icon="ph-delete" size="small" class="delete-icon" @click="removeAward(index)" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-center mt-4">
+                        <v-btn color="primary" prepend-icon="ph-plus" @click="openAwardModal()">Add Award</v-btn>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Volunteer Section -->
+            <div class="editor-section" data-section="volunteer">
+                <div class="section-header">
+                    <span class="section-title">Volunteer</span>
+                </div>
+                <div class="section-content">
+                    <div v-for="(volunteer, index) in props.resumeData.volunteer" :key="index" class="item-container">
+                        <div class="item-header">
+                            <span class="item-title">{{ volunteer.organization }}</span>
+                            <div class="item-actions">
+                                <v-icon icon="ph-pencil-simple" size="small" class="edit-icon"
+                                    @click="openVolunteerModal(index)" />
+                                <v-icon icon="ph-delete" size="small" class="delete-icon"
+                                    @click="removeVolunteer(index)" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-center mt-4">
+                        <v-btn color="primary" prepend-icon="ph-plus" @click="openVolunteerModal()">Add Volunteer
+                        </v-btn>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Publications Section -->
+            <div class="editor-section" data-section="publications">
+                <div class="section-header">
+                    <span class="section-title">Publications</span>
+                </div>
+                <div class="section-content">
+                    <div v-for="(publication, index) in props.resumeData.publications" :key="index"
+                        class="item-container">
+                        <div class="item-header">
+                            <span class="item-title">{{ publication.name }}</span>
+                            <div class="item-actions">
+                                <v-icon icon="ph-pencil-simple" size="small" class="edit-icon"
+                                    @click="openPublicationModal(index)" />
+                                <v-icon icon="ph-delete" size="small" class="delete-icon"
+                                    @click="removePublication(index)" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-center mt-4">
+                        <v-btn color="primary" prepend-icon="ph-plus" @click="openPublicationModal()">Add Publication
+                        </v-btn>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Languages Section -->
+            <div class="editor-section" data-section="languages">
+                <div class="section-header">
+                    <span class="section-title">Languages</span>
+                </div>
+                <div class="section-content">
+                    <div v-for="(language, index) in props.resumeData.languages" :key="index" class="item-container">
+                        <div class="item-header">
+                            <span class="item-title">{{ language.language }}</span>
+                            <div class="item-actions">
+                                <v-icon icon="ph-pencil-simple" size="small" class="edit-icon"
+                                    @click="openLanguageModal(index)" />
+                                <v-icon icon="ph-delete" size="small" class="delete-icon"
+                                    @click="removeLanguage(index)" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-center mt-4">
+                        <v-btn color="primary" prepend-icon="ph-plus" @click="openLanguageModal()">Add Language</v-btn>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Interests Section -->
+            <div class="editor-section" data-section="interests">
+                <div class="section-header">
+                    <span class="section-title">Interests</span>
+                </div>
+                <div class="section-content">
+                    <div v-for="(interest, index) in props.resumeData.interests" :key="index" class="item-container">
+                        <div class="item-header">
+                            <span class="item-title">{{ interest.name }}</span>
+                            <div class="item-actions">
+                                <v-icon icon="ph-pencil-simple" size="small" class="edit-icon"
+                                    @click="openInterestModal(index)" />
+                                <v-icon icon="ph-delete" size="small" class="delete-icon"
+                                    @click="removeInterest(index)" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-center mt-4">
+                        <v-btn color="primary" prepend-icon="ph-plus" @click="openInterestModal()">Add Interest</v-btn>
+                    </div>
+                </div>
+            </div>
+
+            <!-- References Section -->
+            <div class="editor-section" data-section="references">
+                <div class="section-header">
+                    <span class="section-title">References</span>
+                </div>
+                <div class="section-content">
+                    <div v-for="(reference, index) in props.resumeData.references" :key="index" class="item-container">
+                        <div class="item-header">
+                            <span class="item-title">{{ reference.name }}</span>
+                            <div class="item-actions">
+                                <v-icon icon="ph-pencil-simple" size="small" class="edit-icon"
+                                    @click="openReferenceModal(index)" />
+                                <v-icon icon="ph-delete" size="small" class="delete-icon"
+                                    @click="removeReference(index)" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-center mt-4">
+                        <v-btn color="primary" prepend-icon="ph-plus" @click="openReferenceModal()">Add Reference
+                        </v-btn>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="d-flex flex-column align-center">
-            <v-btn color="primary" @click="addCustomSection" prepend-icon="ph-plus" class="mt-4 action-btn"
-                aria-label="Add custom section">Add Custom Section</v-btn>
-        </div>
-
-        <!-- Custom Section Modal -->
-        <v-dialog v-model="customSectionModal.show" max-width="800px" persistent>
-            <v-card class="modal-card">
-                <v-card-title class="modal-title">
-                    <v-icon icon="ph-folder-simple" class="mr-2" />
-                    {{ customSectionModal.isNew ? 'Add Custom Section' : 'Edit Custom Section' }}
-                </v-card-title>
-                <v-card-text class="modal-content">
-                    <v-text-field v-model="customSectionModal.data.title" label="Section Title" variant="outlined"
-                        density="comfortable" class="mb-4" prepend-inner-icon="ph-text-t" />
-                    <div class="mb-4">
-                        <label class="v-label mb-2 d-block">Content</label>
-                        <TiptapEditor v-model="customSectionModal.data.content" />
-                    </div>
-                </v-card-text>
-                <v-card-actions class="modal-actions">
-                    <v-spacer></v-spacer>
-                    <v-btn color="grey-darken-1" variant="outlined" @click="closeCustomSectionModal" class="modal-btn">
-                        Cancel
-                    </v-btn>
-                    <v-btn color="primary" @click="saveCustomSection" class="modal-btn" prepend-icon="ph-check">
-                        {{ customSectionModal.isNew ? 'Add' : 'Save' }}
-                    </v-btn>
-                </v-card-actions>
-            </v-card>
-        </v-dialog>
-
-        <!-- Experience Section Modal -->
-        <v-dialog v-model="experienceSectionModal.show" max-width="500px" persistent>
+        <!-- Work Modal -->
+        <v-dialog v-model="workModal.show" max-width="800px" persistent>
             <v-card class="modal-card">
                 <v-card-title class="modal-title">
                     <v-icon icon="ph-briefcase" class="mr-2" />
-                    Edit Experience Section
+                    {{ workModal.isNew ? 'Add Work' : 'Edit Work' }}
                 </v-card-title>
                 <v-card-text class="modal-content">
-                    <v-text-field v-model="experienceSectionModal.data.sectionName" label="Section Title"
-                        variant="outlined" density="comfortable" prepend-inner-icon="ph-text-t" />
-                </v-card-text>
-                <v-card-actions class="modal-actions">
-                    <v-spacer></v-spacer>
-                    <v-btn color="grey-darken-1" variant="outlined" @click="closeExperienceSectionModal"
-                        class="modal-btn">
-                        Cancel
-                    </v-btn>
-                    <v-btn color="primary" @click="saveExperienceSection" class="modal-btn" prepend-icon="ph-check">
-                        Save
-                    </v-btn>
-                </v-card-actions>
-            </v-card>
-        </v-dialog>
-
-        <!-- Experience Modal -->
-        <v-dialog v-model="experienceModal.show" max-width="800px" persistent>
-            <v-card class="modal-card">
-                <v-card-title class="modal-title">
-                    <v-icon icon="ph-briefcase" class="mr-2" />
-                    {{ experienceModal.isNew ? 'Add Experience' : 'Edit Experience' }}
-                </v-card-title>
-                <v-card-text class="modal-content">
-                    <v-text-field v-model="experienceModal.data.title" label="Job Title" variant="outlined"
-                        density="comfortable" class="mb-3" prepend-inner-icon="ph-user" />
-                    <v-text-field v-model="experienceModal.data.company" label="Company (+ location)" variant="outlined"
-                        density="comfortable" class="mb-3" prepend-inner-icon="ph-buildings" />
-                    <v-text-field v-model="experienceModal.data.period" label="Period" variant="outlined"
-                        density="comfortable" class="mb-3" prepend-inner-icon="ph-calendar" />
+                    <v-text-field v-model="workModal.data.position" label="Position" variant="outlined"
+                        density="comfortable" class="mb-3" />
+                    <v-text-field v-model="workModal.data.name" label="Company" variant="outlined" density="comfortable"
+                        class="mb-3" />
+                    <v-text-field v-model="workModal.data.startDate" label="Start Date" variant="outlined"
+                        density="comfortable" class="mb-3" />
+                    <v-text-field v-model="workModal.data.endDate" label="End Date" variant="outlined"
+                        density="comfortable" class="mb-3" />
                     <div class="mb-3">
-                        <label class="v-label mb-2 d-block">Description</label>
-                        <TiptapEditor v-model="experienceModal.data.description" />
+                        <label class="v-label mb-2 d-block">Summary</label>
+                        <TiptapEditor v-model="workModal.data.summary" />
                     </div>
                 </v-card-text>
                 <v-card-actions class="modal-actions">
                     <v-spacer></v-spacer>
-                    <v-btn color="grey-darken-1" variant="outlined" @click="closeExperienceModal" class="modal-btn">
+                    <v-btn color="grey-darken-1" variant="outlined" @click="workModal.show = false" class="modal-btn">
                         Cancel
                     </v-btn>
-                    <v-btn color="primary" @click="saveExperience" class="modal-btn" prepend-icon="ph-check">
-                        {{ experienceModal.isNew ? 'Add' : 'Save' }}
-                    </v-btn>
-                </v-card-actions>
-            </v-card>
-        </v-dialog>
-
-        <!-- Education Section Modal -->
-        <v-dialog v-model="educationSectionModal.show" max-width="500px" persistent>
-            <v-card class="modal-card">
-                <v-card-title class="modal-title">
-                    <v-icon icon="ph-graduation-cap" class="mr-2" />
-                    Edit Education Section
-                </v-card-title>
-                <v-card-text class="modal-content">
-                    <v-text-field v-model="educationSectionModal.data.sectionName" label="Section Title"
-                        variant="outlined" density="comfortable" prepend-inner-icon="ph-text-t" />
-                </v-card-text>
-                <v-card-actions class="modal-actions">
-                    <v-spacer></v-spacer>
-                    <v-btn color="grey-darken-1" variant="outlined" @click="closeEducationSectionModal"
-                        class="modal-btn">
-                        Cancel
-                    </v-btn>
-                    <v-btn color="primary" @click="saveEducationSection" class="modal-btn" prepend-icon="ph-check">
-                        Save
+                    <v-btn color="primary" @click="saveWorkModal" class="modal-btn" prepend-icon="ph-check">
+                        {{ workModal.isNew ? 'Add' : 'Save' }}
                     </v-btn>
                 </v-card-actions>
             </v-card>
@@ -380,26 +313,247 @@
                     {{ educationModal.isNew ? 'Add Education' : 'Edit Education' }}
                 </v-card-title>
                 <v-card-text class="modal-content">
-                    <v-text-field v-model="educationModal.data.degree" label="Degree" variant="outlined"
-                        density="comfortable" class="mb-3" prepend-inner-icon="ph-certificate" />
-                    <v-text-field v-model="educationModal.data.school" label="School" variant="outlined"
-                        density="comfortable" class="mb-3" prepend-inner-icon="ph-buildings" />
-                    <v-text-field v-model="educationModal.data.period" label="Period" variant="outlined"
-                        density="comfortable" class="mb-3" prepend-inner-icon="ph-calendar" />
-                    <v-text-field v-model="educationModal.data.mark" label="Grade" variant="outlined"
-                        density="comfortable" class="mb-3" prepend-inner-icon="ph-star" />
-                    <div class="mb-3">
-                        <label class="v-label mb-2 d-block">Thesis / Notes</label>
-                        <TiptapEditor v-model="educationModal.data.thesis" />
-                    </div>
+                    <v-text-field v-model="educationModal.data.institution" label="Institution" variant="outlined"
+                        density="comfortable" class="mb-3" />
+                    <v-text-field v-model="educationModal.data.studyType" label="Study Type" variant="outlined"
+                        density="comfortable" class="mb-3" />
+                    <v-text-field v-model="educationModal.data.area" label="Area" variant="outlined"
+                        density="comfortable" class="mb-3" />
+                    <v-text-field v-model="educationModal.data.startDate" label="Start Date" variant="outlined"
+                        density="comfortable" class="mb-3" />
+                    <v-text-field v-model="educationModal.data.endDate" label="End Date" variant="outlined"
+                        density="comfortable" class="mb-3" />
+                    <v-text-field v-model="educationModal.data.score" label="Score" variant="outlined"
+                        density="comfortable" class="mb-3" />
                 </v-card-text>
                 <v-card-actions class="modal-actions">
                     <v-spacer></v-spacer>
-                    <v-btn color="grey-darken-1" variant="outlined" @click="closeEducationModal" class="modal-btn">
+                    <v-btn color="grey-darken-1" variant="outlined" @click="educationModal.show = false"
+                        class="modal-btn">
                         Cancel
                     </v-btn>
-                    <v-btn color="primary" @click="saveEducation" class="modal-btn" prepend-icon="ph-check">
+                    <v-btn color="primary" @click="saveEducationModal" class="modal-btn" prepend-icon="ph-check">
                         {{ educationModal.isNew ? 'Add' : 'Save' }}
+                    </v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+
+        <!-- Skills Modal -->
+        <v-dialog v-model="skillModal.show" max-width="800px" persistent>
+            <v-card class="modal-card">
+                <v-card-title class="modal-title">
+                    <v-icon icon="ph-lightning" class="mr-2" />
+                    {{ skillModal.isNew ? 'Add Skill' : 'Edit Skill' }}
+                </v-card-title>
+                <v-card-text class="modal-content">
+                    <v-text-field v-model="skillModal.data.name" label="Skill Name" variant="outlined"
+                        density="comfortable" class="mb-3" />
+                    <v-combobox v-model="skillModal.data.keywords" label="Keywords" chips multiple clearable
+                        variant="outlined" density="comfortable" />
+                </v-card-text>
+                <v-card-actions class="modal-actions">
+                    <v-spacer></v-spacer>
+                    <v-btn color="grey-darken-1" variant="outlined" @click="skillModal.show = false" class="modal-btn">
+                        Cancel
+                    </v-btn>
+                    <v-btn color="primary" @click="saveSkillModal" class="modal-btn" prepend-icon="ph-check">
+                        {{ skillModal.isNew ? 'Add' : 'Save' }}
+                    </v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+
+        <!-- Projects Modal -->
+        <v-dialog v-model="projectModal.show" max-width="800px" persistent>
+            <v-card class="modal-card">
+                <v-card-title class="modal-title">
+                    <v-icon icon="ph-code" class="mr-2" />
+                    {{ projectModal.isNew ? 'Add Project' : 'Edit Project' }}
+                </v-card-title>
+                <v-card-text class="modal-content">
+                    <v-text-field v-model="projectModal.data.name" label="Project Name" variant="outlined"
+                        density="comfortable" class="mb-3" />
+                    <v-text-field v-model="projectModal.data.description" label="Description" variant="outlined"
+                        density="comfortable" class="mb-3" />
+                    <v-text-field v-model="projectModal.data.url" label="URL" variant="outlined" density="comfortable"
+                        class="mb-3" />
+                    <v-combobox v-model="projectModal.data.highlights" label="Highlights" chips multiple clearable
+                        variant="outlined" density="comfortable" />
+                </v-card-text>
+                <v-card-actions class="modal-actions">
+                    <v-spacer></v-spacer>
+                    <v-btn color="grey-darken-1" variant="outlined" @click="projectModal.show = false"
+                        class="modal-btn">
+                        Cancel
+                    </v-btn>
+                    <v-btn color="primary" @click="saveProjectModal" class="modal-btn" prepend-icon="ph-check">
+                        {{ projectModal.isNew ? 'Add' : 'Save' }}
+                    </v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+
+        <!-- Awards Modal -->
+        <v-dialog v-model="awardModal.show" max-width="800px" persistent>
+            <v-card class="modal-card">
+                <v-card-title class="modal-title">
+                    <v-icon icon="ph-trophy" class="mr-2" />
+                    {{ awardModal.isNew ? 'Add Award' : 'Edit Award' }}
+                </v-card-title>
+                <v-card-text class="modal-content">
+                    <v-text-field v-model="awardModal.data.title" label="Award Title" variant="outlined"
+                        density="comfortable" class="mb-3" />
+                    <v-text-field v-model="awardModal.data.date" label="Date" variant="outlined" density="comfortable"
+                        class="mb-3" />
+                    <v-text-field v-model="awardModal.data.awarder" label="Awarder" variant="outlined"
+                        density="comfortable" class="mb-3" />
+                    <TiptapEditor v-model="awardModal.data.summary" />
+                </v-card-text>
+                <v-card-actions class="modal-actions">
+                    <v-spacer></v-spacer>
+                    <v-btn color="grey-darken-1" variant="outlined" @click="awardModal.show = false" class="modal-btn">
+                        Cancel
+                    </v-btn>
+                    <v-btn color="primary" @click="saveAwardModal" class="modal-btn" prepend-icon="ph-check">
+                        {{ awardModal.isNew ? 'Add' : 'Save' }}
+                    </v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+
+        <!-- Volunteer Modal -->
+        <v-dialog v-model="volunteerModal.show" max-width="800px" persistent>
+            <v-card class="modal-card">
+                <v-card-title class="modal-title">
+                    <v-icon icon="ph-heart" class="mr-2" />
+                    {{ volunteerModal.isNew ? 'Add Volunteer' : 'Edit Volunteer' }}
+                </v-card-title>
+                <v-card-text class="modal-content">
+                    <v-text-field v-model="volunteerModal.data.organization" label="Organization" variant="outlined"
+                        density="comfortable" class="mb-3" />
+                    <v-text-field v-model="volunteerModal.data.position" label="Position" variant="outlined"
+                        density="comfortable" class="mb-3" />
+                    <v-text-field v-model="volunteerModal.data.startDate" label="Start Date" variant="outlined"
+                        density="comfortable" class="mb-3" />
+                    <v-text-field v-model="volunteerModal.data.endDate" label="End Date" variant="outlined"
+                        density="comfortable" class="mb-3" />
+                    <TiptapEditor v-model="volunteerModal.data.summary" />
+                </v-card-text>
+                <v-card-actions class="modal-actions">
+                    <v-spacer></v-spacer>
+                    <v-btn color="grey-darken-1" variant="outlined" @click="volunteerModal.show = false"
+                        class="modal-btn">
+                        Cancel
+                    </v-btn>
+                    <v-btn color="primary" @click="saveVolunteerModal" class="modal-btn" prepend-icon="ph-check">
+                        {{ volunteerModal.isNew ? 'Add' : 'Save' }}
+                    </v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+
+        <!-- Publications Modal -->
+        <v-dialog v-model="publicationModal.show" max-width="800px" persistent>
+            <v-card class="modal-card">
+                <v-card-title class="modal-title">
+                    <v-icon icon="ph-book-open" class="mr-2" />
+                    {{ publicationModal.isNew ? 'Add Publication' : 'Edit Publication' }}
+                </v-card-title>
+                <v-card-text class="modal-content">
+                    <v-text-field v-model="publicationModal.data.name" label="Publication Name" variant="outlined"
+                        density="comfortable" class="mb-3" />
+                    <v-text-field v-model="publicationModal.data.publisher" label="Publisher" variant="outlined"
+                        density="comfortable" class="mb-3" />
+                    <v-text-field v-model="publicationModal.data.releaseDate" label="Release Date" variant="outlined"
+                        density="comfortable" class="mb-3" />
+                    <TiptapEditor v-model="publicationModal.data.summary" />
+                </v-card-text>
+                <v-card-actions class="modal-actions">
+                    <v-spacer></v-spacer>
+                    <v-btn color="grey-darken-1" variant="outlined" @click="publicationModal.show = false"
+                        class="modal-btn">
+                        Cancel
+                    </v-btn>
+                    <v-btn color="primary" @click="savePublicationModal" class="modal-btn" prepend-icon="ph-check">
+                        {{ publicationModal.isNew ? 'Add' : 'Save' }}
+                    </v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+
+        <!-- Languages Modal -->
+        <v-dialog v-model="languageModal.show" max-width="500px" persistent>
+            <v-card class="modal-card">
+                <v-card-title class="modal-title">
+                    <v-icon icon="ph-translate" class="mr-2" />
+                    {{ languageModal.isNew ? 'Add Language' : 'Edit Language' }}
+                </v-card-title>
+                <v-card-text class="modal-content">
+                    <v-text-field v-model="languageModal.data.language" label="Language" variant="outlined"
+                        density="comfortable" class="mb-3" />
+                    <v-text-field v-model="languageModal.data.fluency" label="Fluency" variant="outlined"
+                        density="comfortable" />
+                </v-card-text>
+                <v-card-actions class="modal-actions">
+                    <v-spacer></v-spacer>
+                    <v-btn color="grey-darken-1" variant="outlined" @click="languageModal.show = false"
+                        class="modal-btn">
+                        Cancel
+                    </v-btn>
+                    <v-btn color="primary" @click="saveLanguageModal" class="modal-btn" prepend-icon="ph-check">
+                        {{ languageModal.isNew ? 'Add' : 'Save' }}
+                    </v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+
+        <!-- Interests Modal -->
+        <v-dialog v-model="interestModal.show" max-width="800px" persistent>
+            <v-card class="modal-card">
+                <v-card-title class="modal-title">
+                    <v-icon icon="ph-star" class="mr-2" />
+                    {{ interestModal.isNew ? 'Add Interest' : 'Edit Interest' }}
+                </v-card-title>
+                <v-card-text class="modal-content">
+                    <v-text-field v-model="interestModal.data.name" label="Interest Name" variant="outlined"
+                        density="comfortable" class="mb-3" />
+                    <v-combobox v-model="interestModal.data.keywords" label="Keywords" chips multiple clearable
+                        variant="outlined" density="comfortable" />
+                </v-card-text>
+                <v-card-actions class="modal-actions">
+                    <v-spacer></v-spacer>
+                    <v-btn color="grey-darken-1" variant="outlined" @click="interestModal.show = false"
+                        class="modal-btn">
+                        Cancel
+                    </v-btn>
+                    <v-btn color="primary" @click="saveInterestModal" class="modal-btn" prepend-icon="ph-check">
+                        {{ interestModal.isNew ? 'Add' : 'Save' }}
+                    </v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+
+        <!-- References Modal -->
+        <v-dialog v-model="referenceModal.show" max-width="800px" persistent>
+            <v-card class="modal-card">
+                <v-card-title class="modal-title">
+                    <v-icon icon="ph-users" class="mr-2" />
+                    {{ referenceModal.isNew ? 'Add Reference' : 'Edit Reference' }}
+                </v-card-title>
+                <v-card-text class="modal-content">
+                    <v-text-field v-model="referenceModal.data.name" label="Reference Name" variant="outlined"
+                        density="comfortable" class="mb-3" />
+                    <TiptapEditor v-model="referenceModal.data.reference" />
+                </v-card-text>
+                <v-card-actions class="modal-actions">
+                    <v-spacer></v-spacer>
+                    <v-btn color="grey-darken-1" variant="outlined" @click="referenceModal.show = false"
+                        class="modal-btn">
+                        Cancel
+                    </v-btn>
+                    <v-btn color="primary" @click="saveReferenceModal" class="modal-btn" prepend-icon="ph-check">
+                        {{ referenceModal.isNew ? 'Add' : 'Save' }}
                     </v-btn>
                 </v-card-actions>
             </v-card>
@@ -408,8 +562,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, computed } from 'vue'
-import { ResumeDataClass, ResumeStyleClass } from '@/services/ResumeService'
+import { ref } from 'vue'
 import TiptapEditor from './TiptapEditor.vue'
 
 const props = defineProps({
@@ -425,403 +578,273 @@ const props = defineProps({
 
 const emit = defineEmits(['update:resume-data', 'change'])
 
-const orderedSections = computed(() => {
-    const sections = []
-    sections.push({
-        type: 'experience',
-        order: props.resumeData.experiencesOrder,
-    })
-    sections.push({
-        type: 'education',
-        order: props.resumeData.educationOrder,
-    })
-    props.resumeData.customSections.forEach((section, index) => {
-        sections.push({
-            type: 'custom',
-            order: section.order ?? index,
-            originalIndex: index,
-            data: section,
-        })
-    })
-    sections.sort((a, b) => a.order - b.order)
-    return sections
-})
-
 const deleteConfirmState = ref({})
 
-// Modal states
-const customSectionModal = ref({
+const workModal = ref({
     show: false,
     isNew: false,
     index: -1,
-    data: {
-        title: '',
-        content: '',
-        visible: true,
-        position: 'main'
-    }
+    data: {}
 })
 
-const experienceSectionModal = ref({
-    show: false,
-    data: {
-        sectionName: ''
-    }
+const getNewWorkItem = () => ({
+    name: '',
+    position: '',
+    url: '',
+    startDate: '',
+    endDate: '',
+    summary: '',
+    highlights: []
 })
 
-const experienceModal = ref({
-    show: false,
-    isNew: false,
-    index: -1,
-    data: {
-        title: '',
-        company: '',
-        period: '',
-        description: '',
-        visible: true
+const openWorkModal = (index = -1) => {
+    if (index >= 0) {
+        workModal.value = {
+            show: true,
+            isNew: false,
+            index,
+            data: JSON.parse(JSON.stringify(props.resumeData.work[index]))
+        }
+    } else {
+        workModal.value = {
+            show: true,
+            isNew: true,
+            index: -1,
+            data: getNewWorkItem()
+        }
     }
-})
+}
 
-const educationSectionModal = ref({
-    show: false,
-    data: {
-        sectionName: ''
+const saveWorkModal = () => {
+    if (workModal.value.isNew) {
+        props.resumeData.work.push(workModal.value.data)
+    } else {
+        props.resumeData.work[workModal.value.index] = workModal.value.data
     }
-})
+    workModal.value.show = false
+}
+
+const removeWorkItem = (index) => {
+    props.resumeData.work.splice(index, 1)
+}
 
 const educationModal = ref({
     show: false,
     isNew: false,
     index: -1,
-    data: {
-        degree: '',
-        school: '',
-        period: '',
-        mark: '',
-        thesis: '',
-        visible: true
-    }
+    data: {}
 })
 
-const handleClickOutside = (event) => {
-    Object.keys(deleteConfirmState.value).forEach(key => {
-        deleteConfirmState.value[key] = false
-    })
-}
-
-onMounted(() => {
-    document.addEventListener('click', handleClickOutside)
+const getNewEducationItem = () => ({
+    institution: '',
+    area: '',
+    studyType: '',
+    startDate: '',
+    endDate: '',
+    score: '',
+    courses: []
 })
 
-onUnmounted(() => {
-    document.removeEventListener('click', handleClickOutside)
-})
-
-// Custom Section Modal Methods
-const openCustomSectionModal = (index = -1) => {
-    if (index >= 0) {
-        // Edit existing section
-        const section = props.resumeData.customSections[index]
-        customSectionModal.value = {
-            show: true,
-            isNew: false,
-            index,
-            data: {
-                title: section.title,
-                content: section.content,
-                visible: section.visible,
-                position: section.position
-            }
-        }
-    } else {
-        // Add new section
-        customSectionModal.value = {
-            show: true,
-            isNew: true,
-            index: -1,
-            data: {
-                title: '',
-                content: '',
-                visible: true,
-                position: 'main'
-            }
-        }
-    }
-}
-
-const closeCustomSectionModal = () => {
-    customSectionModal.value.show = false
-}
-
-const saveCustomSection = () => {
-    if (customSectionModal.value.isNew) {
-        // Add new section
-        props.resumeData.customSections.push({
-            ...customSectionModal.value.data
-        })
-    } else {
-        // Update existing section
-        const index = customSectionModal.value.index
-        Object.assign(props.resumeData.customSections[index], customSectionModal.value.data)
-    }
-    closeCustomSectionModal()
-}
-
-// Experience Section Modal Methods
-const openExperienceSectionModal = () => {
-    experienceSectionModal.value = {
-        show: true,
-        data: {
-            sectionName: props.resumeData.experiencesSectionName
-        }
-    }
-}
-
-const closeExperienceSectionModal = () => {
-    experienceSectionModal.value.show = false
-}
-
-const saveExperienceSection = () => {
-    props.resumeData.experiencesSectionName = experienceSectionModal.value.data.sectionName
-    closeExperienceSectionModal()
-}
-
-// Experience Modal Methods
-const openExperienceModal = (index = -1) => {
-    if (index >= 0) {
-        // Edit existing experience
-        const exp = props.resumeData.experiences[index]
-        experienceModal.value = {
-            show: true,
-            isNew: false,
-            index,
-            data: {
-                title: exp.title,
-                company: exp.company,
-                period: exp.period,
-                description: exp.description,
-                visible: exp.visible
-            }
-        }
-    } else {
-        // Add new experience
-        experienceModal.value = {
-            show: true,
-            isNew: true,
-            index: -1,
-            data: {
-                title: '',
-                company: '',
-                period: '',
-                description: '',
-                visible: true
-            }
-        }
-    }
-}
-
-const closeExperienceModal = () => {
-    experienceModal.value.show = false
-}
-
-const saveExperience = () => {
-    if (experienceModal.value.isNew) {
-        // Add new experience
-        props.resumeData.experiences.push({
-            ...experienceModal.value.data
-        })
-    } else {
-        // Update existing experience
-        const index = experienceModal.value.index
-        Object.assign(props.resumeData.experiences[index], experienceModal.value.data)
-    }
-    closeExperienceModal()
-}
-
-// Education Section Modal Methods
-const openEducationSectionModal = () => {
-    educationSectionModal.value = {
-        show: true,
-        data: {
-            sectionName: props.resumeData.educationSectionName
-        }
-    }
-}
-
-const closeEducationSectionModal = () => {
-    educationSectionModal.value.show = false
-}
-
-const saveEducationSection = () => {
-    props.resumeData.educationSectionName = educationSectionModal.value.data.sectionName
-    closeEducationSectionModal()
-}
-
-// Education Modal Methods
 const openEducationModal = (index = -1) => {
     if (index >= 0) {
-        // Edit existing education
-        const edu = props.resumeData.education[index]
         educationModal.value = {
             show: true,
             isNew: false,
             index,
-            data: {
-                degree: edu.degree,
-                school: edu.school,
-                period: edu.period,
-                mark: edu.mark,
-                thesis: edu.thesis,
-                visible: edu.visible
-            }
+            data: JSON.parse(JSON.stringify(props.resumeData.education[index]))
         }
     } else {
-        // Add new education
         educationModal.value = {
             show: true,
             isNew: true,
             index: -1,
-            data: {
-                degree: '',
-                school: '',
-                period: '',
-                mark: '',
-                thesis: '',
-                visible: true
-            }
+            data: getNewEducationItem()
         }
     }
 }
 
-const closeEducationModal = () => {
+const saveEducationModal = () => {
+    if (educationModal.value.isNew) {
+        props.resumeData.education.push(educationModal.value.data)
+    } else {
+        props.resumeData.education[educationModal.value.index] = educationModal.value.data
+    }
     educationModal.value.show = false
 }
 
-const saveEducation = () => {
-    if (educationModal.value.isNew) {
-        // Add new education
-        props.resumeData.education.push({
-            ...educationModal.value.data
-        })
-    } else {
-        // Update existing education
-        const index = educationModal.value.index
-        Object.assign(props.resumeData.education[index], educationModal.value.data)
-    }
-    closeEducationModal()
-}
-
-// Legacy methods (updated to use modals)
-const addExp = () => {
-    openExperienceModal()
-}
-
-const removeExp = (index) => {
-    if (!deleteConfirmState.value[`exp-${index}`]) {
-        deleteConfirmState.value[`exp-${index}`] = true
-        return
-    }
-    props.resumeData.experiences.splice(index, 1)
-    deleteConfirmState.value[`exp-${index}`] = false
-}
-
-const addEdu = () => {
-    openEducationModal()
-}
-
-const removeEdu = (index) => {
-    if (!deleteConfirmState.value[`edu-${index}`]) {
-        deleteConfirmState.value[`edu-${index}`] = true
-        return
-    }
+const removeEducationItem = (index) => {
     props.resumeData.education.splice(index, 1)
-    deleteConfirmState.value[`edu-${index}`] = false
 }
 
-const addCustomSection = () => {
-    openCustomSectionModal()
-}
+const skillModal = ref({
+    show: false,
+    isNew: false,
+    index: -1,
+    data: {}
+})
 
-const removeCustomSection = (index) => {
-    if (!deleteConfirmState.value[index]) {
-        deleteConfirmState.value[index] = true
-        return
-    }
-    props.resumeData.customSections.splice(index, 1)
-    deleteConfirmState.value[index] = false
-}
+const getNewSkill = () => ({
+    name: '',
+    level: '',
+    keywords: []
+})
 
-const moveSection = (sectionInfo, direction) => {
-    const sections = orderedSections.value
-    const currentIndex = sections.findIndex(s =>
-        s.type === sectionInfo.type && s.originalIndex === sectionInfo.originalIndex
-    )
-
-    if ((direction === 'up' && currentIndex === 0) ||
-        (direction === 'down' && currentIndex === sections.length - 1)) {
-        return
-    }
-
-    const newOrder = calculateNewOrder(currentIndex, direction)
-
-    if (sectionInfo.type === 'experience') {
-        props.resumeData.experiencesOrder = newOrder
-    } else if (sectionInfo.type === 'education') {
-        props.resumeData.educationOrder = newOrder
-    } else if (sectionInfo.type === 'custom') {
-        props.resumeData.customSections[sectionInfo.originalIndex].order = newOrder
+const openSkillModal = (index = -1) => {
+    if (index >= 0) {
+        skillModal.value = {
+            show: true,
+            isNew: false,
+            index,
+            data: JSON.parse(JSON.stringify(props.resumeData.skills[index]))
+        }
+    } else {
+        skillModal.value = {
+            show: true,
+            isNew: true,
+            index: -1,
+            data: getNewSkill()
+        }
     }
 }
 
-const calculateNewOrder = (currentIndex, direction) => {
-    const sections = orderedSections.value
-    const targetIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1
+const saveSkillModal = () => {
+    if (skillModal.value.isNew) {
+        props.resumeData.skills.push(skillModal.value.data)
+    } else {
+        props.resumeData.skills[skillModal.value.index] = skillModal.value.data
+    }
+    skillModal.value.show = false
+}
 
-    const neighborOrder = sections[targetIndex].order
+const removeSkill = (index) => {
+    props.resumeData.skills.splice(index, 1)
+}
 
-    if (direction === 'up') {
-        const prevNeighborOrder = targetIndex > 0 ? sections[targetIndex - 1].order : neighborOrder - 2
-        return (neighborOrder + prevNeighborOrder) / 2
-    } else { // down
-        const nextNeighborOrder = targetIndex < sections.length - 1 ? sections[targetIndex + 1].order : neighborOrder + 2
-        return (neighborOrder + nextNeighborOrder) / 2
+// Projects
+const projectModal = ref({ show: false, isNew: false, index: -1, data: {} })
+const getNewProject = () => ({ name: '', description: '', highlights: [], url: '' })
+const openProjectModal = (index = -1) => {
+    projectModal.value = {
+        show: true,
+        isNew: index < 0,
+        index,
+        data: index >= 0 ? JSON.parse(JSON.stringify(props.resumeData.projects[index])) : getNewProject()
     }
 }
-
-const toggleSectionPosition = (index) => {
-    props.resumeData.customSections[index].position =
-        props.resumeData.customSections[index].position === 'sidebar' ? 'main' : 'sidebar';
+const saveProjectModal = () => {
+    if (projectModal.value.isNew) props.resumeData.projects.push(projectModal.value.data)
+    else props.resumeData.projects[projectModal.value.index] = projectModal.value.data
+    projectModal.value.show = false
 }
+const removeProject = (index) => props.resumeData.projects.splice(index, 1)
 
-const cloneCustomSection = (index) => {
-    const sectionToClone = props.resumeData.customSections[index]
-    const clonedSection = {
-        ...JSON.parse(JSON.stringify(sectionToClone)),
-        title: `${sectionToClone.title} (Copy)`
+// Awards
+const awardModal = ref({ show: false, isNew: false, index: -1, data: {} })
+const getNewAward = () => ({ title: '', date: '', awarder: '', summary: '' })
+const openAwardModal = (index = -1) => {
+    awardModal.value = {
+        show: true,
+        isNew: index < 0,
+        index,
+        data: index >= 0 ? JSON.parse(JSON.stringify(props.resumeData.awards[index])) : getNewAward()
     }
-    props.resumeData.customSections.splice(index + 1, 0, clonedSection)
 }
-
-const getCustomSectionPreview = (content) => {
-    if (!content) return '';
-
-    // Strip HTML tags and get plain text
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = content;
-    const plainText = tempDiv.textContent || tempDiv.innerText || '';
-
-    // Return first 80 characters with ellipsis if longer
-    return plainText.length > 80 ? plainText.substring(0, 80) + '...' : plainText;
+const saveAwardModal = () => {
+    if (awardModal.value.isNew) props.resumeData.awards.push(awardModal.value.data)
+    else props.resumeData.awards[awardModal.value.index] = awardModal.value.data
+    awardModal.value.show = false
 }
+const removeAward = (index) => props.resumeData.awards.splice(index, 1)
 
-const getPositionTooltipText = (position) => {
-    if (position === 'sidebar') {
-        return 'Move to main content';
-    } else if (position === 'main') {
-        return 'Move to sidebar';
+// Volunteer
+const volunteerModal = ref({ show: false, isNew: false, index: -1, data: {} })
+const getNewVolunteer = () => ({ organization: '', position: '', url: '', startDate: '', endDate: '', summary: '', highlights: [] })
+const openVolunteerModal = (index = -1) => {
+    volunteerModal.value = {
+        show: true,
+        isNew: index < 0,
+        index,
+        data: index >= 0 ? JSON.parse(JSON.stringify(props.resumeData.volunteer[index])) : getNewVolunteer()
     }
-    return '';
 }
+const saveVolunteerModal = () => {
+    if (volunteerModal.value.isNew) props.resumeData.volunteer.push(volunteerModal.value.data)
+    else props.resumeData.volunteer[volunteerModal.value.index] = volunteerModal.value.data
+    volunteerModal.value.show = false
+}
+const removeVolunteer = (index) => props.resumeData.volunteer.splice(index, 1)
+
+// Publications
+const publicationModal = ref({ show: false, isNew: false, index: -1, data: {} })
+const getNewPublication = () => ({ name: '', publisher: '', releaseDate: '', url: '', summary: '' })
+const openPublicationModal = (index = -1) => {
+    publicationModal.value = {
+        show: true,
+        isNew: index < 0,
+        index,
+        data: index >= 0 ? JSON.parse(JSON.stringify(props.resumeData.publications[index])) : getNewPublication()
+    }
+}
+const savePublicationModal = () => {
+    if (publicationModal.value.isNew) props.resumeData.publications.push(publicationModal.value.data)
+    else props.resumeData.publications[publicationModal.value.index] = publicationModal.value.data
+    publicationModal.value.show = false
+}
+const removePublication = (index) => props.resumeData.publications.splice(index, 1)
+
+// Languages
+const languageModal = ref({ show: false, isNew: false, index: -1, data: {} })
+const getNewLanguage = () => ({ language: '', fluency: '' })
+const openLanguageModal = (index = -1) => {
+    languageModal.value = {
+        show: true,
+        isNew: index < 0,
+        index,
+        data: index >= 0 ? JSON.parse(JSON.stringify(props.resumeData.languages[index])) : getNewLanguage()
+    }
+}
+const saveLanguageModal = () => {
+    if (languageModal.value.isNew) props.resumeData.languages.push(languageModal.value.data)
+    else props.resumeData.languages[languageModal.value.index] = languageModal.value.data
+    languageModal.value.show = false
+}
+const removeLanguage = (index) => props.resumeData.languages.splice(index, 1)
+
+// Interests
+const interestModal = ref({ show: false, isNew: false, index: -1, data: {} })
+const getNewInterest = () => ({ name: '', keywords: [] })
+const openInterestModal = (index = -1) => {
+    interestModal.value = {
+        show: true,
+        isNew: index < 0,
+        index,
+        data: index >= 0 ? JSON.parse(JSON.stringify(props.resumeData.interests[index])) : getNewInterest()
+    }
+}
+const saveInterestModal = () => {
+    if (interestModal.value.isNew) props.resumeData.interests.push(interestModal.value.data)
+    else props.resumeData.interests[interestModal.value.index] = interestModal.value.data
+    interestModal.value.show = false
+}
+const removeInterest = (index) => props.resumeData.interests.splice(index, 1)
+
+// References
+const referenceModal = ref({ show: false, isNew: false, index: -1, data: {} })
+const getNewReference = () => ({ name: '', reference: '' })
+const openReferenceModal = (index = -1) => {
+    referenceModal.value = {
+        show: true,
+        isNew: index < 0,
+        index,
+        data: index >= 0 ? JSON.parse(JSON.stringify(props.resumeData.references[index])) : getNewReference()
+    }
+}
+const saveReferenceModal = () => {
+    if (referenceModal.value.isNew) props.resumeData.references.push(referenceModal.value.data)
+    else props.resumeData.references[referenceModal.value.index] = referenceModal.value.data
+    referenceModal.value.show = false
+}
+const removeReference = (index) => props.resumeData.references.splice(index, 1)
 </script>
 
 <style scoped src="./ResumeEditorStyles.css"></style>

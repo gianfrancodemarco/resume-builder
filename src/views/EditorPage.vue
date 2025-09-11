@@ -4,7 +4,7 @@
             <div class="editor-content" :class="{ 'mobile-view': isMobile }">
                 <!-- Lateral Menu -->
 
-                <LateralMenu v-model:active-tab="activeTab" :custom-sections="resumeData.customSections"
+                <LateralMenu v-model:active-tab="activeTab" :resume-data="resumeData"
                     :handleShowAll="handleShowAllTooltips" :handleShowTooltipsStart="handleShowTooltipsStart"
                     :handleShowTooltipsEnd="handleShowTooltipsEnd" :handleZoomIn="handleZoomIn"
                     :handleZoomOut="handleZoomOut" :handleExportJSON="handleExportJSON"

@@ -34,46 +34,16 @@
             <div class="menu-section scrollable-section">
                 <!-- Info sections -->
                 <template v-if="activeTab === 'info'">
-                    <v-tooltip location="right" :model-value="showAllTooltips">
+                    <v-tooltip v-for="section in sections" :key="section.key" location="right"
+                        :model-value="showAllTooltips">
                         <template v-slot:activator="{ props: tooltipProps }">
-                            <v-btn v-bind="tooltipProps" icon="ph-user-circle"
-                                :color="currentSection === 'personal' ? 'primary' : 'grey'" variant="text"
-                                class="menu-btn" @click="scrollToSection('personal')"
-                                :class="{ 'active': currentSection === 'personal' }" />
+                            <v-btn v-bind="tooltipProps" :icon="section.icon"
+                                :color="currentSection === section.key ? 'primary' : 'grey'" variant="text"
+                                class="menu-btn" @click="scrollToSection(section.key)"
+                                :class="{ 'active': currentSection === section.key }" />
                         </template>
-                        Personal Info
+                        {{ section.title }}
                     </v-tooltip>
-                    <v-tooltip location="right" :model-value="showAllTooltips">
-                        <template v-slot:activator="{ props: tooltipProps }">
-                            <v-btn v-bind="tooltipProps" icon="ph-briefcase"
-                                :color="currentSection === 'experience' ? 'primary' : 'grey'" variant="text"
-                                class="menu-btn" @click="scrollToSection('experience')"
-                                :class="{ 'active': currentSection === 'experience' }" />
-                        </template>
-                        Experience
-                    </v-tooltip>
-                    <v-tooltip location="right" :model-value="showAllTooltips">
-                        <template v-slot:activator="{ props: tooltipProps }">
-                            <v-btn v-bind="tooltipProps" icon="ph-graduation-cap"
-                                :color="currentSection === 'education' ? 'primary' : 'grey'" variant="text"
-                                class="menu-btn" @click="scrollToSection('education')"
-                                :class="{ 'active': currentSection === 'education' }" />
-                        </template>
-                        Education
-                    </v-tooltip>
-
-                    <!-- Custom Sections -->
-                    <template v-for="(section, index) in (customSections || [])" :key="`custom-${index}`">
-                        <v-tooltip location="right" :model-value="showAllTooltips" v-if="section && section.title">
-                            <template v-slot:activator="{ props: tooltipProps }">
-                                <v-btn v-bind="tooltipProps" :icon="getCustomSectionIcon(section)"
-                                    :color="currentSection === `custom-${index}` ? 'primary' : 'grey'" variant="text"
-                                    class="menu-btn" @click="scrollToSection(`custom-${index}`)"
-                                    :class="{ 'active': currentSection === `custom-${index}` }" />
-                            </template>
-                            {{ section.title }}
-                        </v-tooltip>
-                    </template>
                 </template>
 
                 <!-- Style sections -->
@@ -199,7 +169,7 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted, onBeforeUnmount, computed } from 'vue'
+import { ref, watch, onMounted, onBeforeUnmount, computed, nextTick } from 'vue'
 import { useTheme } from 'vuetify'
 
 const theme = useTheme()
@@ -210,9 +180,9 @@ const props = defineProps({
         type: String,
         default: 'info'
     },
-    customSections: {
-        type: Array,
-        default: () => []
+    resumeData: {
+        type: Object,
+        required: true
     },
     handleShowAll: Function,
     handleShowTooltipsStart: Function,
@@ -241,10 +211,25 @@ const toggleTheme = () => {
     localStorage.setItem('theme', newTheme);
 }
 
-// Computed property to safely handle customSections
-const safeCustomSections = computed(() => {
-    return props.customSections?.filter(section => section && section.title) || []
-})
+const sections = computed(() => {
+    const availableSections = [];
+    if (props.resumeData) {
+        if (props.resumeData.basics) availableSections.push({ key: 'basics', title: 'Basics', icon: 'ph-user-circle' });
+        if (props.resumeData.work && props.resumeData.work.length > 0) availableSections.push({ key: 'work', title: 'Work Experience', icon: 'ph-briefcase' });
+        if (props.resumeData.education && props.resumeData.education.length > 0) availableSections.push({ key: 'education', title: 'Education', icon: 'ph-graduation-cap' });
+        if (props.resumeData.skills && props.resumeData.skills.length > 0) availableSections.push({ key: 'skills', title: 'Skills', icon: 'ph-lightning' });
+        if (props.resumeData.projects && props.resumeData.projects.length > 0) availableSections.push({ key: 'projects', title: 'Projects', icon: 'ph-folder' });
+        if (props.resumeData.awards && props.resumeData.awards.length > 0) availableSections.push({ key: 'awards', title: 'Awards', icon: 'ph-trophy' });
+        if (props.resumeData.certificates && props.resumeData.certificates.length > 0) availableSections.push({ key: 'certificates', title: 'Certificates', icon: 'ph-certificate' });
+        if (props.resumeData.volunteer && props.resumeData.volunteer.length > 0) availableSections.push({ key: 'volunteer', title: 'Volunteer', icon: 'ph-heart' });
+        if (props.resumeData.publications && props.resumeData.publications.length > 0) availableSections.push({ key: 'publications', title: 'Publications', icon: 'ph-book-open' });
+        if (props.resumeData.languages && props.resumeData.languages.length > 0) availableSections.push({ key: 'languages', title: 'Languages', icon: 'ph-translate' });
+        if (props.resumeData.interests && props.resumeData.interests.length > 0) availableSections.push({ key: 'interests', title: 'Interests', icon: 'ph-star' });
+        if (props.resumeData.references && props.resumeData.references.length > 0) availableSections.push({ key: 'references', title: 'References', icon: 'ph-users' });
+    }
+    return availableSections;
+});
+
 
 // Scroll detection setup
 let scrollTimeout = null
@@ -257,7 +242,6 @@ const setupScrollListener = () => {
     if (editorWindow) {
         editorWindow.addEventListener('scroll', handleScroll)
         scrollListenerAttached = true
-        handleScroll()
     }
 }
 
@@ -270,38 +254,24 @@ const handleScroll = () => {
         const editorWindow = document.querySelector('.editor-window')
         if (!editorWindow) return
 
-        const sections = document.querySelectorAll('.editor-section[data-section], .section-block[data-section]')
+        const sections = editorWindow.querySelectorAll('.editor-section[data-section]')
         if (!sections || sections.length === 0) return
 
         const scrollTop = editorWindow.scrollTop
-        const containerHeight = editorWindow.clientHeight
+        const topOffset = 20 // A small offset from the top in pixels
 
-        let bestMatch = { section: '', sectionTop: Infinity }
+        let newCurrentSection = sections.length > 0 ? sections[0].dataset.section : ''
 
-        sections.forEach(section => {
-            if (!section) return
-
-            const rect = section.getBoundingClientRect()
-            const containerRect = editorWindow.getBoundingClientRect()
-            const sectionTop = rect.top - containerRect.top
-            const sectionBottom = sectionTop + rect.height
-
-            // Check if section is visible in the viewport
-            const isVisible = sectionBottom > scrollTop && sectionTop < scrollTop + containerHeight
-
-            if (isVisible) {
-                // Prioritize the first (topmost) visible section
-                if (!bestMatch.section || sectionTop < bestMatch.sectionTop) {
-                    bestMatch = {
-                        section: section.dataset.section,
-                        sectionTop: sectionTop
-                    }
-                }
+        // Find the last section that is above the viewport top + offset
+        for (const section of sections) {
+            if (section.offsetTop <= scrollTop + topOffset) {
+                newCurrentSection = section.dataset.section
+            } else {
+                break // No need to check further as sections are ordered
             }
-        })
-
-        currentSection.value = bestMatch.section
-    }, 50) // Reduced debounce for more responsive detection
+        }
+        currentSection.value = newCurrentSection
+    }, 50)
 }
 
 // Watch for changes in the activeTab prop
@@ -314,10 +284,17 @@ watch(activeTab, (newValue) => {
     emit('update:activeTab', newValue)
 })
 
+watch(() => props.activeTab, () => {
+    // When tab changes, the editor window might appear, so we try to set up the listener.
+    // Using nextTick to wait for DOM updates.
+    nextTick(() => {
+        setupScrollListener();
+        handleScroll(); // Also run once to set initial state
+    });
+}, { immediate: true });
+
 // Setup scroll listener when component mounts
 onMounted(() => {
-    setupScrollListener()
-
     // Add global mouse event listener to hide tooltips when mouse leaves the menu
     document.addEventListener('mouseup', handleShowTooltipsEnd)
     document.addEventListener('mouseleave', handleShowTooltipsEnd)
@@ -360,49 +337,6 @@ const handleHome = () => props.handleHome && props.handleHome()
 // Scroll to section function
 const scrollToSection = (sectionName) => {
     emit('scrollToSection', sectionName)
-}
-
-// Get icon for custom section based on title or type
-const getCustomSectionIcon = (section) => {
-    if (!section || !section.title) {
-        return 'ph-plus-circle'
-    }
-
-    const title = section.title.toLowerCase().trim()
-
-    // Map common section titles to icons
-    const iconMap = {
-        'skills': 'ph-lightning',
-        'languages': 'ph-translate',
-        'certifications': 'ph-certificate',
-        'projects': 'ph-folder',
-        'publications': 'ph-book-open',
-        'awards': 'ph-trophy',
-        'volunteer': 'ph-heart',
-        'interests': 'ph-star',
-        'hobby': 'ph-star',
-        'hobbies': 'ph-star',
-        'references': 'ph-users',
-        'contacts': 'ph-phone',
-        'contact': 'ph-phone',
-        'summary': 'ph-text-align-left',
-        'objective': 'ph-target',
-        'achievements': 'ph-medal',
-        'activities': 'ph-game-controller',
-        'memberships': 'ph-buildings',
-        'patents': 'ph-lightbulb'
-    }
-
-    // Simple word matching
-    const words = title.split(/\s+/)
-    for (const word of words) {
-        if (iconMap[word]) {
-            return iconMap[word]
-        }
-    }
-
-    // Default icon for unknown sections
-    return 'ph-plus-circle'
 }
 </script>
 
@@ -495,6 +429,7 @@ const getCustomSectionIcon = (section) => {
         transform: rotate(-5deg);
         opacity: 1;
     }
+
     100% {
         transform: rotate(5deg);
         opacity: 0.8;

@@ -77,8 +77,8 @@ export class ExporterService {
      * @returns {string} The generated filename
      */
     static getFilename(resumeData, extension) {
-        const name = resumeData.personal.name?.trim()
-        const position = resumeData.personal.title?.trim()
+        const name = resumeData.basics.name?.trim()
+        const position = resumeData.basics.label?.trim()
 
         return (name && position)
             ? `${name}_${position}.${extension}`

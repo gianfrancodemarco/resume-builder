@@ -345,7 +345,6 @@ const handleCustomCSSChange = () => {
 
 
 </script>
-
 <style scoped src="./ResumeEditorStyles.css"></style>
 
 <style scoped>
