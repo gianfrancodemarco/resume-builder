@@ -25,18 +25,18 @@
                         <div class="d-flex align-center w-100">
                             <span class="section-title">
                                 {{ props.resumeData.experiencesSectionName }}
+                            </span>
+                            <div class="section-actions ml-auto">
                                 <v-tooltip location="top">
                                     <template v-slot:activator="{ props: iconProps }">
                                         <v-icon v-bind="iconProps" icon="ph-pencil-simple" size="small"
-                                            class="edit-icon" @click.stop="openExperienceSectionModal" />
+                                            class="edit-icon" @click.stop="openSectionNameModal('experience')" />
                                     </template>
                                     Edit section
                                 </v-tooltip>
                                 <v-icon :icon="props.resumeData.experiencesVisible ? 'ph-eye' : 'ph-eye-slash'"
                                     size="small" class="visibility-icon"
                                     @click.stop="props.resumeData.experiencesVisible = !props.resumeData.experiencesVisible" />
-                            </span>
-                            <div class="section-actions ml-auto">
                                 <v-tooltip location="top">
                                     <template v-slot:activator="{ props: iconProps }">
                                         <v-icon v-bind="iconProps" icon="ph-arrow-up" size="small" class="move-icon"
@@ -61,33 +61,15 @@
                     <div class="section-content">
                         <div v-for="(exp, expIndex) in props.resumeData.experiences" :key="expIndex"
                             class="experience-item">
-                            <div class="item-header">
-                                <span class="item-title">{{ exp.title }} - {{ exp.company }}</span>
-                                <div class="item-actions">
-                                    <v-icon
-                                        :icon="props.resumeData.experiences[expIndex].visible ? 'ph-eye' : 'ph-eye-slash'"
-                                        size="small" class="visibility-icon"
-                                        @click.stop="props.resumeData.experiences[expIndex].visible = !props.resumeData.experiences[expIndex].visible" />
-                                    <v-tooltip location="top">
-                                        <template v-slot:activator="{ props: iconProps }">
-                                            <v-icon v-bind="iconProps" icon="ph-pencil-simple" size="small"
-                                                class="edit-icon" @click.stop="openExperienceModal(expIndex)" />
-                                        </template>
-                                        Edit experience
-                                    </v-tooltip>
-                                    <v-tooltip location="top">
-                                        <template v-slot:activator="{ props: iconProps }">
-                                            <v-icon v-bind="iconProps"
-                                                :icon="deleteConfirmState[`exp-${expIndex}`] ? 'ph-check' : 'ph-delete'"
-                                                size="small" class="delete-icon"
-                                                :class="{ 'v-icon--disabled': !props.resumeData.experiencesVisible }"
-                                                @click.stop="removeExp(expIndex)"
-                                                :disabled="!props.resumeData.experiencesVisible" />
-                                        </template>
-                                        {{ deleteConfirmState[`exp-${expIndex}`] ? 'Confirm delete' : "Delete experience" }}
-                                    </v-tooltip>
-                                </div>
-                            </div>
+                            <SectionListItem :title="`${exp.title} - ${exp.company}`" :visible="exp.visible"
+                                :can-move-up="expIndex > 0"
+                                :can-move-down="expIndex < props.resumeData.experiences.length - 1"
+                                :delete-confirm="deleteConfirmState[`exp-${expIndex}`]"
+                                :disabled="!props.resumeData.experiencesVisible"
+                                @toggle-visibility="toggleItemVisibility(props.resumeData.experiences, expIndex)"
+                                @edit="openExperienceModal(expIndex)" @move-up="moveExperienceItem(expIndex, 'up')"
+                                @move-down="moveExperienceItem(expIndex, 'down')"
+                                @delete="removeItem('exp', props.resumeData.experiences, expIndex)" />
                         </div>
                         <div class="d-flex justify-center">
                             <v-btn color="primary" @click="addExp" aria-label="Add Experience"
@@ -103,18 +85,18 @@
                         <div class="d-flex align-center w-100">
                             <span class="section-title">
                                 {{ props.resumeData.educationSectionName }}
+                            </span>
+                            <div class="section-actions ml-auto">
                                 <v-tooltip location="top">
                                     <template v-slot:activator="{ props: iconProps }">
                                         <v-icon v-bind="iconProps" icon="ph-pencil-simple" size="small"
-                                            class="edit-icon" @click.stop="openEducationSectionModal" />
+                                            class="edit-icon" @click.stop="openSectionNameModal('education')" />
                                     </template>
                                     Edit section
                                 </v-tooltip>
                                 <v-icon :icon="props.resumeData.educationVisible ? 'ph-eye' : 'ph-eye-slash'"
                                     size="small" class="visibility-icon"
                                     @click.stop="props.resumeData.educationVisible = !props.resumeData.educationVisible" />
-                            </span>
-                            <div class="section-actions ml-auto">
                                 <v-tooltip location="top">
                                     <template v-slot:activator="{ props: iconProps }">
                                         <v-icon v-bind="iconProps" icon="ph-arrow-up" size="small" class="move-icon"
@@ -139,34 +121,15 @@
                     <div class="section-content">
                         <div v-for="(edu, eduIndex) in props.resumeData.education" :key="eduIndex"
                             class="education-item">
-                            <div class="item-header">
-                                <span class="item-title">{{ edu.degree }} - {{ edu.school }}</span>
-                                <div class="item-actions">
-                                    <v-icon
-                                        :icon="props.resumeData.education[eduIndex].visible ? 'ph-eye' : 'ph-eye-slash'"
-                                        size="small" class="visibility-icon"
-                                        @click.stop="props.resumeData.education[eduIndex].visible = !props.resumeData.education[eduIndex].visible" />
-                                    <v-tooltip location="top">
-                                        <template v-slot:activator="{ props: iconProps }">
-                                            <v-icon v-bind="iconProps" icon="ph-pencil-simple" size="small"
-                                                class="edit-icon" @click.stop="openEducationModal(eduIndex)" />
-                                        </template>
-                                        Edit education
-                                    </v-tooltip>
-                                    <v-tooltip location="top">
-                                        <template v-slot:activator="{ props: iconProps }">
-                                            <v-icon v-bind="iconProps"
-                                                :icon="deleteConfirmState[`edu-${eduIndex}`] ? 'ph-check' : 'ph-delete'"
-                                                size="small" class="delete-icon"
-                                                :class="{ 'v-icon--disabled': !props.resumeData.educationVisible }"
-                                                @click.stop="removeEdu(eduIndex)"
-                                                :disabled="!props.resumeData.educationVisible" />
-                                        </template>
-                                        {{ deleteConfirmState[`edu-${eduIndex}`] ? 'Confirm delete' : "Delete education"
-                                        }}
-                                    </v-tooltip>
-                                </div>
-                            </div>
+                            <SectionListItem :title="`${edu.degree} - ${edu.school}`" :visible="edu.visible"
+                                :can-move-up="eduIndex > 0"
+                                :can-move-down="eduIndex < props.resumeData.education.length - 1"
+                                :delete-confirm="deleteConfirmState[`edu-${eduIndex}`]"
+                                :disabled="!props.resumeData.educationVisible"
+                                @toggle-visibility="toggleItemVisibility(props.resumeData.education, eduIndex)"
+                                @edit="openEducationModal(eduIndex)" @move-up="moveEducationItem(eduIndex, 'up')"
+                                @move-down="moveEducationItem(eduIndex, 'down')"
+                                @delete="removeItem('edu', props.resumeData.education, eduIndex)" />
                         </div>
                         <div class="d-flex justify-center">
                             <v-btn color="primary" @click="addEdu" aria-label="Add Education"
@@ -183,76 +146,20 @@
                         <div class="custom-section-title-row">
                             <div class="section-title">{{ section.data.title }}</div>
                             <div class="section-actions">
-                                <v-tooltip location="top">
-                                    <template v-slot:activator="{ props: iconProps }">
-                                        <v-icon v-bind="iconProps" icon="ph-pencil-simple" size="small"
-                                            class="edit-icon"
-                                            @click.stop="openCustomSectionModal(section.originalIndex)" />
-                                    </template>
-                                    Edit section
-                                </v-tooltip>
-                                <v-tooltip location="top">
-                                    <template v-slot:activator="{ props: iconProps }">
-                                        <v-icon v-bind="iconProps"
-                                            :icon="props.resumeData.customSections[section.originalIndex].visible ? 'ph-eye' : 'ph-eye-slash'"
-                                            size="small" class="visibility-icon"
-                                            @click.stop="props.resumeData.customSections[section.originalIndex].visible = !props.resumeData.customSections[section.originalIndex].visible" />
-                                    </template>
-                                    {{ props.resumeData.customSections[section.originalIndex].visible ? 'Hide section' :
-                                        'Show section'
-                                    }}
-                                </v-tooltip>
-                                <v-tooltip location="top">
-                                    <template v-slot:activator="{ props: iconProps }">
-                                        <v-icon v-bind="iconProps"
-                                            :icon="props.resumeData.customSections[section.originalIndex].position === 'sidebar' ? 'ph-format-align-right' : 'ph-format-align-left'"
-                                            size="small" class="position-icon"
-                                            @click.stop="toggleSectionPosition(section.originalIndex)" />
-                                    </template>
-                                    {{
-                                        getPositionTooltipText(props.resumeData.customSections[section.originalIndex].position)
-                                    }}
-                                </v-tooltip>
-                                <v-tooltip location="top">
-                                    <template v-slot:activator="{ props: iconProps }">
-                                        <v-icon v-bind="iconProps" icon="ph-arrow-up" size="small" class="move-icon"
-                                            :class="{ 'v-icon--disabled': index === 0 }"
-                                            @click.stop="moveSection({ type: 'custom', originalIndex: section.originalIndex }, 'up')"
-                                            :disabled="index === 0" />
-                                    </template>
-                                    Move section up
-                                </v-tooltip>
-                                <v-tooltip location="top">
-                                    <template v-slot:activator="{ props: iconProps }">
-                                        <v-icon v-bind="iconProps" icon="ph-arrow-down" size="small" class="move-icon"
-                                            :class="{ 'v-icon--disabled': index === orderedSections.length - 1 }"
-                                            @click.stop="moveSection({ type: 'custom', originalIndex: section.originalIndex }, 'down')"
-                                            :disabled="index === orderedSections.length - 1" />
-                                    </template>
-                                    Move section down
-                                </v-tooltip>
-                                <v-tooltip location="top">
-                                    <template v-slot:activator="{ props: iconProps }">
-                                        <v-icon v-bind="iconProps"
-                                            :icon="deleteConfirmState[section.originalIndex] ? 'ph-check' : 'ph-delete'"
-                                            size="small" class="delete-icon"
-                                            :class="{ 'v-icon--disabled': !props.resumeData.customSections[section.originalIndex].visible }"
-                                            @click.stop="removeCustomSection(section.originalIndex)"
-                                            :disabled="!props.resumeData.customSections[section.originalIndex].visible" />
-                                    </template>
-                                    {{ deleteConfirmState[section.originalIndex] ? 'Confirm delete' : 'Delete section'
-                                    }}
-                                </v-tooltip>
-                                <v-tooltip location="top">
-                                    <template v-slot:activator="{ props: iconProps }">
-                                        <v-icon v-bind="iconProps" icon="ph-content-copy" size="small"
-                                            class="clone-icon"
-                                            :class="{ 'v-icon--disabled': !props.resumeData.customSections[section.originalIndex].visible }"
-                                            @click.stop="cloneCustomSection(section.originalIndex)"
-                                            :disabled="!props.resumeData.customSections[section.originalIndex].visible" />
-                                    </template>
-                                    Clone section
-                                </v-tooltip>
+                                <CustomSectionHeaderActions
+                                    :visible="props.resumeData.customSections[section.originalIndex].visible"
+                                    :position="props.resumeData.customSections[section.originalIndex].position"
+                                    :can-move-up="index === 0 ? false : true"
+                                    :can-move-down="index === orderedSections.length - 1 ? false : true"
+                                    :delete-confirm="deleteConfirmState[section.originalIndex]"
+                                    :disabled="!props.resumeData.customSections[section.originalIndex].visible"
+                                    @edit="openCustomSectionModal(section.originalIndex)"
+                                    @toggle-visible="toggleItemVisibility(props.resumeData.customSections, section.originalIndex)"
+                                    @toggle-position="toggleSectionPosition(section.originalIndex)"
+                                    @move-up="moveSection({ type: 'custom', originalIndex: section.originalIndex }, 'up')"
+                                    @move-down="moveSection({ type: 'custom', originalIndex: section.originalIndex }, 'down')"
+                                    @delete="removeItem('', props.resumeData.customSections, section.originalIndex)"
+                                    @clone="cloneCustomSection(section.originalIndex)" />
                             </div>
                         </div>
                     </div>
@@ -293,24 +200,24 @@
             </v-card>
         </v-dialog>
 
-        <!-- Experience Section Modal -->
-        <v-dialog v-model="experienceSectionModal.show" max-width="500px" persistent>
+        <!-- Section Name Modal (reused for experience/education) -->
+        <v-dialog v-model="sectionNameModal.show" max-width="500px" persistent>
             <v-card class="modal-card">
                 <v-card-title class="modal-title">
-                    <v-icon icon="ph-briefcase" class="mr-2" />
-                    Edit Experience Section
+                    <v-icon :icon="sectionNameModal.type === 'experience' ? 'ph-briefcase' : 'ph-graduation-cap'"
+                        class="mr-2" />
+                    Edit {{ sectionNameModal.type === 'experience' ? 'Experience' : 'Education' }} Section
                 </v-card-title>
                 <v-card-text class="modal-content">
-                    <v-text-field v-model="experienceSectionModal.data.sectionName" label="Section Title"
-                        variant="outlined" density="comfortable" prepend-inner-icon="ph-text-t" />
+                    <v-text-field v-model="sectionNameModal.data.sectionName" label="Section Title" variant="outlined"
+                        density="comfortable" prepend-inner-icon="ph-text-t" />
                 </v-card-text>
                 <v-card-actions class="modal-actions">
                     <v-spacer></v-spacer>
-                    <v-btn color="grey-darken-1" variant="outlined" @click="closeExperienceSectionModal"
-                        class="modal-btn">
+                    <v-btn color="grey-darken-1" variant="outlined" @click="closeSectionNameModal" class="modal-btn">
                         Cancel
                     </v-btn>
-                    <v-btn color="primary" @click="saveExperienceSection" class="modal-btn" prepend-icon="ph-check">
+                    <v-btn color="primary" @click="saveSectionName" class="modal-btn" prepend-icon="ph-check">
                         Save
                     </v-btn>
                 </v-card-actions>
@@ -348,29 +255,7 @@
             </v-card>
         </v-dialog>
 
-        <!-- Education Section Modal -->
-        <v-dialog v-model="educationSectionModal.show" max-width="500px" persistent>
-            <v-card class="modal-card">
-                <v-card-title class="modal-title">
-                    <v-icon icon="ph-graduation-cap" class="mr-2" />
-                    Edit Education Section
-                </v-card-title>
-                <v-card-text class="modal-content">
-                    <v-text-field v-model="educationSectionModal.data.sectionName" label="Section Title"
-                        variant="outlined" density="comfortable" prepend-inner-icon="ph-text-t" />
-                </v-card-text>
-                <v-card-actions class="modal-actions">
-                    <v-spacer></v-spacer>
-                    <v-btn color="grey-darken-1" variant="outlined" @click="closeEducationSectionModal"
-                        class="modal-btn">
-                        Cancel
-                    </v-btn>
-                    <v-btn color="primary" @click="saveEducationSection" class="modal-btn" prepend-icon="ph-check">
-                        Save
-                    </v-btn>
-                </v-card-actions>
-            </v-card>
-        </v-dialog>
+
 
         <!-- Education Modal -->
         <v-dialog v-model="educationModal.show" max-width="800px" persistent>
@@ -409,8 +294,9 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted, computed } from 'vue'
-import { ResumeDataClass, ResumeStyleClass } from '@/services/ResumeService'
 import TiptapEditor from './TiptapEditor.vue'
+import SectionListItem from './SectionListItem.vue'
+import CustomSectionHeaderActions from './CustomSectionHeaderActions.vue'
 
 const props = defineProps({
     resumeData: {
@@ -462,8 +348,9 @@ const customSectionModal = ref({
     }
 })
 
-const experienceSectionModal = ref({
+const sectionNameModal = ref({
     show: false,
+    type: 'experience', // 'experience' | 'education'
     data: {
         sectionName: ''
     }
@@ -482,12 +369,7 @@ const experienceModal = ref({
     }
 })
 
-const educationSectionModal = ref({
-    show: false,
-    data: {
-        sectionName: ''
-    }
-})
+// removed dedicated education section modal in favor of unified modal
 
 const educationModal = ref({
     show: false,
@@ -567,23 +449,28 @@ const saveCustomSection = () => {
     closeCustomSectionModal()
 }
 
-// Experience Section Modal Methods
-const openExperienceSectionModal = () => {
-    experienceSectionModal.value = {
+// Unified Section Name Modal Methods
+const openSectionNameModal = (type) => {
+    sectionNameModal.value = {
         show: true,
+        type,
         data: {
-            sectionName: props.resumeData.experiencesSectionName
+            sectionName: type === 'experience' ? props.resumeData.experiencesSectionName : props.resumeData.educationSectionName
         }
     }
 }
 
-const closeExperienceSectionModal = () => {
-    experienceSectionModal.value.show = false
+const closeSectionNameModal = () => {
+    sectionNameModal.value.show = false
 }
 
-const saveExperienceSection = () => {
-    props.resumeData.experiencesSectionName = experienceSectionModal.value.data.sectionName
-    closeExperienceSectionModal()
+const saveSectionName = () => {
+    if (sectionNameModal.value.type === 'experience') {
+        props.resumeData.experiencesSectionName = sectionNameModal.value.data.sectionName
+    } else {
+        props.resumeData.educationSectionName = sectionNameModal.value.data.sectionName
+    }
+    closeSectionNameModal()
 }
 
 // Experience Modal Methods
@@ -638,24 +525,7 @@ const saveExperience = () => {
     closeExperienceModal()
 }
 
-// Education Section Modal Methods
-const openEducationSectionModal = () => {
-    educationSectionModal.value = {
-        show: true,
-        data: {
-            sectionName: props.resumeData.educationSectionName
-        }
-    }
-}
-
-const closeEducationSectionModal = () => {
-    educationSectionModal.value.show = false
-}
-
-const saveEducationSection = () => {
-    props.resumeData.educationSectionName = educationSectionModal.value.data.sectionName
-    closeEducationSectionModal()
-}
+// removed dedicated education section name handlers in favor of unified modal
 
 // Education Modal Methods
 const openEducationModal = (index = -1) => {
@@ -711,81 +581,83 @@ const saveEducation = () => {
     closeEducationModal()
 }
 
-// Legacy methods (updated to use modals)
 const addExp = () => {
     openExperienceModal()
 }
 
-const removeExp = (index) => {
-    if (!deleteConfirmState.value[`exp-${index}`]) {
-        deleteConfirmState.value[`exp-${index}`] = true
+const removeItem = (prefixKey, list, index) => {
+    const key = prefixKey ? `${prefixKey}-${index}` : index
+    if (!deleteConfirmState.value[key]) {
+        deleteConfirmState.value[key] = true
         return
     }
-    props.resumeData.experiences.splice(index, 1)
-    deleteConfirmState.value[`exp-${index}`] = false
+    list.splice(index, 1)
+    deleteConfirmState.value[key] = false
 }
 
 const addEdu = () => {
     openEducationModal()
 }
 
-const removeEdu = (index) => {
-    if (!deleteConfirmState.value[`edu-${index}`]) {
-        deleteConfirmState.value[`edu-${index}`] = true
-        return
-    }
-    props.resumeData.education.splice(index, 1)
-    deleteConfirmState.value[`edu-${index}`] = false
-}
+// removed in favor of removeItem
 
 const addCustomSection = () => {
     openCustomSectionModal()
 }
 
-const removeCustomSection = (index) => {
-    if (!deleteConfirmState.value[index]) {
-        deleteConfirmState.value[index] = true
-        return
-    }
-    props.resumeData.customSections.splice(index, 1)
-    deleteConfirmState.value[index] = false
-}
+// removed in favor of removeItem
 
 const moveSection = (sectionInfo, direction) => {
     const sections = orderedSections.value
-    const currentIndex = sections.findIndex(s =>
-        s.type === sectionInfo.type && s.originalIndex === sectionInfo.originalIndex
-    )
+    const currentIndex = sections.findIndex(s => s.type === sectionInfo.type && s.originalIndex === sectionInfo.originalIndex)
+    if ((direction === 'up' && currentIndex === 0) || (direction === 'down' && currentIndex === sections.length - 1)) return
 
-    if ((direction === 'up' && currentIndex === 0) ||
-        (direction === 'down' && currentIndex === sections.length - 1)) {
-        return
+    const targetIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1
+    const current = sections[currentIndex]
+    const target = sections[targetIndex]
+
+    const currentOrder = current.order
+    const targetOrder = target.order
+
+    // apply swap to underlying data
+    if (current.type === 'experience') {
+        props.resumeData.experiencesOrder = targetOrder
+    } else if (current.type === 'education') {
+        props.resumeData.educationOrder = targetOrder
+    } else {
+        props.resumeData.customSections[current.originalIndex].order = targetOrder
     }
 
-    const newOrder = calculateNewOrder(currentIndex, direction)
-
-    if (sectionInfo.type === 'experience') {
-        props.resumeData.experiencesOrder = newOrder
-    } else if (sectionInfo.type === 'education') {
-        props.resumeData.educationOrder = newOrder
-    } else if (sectionInfo.type === 'custom') {
-        props.resumeData.customSections[sectionInfo.originalIndex].order = newOrder
+    if (target.type === 'experience') {
+        props.resumeData.experiencesOrder = currentOrder
+    } else if (target.type === 'education') {
+        props.resumeData.educationOrder = currentOrder
+    } else {
+        props.resumeData.customSections[target.originalIndex].order = currentOrder
     }
 }
 
-const calculateNewOrder = (currentIndex, direction) => {
-    const sections = orderedSections.value
-    const targetIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1
+// Simple array move helpers for items
+const moveArrayItem = (arr, index, direction) => {
+    const targetIndex = direction === 'up' ? index - 1 : index + 1
+    if (targetIndex < 0 || targetIndex >= arr.length) return
+    const temp = arr[index]
+    arr[index] = arr[targetIndex]
+    arr[targetIndex] = temp
+}
 
-    const neighborOrder = sections[targetIndex].order
+const moveExperienceItem = (index, direction) => {
+    if (!props.resumeData.experiencesVisible) return
+    moveArrayItem(props.resumeData.experiences, index, direction)
+}
 
-    if (direction === 'up') {
-        const prevNeighborOrder = targetIndex > 0 ? sections[targetIndex - 1].order : neighborOrder - 2
-        return (neighborOrder + prevNeighborOrder) / 2
-    } else { // down
-        const nextNeighborOrder = targetIndex < sections.length - 1 ? sections[targetIndex + 1].order : neighborOrder + 2
-        return (neighborOrder + nextNeighborOrder) / 2
-    }
+const moveEducationItem = (index, direction) => {
+    if (!props.resumeData.educationVisible) return
+    moveArrayItem(props.resumeData.education, index, direction)
+}
+
+const toggleItemVisibility = (list, index) => {
+    list[index].visible = !list[index].visible
 }
 
 const toggleSectionPosition = (index) => {
@@ -802,26 +674,9 @@ const cloneCustomSection = (index) => {
     props.resumeData.customSections.splice(index + 1, 0, clonedSection)
 }
 
-const getCustomSectionPreview = (content) => {
-    if (!content) return '';
+// removed unused preview helper; using v-html directly
 
-    // Strip HTML tags and get plain text
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = content;
-    const plainText = tempDiv.textContent || tempDiv.innerText || '';
-
-    // Return first 80 characters with ellipsis if longer
-    return plainText.length > 80 ? plainText.substring(0, 80) + '...' : plainText;
-}
-
-const getPositionTooltipText = (position) => {
-    if (position === 'sidebar') {
-        return 'Move to main content';
-    } else if (position === 'main') {
-        return 'Move to sidebar';
-    }
-    return '';
-}
+// removed helper; handled by CustomSectionHeaderActions label
 </script>
 
 <style scoped src="./ResumeEditorStyles.css"></style>
