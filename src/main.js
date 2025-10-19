@@ -119,6 +119,7 @@ const vuetify = createVuetify({
                         'ph-pencil-simple': PhPencilSimple,
                         'ph-check': PhCheck,
                         'ph-trash': PhTrash,
+                        'ph-delete': PhTrash,
                         'ph-plus': PhPlus,
                         'ph-format-align-right': PhTextAlignRight,
                         'ph-format-align-left': PhTextAlignLeft,
