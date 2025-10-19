@@ -31,7 +31,7 @@
         <!-- Section Navigation -->
         <template v-if="activeTab === 'info' || activeTab === 'style'">
             <div class="menu-divider"></div>
-            <div class="menu-section scrollable-section">
+            <div class="menu-section">
                 <!-- Info sections -->
                 <template v-if="activeTab === 'info'">
                     <v-tooltip location="right" :model-value="showAllTooltips">
@@ -171,9 +171,6 @@
                 Download TXT
             </v-tooltip>
         </div>
-
-        <!-- Spacer to push home button to bottom -->
-        <div class="menu-spacer"></div>
 
         <!-- Divider -->
         <div class="menu-divider"></div>
@@ -422,23 +419,7 @@ const getCustomSectionIcon = (section) => {
     z-index: 10;
     backdrop-filter: blur(10px);
     height: 100vh;
-    overflow-y: hidden;
-    /* Prevent scrolling on the main container */
-}
-
-.scrollable-section {
     overflow-y: auto;
-    max-height: calc(100vh - 400px);
-    /* Adjust as needed */
-    scrollbar-width: none;
-    /* For Firefox */
-    -ms-overflow-style: none;
-    /* For Internet Explorer and Edge */
-}
-
-.scrollable-section::-webkit-scrollbar {
-    display: none;
-    /* For Chrome, Safari, and Opera */
 }
 
 .lateral-menu::-webkit-scrollbar {
@@ -459,11 +440,6 @@ const getCustomSectionIcon = (section) => {
     border-top: 1px solid rgb(var(--v-theme-editor-divider));
     margin: 16px 0;
     flex-shrink: 0;
-}
-
-.menu-spacer {
-    flex: 1;
-    min-height: 20px;
 }
 
 .menu-btn {
