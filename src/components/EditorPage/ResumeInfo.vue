@@ -68,8 +68,7 @@
                                 :disabled="!props.resumeData.experiencesVisible"
                                 @toggle-visibility="toggleItemVisibility(props.resumeData.experiences, expIndex)"
                                 @edit="openExperienceModal(expIndex)" @move-up="moveExperienceItem(expIndex, 'up')"
-                                @move-down="moveExperienceItem(expIndex, 'down')"
-                                @delete="removeItem('exp', props.resumeData.experiences, expIndex)" />
+                                @move-down="moveExperienceItem(expIndex, 'down')" @delete="removeExp(expIndex)" />
                         </div>
                         <div class="d-flex justify-center">
                             <v-btn color="primary" @click="addExp" aria-label="Add Experience"
@@ -128,8 +127,7 @@
                                 :disabled="!props.resumeData.educationVisible"
                                 @toggle-visibility="toggleItemVisibility(props.resumeData.education, eduIndex)"
                                 @edit="openEducationModal(eduIndex)" @move-up="moveEducationItem(eduIndex, 'up')"
-                                @move-down="moveEducationItem(eduIndex, 'down')"
-                                @delete="removeItem('edu', props.resumeData.education, eduIndex)" />
+                                @move-down="moveEducationItem(eduIndex, 'down')" @delete="removeEdu(eduIndex)" />
                         </div>
                         <div class="d-flex justify-center">
                             <v-btn color="primary" @click="addEdu" aria-label="Add Education"
@@ -158,7 +156,7 @@
                                     @toggle-position="toggleSectionPosition(section.originalIndex)"
                                     @move-up="moveSection({ type: 'custom', originalIndex: section.originalIndex }, 'up')"
                                     @move-down="moveSection({ type: 'custom', originalIndex: section.originalIndex }, 'down')"
-                                    @delete="removeItem('', props.resumeData.customSections, section.originalIndex)"
+                                    @delete="removeCustomSection(section.originalIndex)"
                                     @clone="cloneCustomSection(section.originalIndex)" />
                             </div>
                         </div>
@@ -600,6 +598,18 @@ const addEdu = () => {
 }
 
 // removed in favor of removeItem
+
+const removeExp = (index) => {
+    removeItem('exp', props.resumeData.experiences, index)
+}
+
+const removeEdu = (index) => {
+    removeItem('edu', props.resumeData.education, index)
+}
+
+const removeCustomSection = (index) => {
+    removeItem('', props.resumeData.customSections, index)
+}
 
 const addCustomSection = () => {
     openCustomSectionModal()
