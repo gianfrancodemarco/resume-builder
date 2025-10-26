@@ -10,6 +10,7 @@
     @page {
         size: A4;
         margin: 0;
+        break-inside: auto; /* default: allow breaks inside */
     }
 
     html,
