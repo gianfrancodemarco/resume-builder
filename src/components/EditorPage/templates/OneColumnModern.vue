@@ -183,18 +183,4 @@ export default {
 .ocm-resume * {
   white-space: normal;
 }
-
-@media print {
-  .ocm-resume {
-    margin: 0;
-    padding: 15mm;
-    border: none;
-    box-shadow: none;
-    width: 100%;
-    max-width: 100%;
-    box-sizing: border-box;
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
-  }
-}
 </style>
