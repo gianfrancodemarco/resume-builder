@@ -1,8 +1,6 @@
 import { ResumeStyleV1_1 } from '../ResumeStyleV1_1';
 
 export class TwoColumnsBlue extends ResumeStyleV1_1 {
-    static TEMPLATE_NAME = '2 Columns Blue';
-
     static createDefault() {
         return {
             templateName: 'TwoColumnsBlue',
