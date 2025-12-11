@@ -141,12 +141,12 @@
                         <div class="slider-container">
                             <div class="text-subtitle-2">Base Size</div>
                             <v-slider v-model="styleData.typography.baseSize" min="12" max="20" step="1"
-                                thumb-label></v-slider>
+                                thumb-label hide-details></v-slider>
                         </div>
                         <div class="slider-container">
                             <div class="text-subtitle-2">Heading Size</div>
                             <v-slider v-model="styleData.typography.headingSize" min="16" max="32" step="1"
-                                thumb-label></v-slider>
+                                thumb-label hide-details></v-slider>
                         </div>
                     </div>
                 </div>
@@ -166,16 +166,16 @@
                 <div class="d-flex flex-column gap-4">
                     <div class="slider-container">
                         <div class="text-subtitle-2">Section Spacing</div>
-                        <v-slider v-model="styleData.spacing.section" min="12" max="48" step="4" thumb-label></v-slider>
+                        <v-slider v-model="styleData.spacing.section" min="12" max="48" step="4" thumb-label hide-details></v-slider>
                     </div>
                     <div class="slider-container">
                         <div class="text-subtitle-2">Content Spacing</div>
-                        <v-slider v-model="styleData.spacing.content" min="0" max="24" step="2" thumb-label></v-slider>
+                        <v-slider v-model="styleData.spacing.content" min="0" max="24" step="2" thumb-label hide-details></v-slider>
                     </div>
                     <div class="slider-container" v-if="!isOneColumnTemplate">
                         <div class="text-subtitle-2">Sidebar Width</div>
                         <v-slider v-model="styleData.spacing.sidebarWidth" min="0" max="400" step="10"
-                            thumb-label></v-slider>
+                            thumb-label hide-details></v-slider>
                     </div>
                     <div v-if="!isOneColumnTemplate">
                         <v-switch v-model="styleData.spacing.sidebarLeft" :disabled="!isSidebarPresent"

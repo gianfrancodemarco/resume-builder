@@ -1,8 +1,6 @@
 /* Override Vuetify slider defaults completely */
 .v-slider {
-    margin-bottom: 16px;
     min-height: 40px;
-    padding-top: 20px;
 }
 
 .v-slider .v-slider-track {
@@ -75,7 +73,6 @@
     display: flex;
     align-items: center;
     gap: 16px;
-    margin-bottom: 16px;
 }
 
 .slider-container .text-subtitle-2 {

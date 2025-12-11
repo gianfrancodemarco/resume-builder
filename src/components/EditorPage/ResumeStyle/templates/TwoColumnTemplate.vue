@@ -16,12 +16,12 @@
                 <h1>{{ resumeData.personal.name || 'Your Name' }}</h1>
                 <h2 class="subtitle">{{ resumeData.personal.title }}</h2>
               </div>
-              <img 
-                v-if="resumeData.personal.imageData" 
-                class="avatar" 
-                :src="resumeData.personal.imageData" 
-                alt="Profile photo"
-              />
+              <div v-if="resumeData.personal.image.data" class="avatar" :style="{
+                backgroundImage: `url(${resumeData.personal.image.data})`,
+                backgroundRepeat: 'no-repeat',
+                backgroundSize: `${resumeData.personal.image.scale ?? 100}% auto`,
+                backgroundPosition: `${resumeData.personal.image.x ?? 50}% ${resumeData.personal.image.y ?? 50}%`
+              }" aria-label="Profile photo" />
             </div>
 
             <template v-for="(section, index) in orderedMainSections" :key="getMainSectionKey(section)">
@@ -127,6 +127,6 @@ export default {
   width: 96px;
   height: 96px;
   border-radius: 50%;
-  object-fit: cover;
+  background-color: #eee;
 }
 </style>
