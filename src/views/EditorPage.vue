@@ -55,12 +55,12 @@
 <script setup>
 import LateralMenu from '@/components/EditorPage/LateralMenu.vue'
 import ResumeEditor from '@/components/EditorPage/ResumeEditor.vue'
-import TemplateFactory from '@/components/EditorPage/templates/TemplateFactory.vue'
+import TemplateFactory from '@/components/EditorPage/ResumeStyle/templates/TemplateFactory.vue'
 import { ExporterService } from '@/services/ExporterService'
 import { ResumeDataClass, ResumeService, ResumeStyleClass } from '@/services/ResumeService'
-import { computed, nextTick, onBeforeMount, onBeforeUnmount, onMounted, ref } from 'vue'
-import { useDisplay } from 'vuetify'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useDisplay } from 'vuetify'
 
 const { mobile } = useDisplay()
 const router = useRouter()

@@ -11,8 +11,18 @@
           </div>
 
           <div class="content">
-            <h1>{{ resumeData.personal.name || 'Your Name' }}</h1>
-            <h2 class="subtitle">{{ resumeData.personal.title }}</h2>
+            <div class="content-header">
+              <div class="content-header-text">
+                <h1>{{ resumeData.personal.name || 'Your Name' }}</h1>
+                <h2 class="subtitle">{{ resumeData.personal.title }}</h2>
+              </div>
+              <div v-if="resumeData.personal.image.data" class="avatar" :style="{
+                backgroundImage: `url(${resumeData.personal.image.data})`,
+                backgroundRepeat: 'no-repeat',
+                backgroundSize: `${resumeData.personal.image.scale ?? 100}% auto`,
+                backgroundPosition: `${resumeData.personal.image.x ?? 50}% ${resumeData.personal.image.y ?? 50}%`
+              }" aria-label="Profile photo" />
+            </div>
 
             <template v-for="(section, index) in orderedMainSections" :key="getMainSectionKey(section)">
               <div class="section" v-if="section.type === 'experiences'">
@@ -99,3 +109,24 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.content-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.content-header-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.avatar {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  background-color: #eee;
+}
+</style>

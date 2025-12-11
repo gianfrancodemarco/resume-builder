@@ -6,7 +6,13 @@ export class ResumeDataV2 {
         this.personal = {
             name: data.personal?.name || '',
             title: data.personal?.title || '',
-            visible: data.personal?.visible ?? true
+            visible: data.personal?.visible ?? true,
+            image: {
+                data: data.personal?.image?.data || '',
+                x: data.personal?.image?.x ?? 50,
+                y: data.personal?.image?.y ?? 50,
+                scale: data.personal?.image?.scale ?? 100
+            },
         };
         this.experiences = (data.experiences || []).map(exp => ({
             title: exp.title || '',
