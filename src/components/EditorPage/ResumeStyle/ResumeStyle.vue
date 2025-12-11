@@ -343,10 +343,7 @@ const handleCustomCSSChange = () => {
     emit('change')
 }
 
-
 </script>
-
-<style scoped src="./ResumeEditorStyles.css"></style>
 
 <style scoped>
 .color-field {
@@ -397,99 +394,12 @@ const handleCustomCSSChange = () => {
     font-family: monospace;
 }
 
-/* Override Vuetify slider defaults completely */
-:deep(.v-slider) {
-    margin-bottom: 16px;
-    min-height: 40px;
-}
-
-:deep(.v-slider .v-slider-track) {
-    height: 4px !important;
-    border-radius: 2px !important;
-}
-
-:deep(.v-slider .v-slider-track__fill) {
-    background-color: rgb(var(--v-theme-primary)) !important;
-    border-radius: 2px !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-}
-
-:deep(.v-slider .v-slider-track__background) {
-    background-color: rgb(var(--v-theme-editor-border)) !important;
-    border-radius: 2px !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-}
-
-/* Force small thumb size */
-:deep(.v-slider .v-slider-thumb) {
-    background-color: rgb(var(--v-theme-primary)) !important;
-    border: 2px solid rgb(var(--v-theme-surface)) !important;
-    width: 12px !important;
-    height: 12px !important;
-    min-width: 12px !important;
-    min-height: 12px !important;
-    max-width: 12px !important;
-    max-height: 12px !important;
-    transform: translate(-50%, -50%) !important;
-}
-
-:deep(.v-slider .v-slider-thumb::before) {
-    width: 12px !important;
-    height: 12px !important;
-    min-width: 12px !important;
-    min-height: 12px !important;
-    max-width: 12px !important;
-    max-height: 12px !important;
-}
-
-:deep(.v-slider .v-slider-thumb__label) {
-    background-color: rgb(var(--v-theme-primary)) !important;
-    color: white !important;
-    font-weight: 600 !important;
-}
-
-:deep(.v-slider .v-label) {
-    color: rgb(var(--v-theme-editor-text-primary)) !important;
-    font-weight: 500 !important;
-}
-
-/* Additional overrides for Vuetify's default styling */
-:deep(.v-slider .v-slider-track__background::before) {
-    background-color: rgb(var(--v-theme-editor-border)) !important;
-    opacity: 1 !important;
-}
-
-:deep(.v-slider .v-slider-track__fill::before) {
-    background-color: rgb(var(--v-theme-primary)) !important;
-    opacity: 1 !important;
-}
-
 /* Style the text labels */
 .text-subtitle-2 {
     color: rgb(var(--v-theme-editor-text-primary)) !important;
     font-weight: 500;
     width: 50%;
     display: inline-block;
-}
-
-/* Create 50/50 layout for slider containers */
-.slider-container {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    margin-bottom: 16px;
-}
-
-.slider-container .text-subtitle-2 {
-    width: 50%;
-    margin-bottom: 0;
-}
-
-.slider-container .v-slider {
-    width: 50%;
-    margin-bottom: 0;
 }
 
 /* Style the switch with better visibility */

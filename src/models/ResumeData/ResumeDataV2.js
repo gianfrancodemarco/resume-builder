@@ -7,8 +7,8 @@ export class ResumeDataV2 {
             name: data.personal?.name || '',
             title: data.personal?.title || '',
             visible: data.personal?.visible ?? true,
-            image: data.personal?.image || '',
-            imageData: data.personal?.imageData || ''
+            imageData: data.personal?.imageData || '',
+            imageZoom: data.personal?.imageZoom ?? 100
         };
         this.experiences = (data.experiences || []).map(exp => ({
             title: exp.title || '',

@@ -1,32 +1,7 @@
 <template>
     <div>
         <div class="editor-sections">
-            <!-- Personal Section -->
-            <div class="editor-section" data-section="personal">
-                <div class="section-header">
-                    <div class="d-flex align-center w-100">
-                        <span class="section-title">
-                            Personal Information
-                        </span>
-                    </div>
-                </div>
-                <div class="section-content">
-                    <v-text-field v-model="props.resumeData.personal.name" label="Name" variant="outlined"
-                        density="comfortable" class="mb-2" aria-label="Name" />
-                    <v-text-field v-model="props.resumeData.personal.title" label="Title" variant="outlined"
-                        density="comfortable" aria-label="Title" />
-                    <div class="d-flex align-center">
-                        <v-file-input 
-                            :model-value="props.resumeData.personal.image" label="Image" variant="outlined"
-                            density="comfortable" aria-label="Image" accept="image/*" @change="handleImageChange"
-                            prepend-icon=""
-                            clearable
-                            clear-icon="ph-delete"
-                            @click:clear="handleClearImage"
-                            />
-                    </div>
-                </div>
-            </div>
+            <PersonalInfo :resume-data="props.resumeData" />
 
             <div v-for="(section, index) in orderedSections" :key="section.type + (section.originalIndex || '')">
                 <!-- Experience Section -->
@@ -263,8 +238,6 @@
             </v-card>
         </v-dialog>
 
-
-
         <!-- Education Modal -->
         <v-dialog v-model="educationModal.show" max-width="800px" persistent>
             <v-card class="modal-card">
@@ -303,6 +276,7 @@
 <script setup>
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import CustomSectionHeaderActions from './CustomSectionHeaderActions.vue'
+import PersonalInfo from './Personalnfo.vue'
 import SectionListItem from './SectionListItem.vue'
 import TiptapEditor from './TiptapEditor.vue'
 
@@ -693,26 +667,4 @@ const cloneCustomSection = (index) => {
     }
     props.resumeData.customSections.splice(index + 1, 0, clonedSection)
 }
-
-// removed unused preview helper; using v-html directly
-
-// removed helper; handled by CustomSectionHeaderActions label
-
-const handleImageChange = (event) => {
-    const file = event.target.files[0]
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            props.resumeData.personal.imageData = e.target.result;
-        };
-        reader.readAsDataURL(file);
-    }
-}
-
-const handleClearImage = () => {
-    props.resumeData.personal.image = null
-    props.resumeData.personal.imageData = ''
-}
 </script>
-
-<style scoped src="./ResumeEditorStyles.css"></style>

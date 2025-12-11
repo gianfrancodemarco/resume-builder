@@ -61,8 +61,8 @@
 </template>
 
 <script>
-import AIGenerationService from "../../services/AIGenerationService";
-import TranscriptionService from "../../services/TranscriptionService";
+import AIGenerationService from "../../../services/AIGenerationService";
+import TranscriptionService from "../../../services/TranscriptionService";
 import { ResumeDataV2 } from '@/models/ResumeData/ResumeDataV2';
 
 const PROMPT_EDIT = `

@@ -19,11 +19,12 @@
 </template>
 
 <script setup>
-import './ResumeEditorStyles.css'
 import { ref, watch } from 'vue'
-import ResumeStyle from './ResumeStyle.vue'
-import ResumeInfo from './ResumeInfo.vue'
-import AIHub from './AIHub.vue'
+import AIHub from './AIHub/AIHub.vue'
+import './ResumeEditorStyles.css'
+import ResumeInfo from './ResumeInfo/ResumeInfo.vue'
+import ResumeStyle from './ResumeStyle/ResumeStyle.vue'
+import './SliderStyles.css'
 
 const props = defineProps({
   resumeData: {

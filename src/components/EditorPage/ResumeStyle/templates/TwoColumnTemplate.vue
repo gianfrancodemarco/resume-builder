@@ -16,7 +16,12 @@
                 <h1>{{ resumeData.personal.name || 'Your Name' }}</h1>
                 <h2 class="subtitle">{{ resumeData.personal.title }}</h2>
               </div>
-              <img v-if="resumeData.personal.imageData" class="avatar" :src="resumeData.personal.imageData" alt="Profile photo" />
+              <img 
+                v-if="resumeData.personal.imageData" 
+                class="avatar" 
+                :src="resumeData.personal.imageData" 
+                alt="Profile photo"
+              />
             </div>
 
             <template v-for="(section, index) in orderedMainSections" :key="getMainSectionKey(section)">
