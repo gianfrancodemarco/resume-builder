@@ -5,56 +5,36 @@
 const FULL = ['regular', 'italic', '700', '700italic']
 
 export const FONT_FAMILIES = [
-    { id: 'inter', name: 'Inter', category: 'sans', variants: FULL },
-    { id: 'roboto', name: 'Roboto', category: 'sans', variants: FULL },
-    { id: 'open-sans', name: 'Open Sans', category: 'sans', variants: FULL },
-    { id: 'lato', name: 'Lato', category: 'sans', variants: FULL },
-    { id: 'source-sans-3', name: 'Source Sans 3', category: 'sans', variants: FULL },
-    { id: 'montserrat', name: 'Montserrat', category: 'sans', variants: FULL },
-    { id: 'arimo', name: 'Arimo', category: 'sans', variants: FULL },
-    { id: 'gelasio', name: 'Gelasio', category: 'serif', variants: FULL },
-    { id: 'tinos', name: 'Tinos', category: 'serif', variants: FULL },
-    { id: 'merriweather', name: 'Merriweather', typstName: 'Merriweather Light 18pt', category: 'serif', variants: FULL },
-    { id: 'lora', name: 'Lora', category: 'serif', variants: FULL },
-    { id: 'eb-garamond', name: 'EB Garamond', category: 'serif', variants: FULL },
-    { id: 'source-serif-4', name: 'Source Serif 4', category: 'serif', variants: FULL },
-    { id: 'cousine', name: 'Cousine', category: 'mono', variants: FULL },
+    { id: 'inter', name: 'Inter', variants: FULL },
+    { id: 'roboto', name: 'Roboto', variants: FULL },
+    { id: 'open-sans', name: 'Open Sans', variants: FULL },
+    { id: 'lato', name: 'Lato', variants: FULL },
+    { id: 'source-sans-3', name: 'Source Sans 3', variants: FULL },
+    { id: 'montserrat', name: 'Montserrat', variants: FULL },
+    { id: 'arimo', name: 'Arimo', variants: FULL },
+    { id: 'gelasio', name: 'Gelasio', variants: FULL },
+    { id: 'tinos', name: 'Tinos', variants: FULL },
+    { id: 'merriweather', name: 'Merriweather', typstName: 'Merriweather Light 18pt', variants: FULL },
+    { id: 'lora', name: 'Lora', variants: FULL },
+    { id: 'eb-garamond', name: 'EB Garamond', variants: FULL },
+    { id: 'source-serif-4', name: 'Source Serif 4', variants: FULL },
+    { id: 'cousine', name: 'Cousine', variants: FULL },
 ]
 
 export const FONT_NAMES = FONT_FAMILIES.map(f => f.name)
 
 export const DEFAULT_FONT = 'Inter'
 
-// Fonts offered before the Typst renderer (system fonts) mapped to the closest
-// bundled family, metric-compatible where one exists (Arimo, Tinos, Cousine, Gelasio).
-const LEGACY_FONTS = {
-    'Arial': 'Arimo',
-    'Helvetica': 'Arimo',
-    'Verdana': 'Open Sans',
-    'Tahoma': 'Open Sans',
-    'Trebuchet MS': 'Open Sans',
-    'Gill Sans': 'Lato',
-    'Impact': 'Montserrat',
-    'Georgia': 'Gelasio',
-    'Times New Roman': 'Tinos',
-    'Palatino Linotype': 'EB Garamond',
-    'Book Antiqua': 'EB Garamond',
-    'Courier New': 'Cousine',
-    'Lucida Console': 'Cousine',
-}
-
 /**
- * Maps any font name (bundled, legacy system font or CSS font stack) to a bundled family.
+ * Picks the first bundled family in a font name or CSS font stack.
  * @param {string} font
- * @returns {string}
+ * @returns {string} The bundled family, or the default font if none matches
  */
 export function resolveFont(font) {
-    const candidates = (font || '').split(',').map(f => f.trim().replace(/^['"]|['"]$/g, ''))
+    const candidates = (font || '').split(',').map(f => f.trim().replace(/^['"]|['"]$/g, '').toLowerCase())
     for (const candidate of candidates) {
-        const bundled = FONT_NAMES.find(name => name.toLowerCase() === candidate.toLowerCase())
+        const bundled = FONT_NAMES.find(name => name.toLowerCase() === candidate)
         if (bundled) return bundled
-        const legacy = Object.keys(LEGACY_FONTS).find(name => name.toLowerCase() === candidate.toLowerCase())
-        if (legacy) return LEGACY_FONTS[legacy]
     }
     return DEFAULT_FONT
 }

@@ -130,11 +130,6 @@ function fitSvg(svg, { width, height }) {
 }
 
 export class TypstService {
-    /** Starts downloading the compiler, so the first preview appears sooner. */
-    static preload() {
-        getEngine().catch(() => {})
-    }
-
     /**
      * @returns {Promise<{ svg: string, size: { width: number, height: number }, pages: Array<{ width: number, height: number }> }>}
      *   One SVG with all pages stacked vertically, its size, and each page's size, all in pt

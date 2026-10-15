@@ -1,6 +1,5 @@
 import { ResumeDataV2 as ResumeDataClass } from '@/models/ResumeData/ResumeDataV2'
 import { TwoColumnsBlue as ResumeStyleClass } from '@/models/ResumeStyle/defaultTemplates/TwoColumnsBlue'
-import { resolveFont } from '@/typst/fonts'
 
 // Export the model classes
 // These always point to the latest version of the models
@@ -30,7 +29,7 @@ export class ResumeService {
                     }
 
                     const resumeData = ResumeDataClass.fromJSON(data.resumeData)
-                    const resumeStyle = ResumeService.normalizeStyle(data.resumeStyle)
+                    const resumeStyle = data.resumeStyle
 
                     resolve({ resumeData, resumeStyle })
                 } catch (error) {
@@ -44,24 +43,6 @@ export class ResumeService {
 
             reader.readAsText(file)
         })
-    }
-
-    /**
-     * Upgrades a stored style to what the renderer supports: fonts that are no
-     * longer offered (old system fonts) are mapped to the closest bundled font.
-     * @param {Object} resumeStyle
-     * @returns {Object} The same style object, updated in place
-     */
-    static normalizeStyle(resumeStyle) {
-        if (!resumeStyle) return resumeStyle
-        if (resumeStyle.customCSS === undefined) {
-            resumeStyle.customCSS = ''
-        }
-        if (resumeStyle.typography) {
-            resumeStyle.typography.headingFont = resolveFont(resumeStyle.typography.headingFont)
-            resumeStyle.typography.bodyFont = resolveFont(resumeStyle.typography.bodyFont)
-        }
-        return resumeStyle
     }
 
     /**

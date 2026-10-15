@@ -52,13 +52,13 @@ describe('buildDocument', () => {
         expect(data.sizes).toEqual({ base: 10.5, heading: 19.5, section: 18, content: 9, sidebar: 210 })
     })
 
-    it('maps legacy system fonts to bundled fonts and reports them', () => {
+    it('reports the fonts it uses and falls back to the default for unknown ones', () => {
         const style = TwoColumnsBlue.createDefault()
-        style.typography.headingFont = 'Helvetica'
-        style.typography.bodyFont = 'Times New Roman'
+        style.typography.headingFont = 'Lora'
+        style.typography.bodyFont = 'Comic Sans MS'
         const { data, fonts } = buildDocument(ResumeDataV2.createDefault(), style)
-        expect(data.fonts).toEqual({ heading: 'Arimo', body: 'Tinos' })
-        expect(fonts).toEqual(['Arimo', 'Tinos'])
+        expect(data.fonts).toEqual({ heading: 'Lora', body: 'Inter' })
+        expect(fonts).toEqual(['Lora', 'Inter'])
     })
 
     it('includes the avatar only when an image is set', () => {

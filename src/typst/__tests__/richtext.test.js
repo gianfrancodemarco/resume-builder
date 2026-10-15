@@ -44,7 +44,7 @@ describe('htmlToNodes', () => {
 
     it('converts span styles and collects the fonts they use', () => {
         const fonts = new Set()
-        const [span] = htmlToNodes('<span style="color: rgb(255, 0, 0); font-size: 16px; font-family: Georgia">x</span>', fonts)
+        const [span] = htmlToNodes('<span style="color: rgb(255, 0, 0); font-size: 16px; font-family: Gelasio, serif">x</span>', fonts)
         expect(span).toEqual({ t: 'span', color: '#ff0000', size: 12, font: 'Gelasio', c: ['x'] })
         expect([...fonts]).toEqual(['Gelasio'])
     })
