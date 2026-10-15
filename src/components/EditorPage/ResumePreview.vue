@@ -4,8 +4,8 @@
             :style="{ aspectRatio: `${page.width} / ${page.height}` }">
             <!-- One SVG holds every page stacked; each sheet shows its own slice -->
             <img :src="svgUrl" alt="" draggable="false" :style="{
-                width: `${docWidth / page.width * 100}%`,
-                height: `${docHeight / page.height * 100}%`,
+                width: `${docSize.width / page.width * 100}%`,
+                height: `${docSize.height / page.height * 100}%`,
                 top: `-${page.top / page.height * 100}%`
             }" />
         </div>
@@ -50,8 +50,6 @@ const error = ref('')
 const updating = ref(false)
 
 const docSize = ref({ width: 0, height: 0 })
-const docWidth = computed(() => docSize.value.width)
-const docHeight = computed(() => docSize.value.height)
 const visiblePages = computed(() => pages.value.slice(0, props.maxPages))
 
 let timer = null
