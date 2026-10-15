@@ -1,5 +1,5 @@
-# Use Node.js 18 Alpine for smaller image size
-FROM node:18-alpine
+# Use Node.js 22 Alpine for smaller image size
+FROM node:22-alpine
 
 # Create a non-root user for better security
 RUN addgroup -g 1001 -S nodejs && \
@@ -12,7 +12,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install dependencies
-RUN npm ci --force
+RUN npm ci
 
 # Copy source code with proper ownership
 COPY --chown=nodejs:nodejs . .

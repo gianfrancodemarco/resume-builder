@@ -1,133 +1,87 @@
-import { describe, expect, it, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 import { ResumeService } from '@/services/ResumeService'
-import { ResumeDataV2 } from '@/models/ResumeData/ResumeDataV2'
-import { ResumeStyleV1_1 } from '@/models/ResumeStyle/ResumeStyleV1_1'
+import { sampleResume, settingsOf, validateResume } from '@/resume/resume'
+
+const jsonFile = content => ({ text: async () => (typeof content === 'string' ? content : JSON.stringify(content)) })
+
+// jsdom's Blob has no text()
+const readJson = blob => new Promise(resolve => {
+    const reader = new FileReader()
+    reader.onload = () => resolve(JSON.parse(reader.result))
+    reader.readAsText(blob)
+})
 
 describe('ResumeService', () => {
-    beforeEach(() => {
-        // Reset all mocks before each test
-        vi.clearAllMocks()
-    })
-
     describe('loadFromFile', () => {
-        it('loads valid resume data from file', async () => {
-            const mockResumeData = {
-                version: 1,
-                personal: {
-                    name: 'John Doe',
-                    title: 'Software Engineer'
-                }
-            }
-            const mockResumeStyle = {
-                version: 1,
-                colors: {
-                    primary: '#000000'
-                }
-            }
-            const mockFile = new File(
-                [JSON.stringify({ resumeData: mockResumeData, resumeStyle: mockResumeStyle })],
-                'resume.json',
-                { type: 'application/json' }
-            )
+        it('loads a JSON Resume from another tool and builds a layout for it', async () => {
+            const resume = await ResumeService.loadFromFile(jsonFile({
+                basics: { name: 'Jane Doe', summary: 'Hello' },
+                work: [{ name: 'Acme', position: 'Engineer', startDate: '2020-01' }],
+            }))
 
-            const result = await ResumeService.loadFromFile(mockFile)
-
-            expect(result.resumeData).toBeInstanceOf(ResumeDataV2)
-            expect(result.resumeData.personal.name).toBe('John Doe')
-            expect(result.resumeStyle.colors.primary).toBe('#000000')
+            expect(resume.basics.name).toBe('Jane Doe')
+            expect(settingsOf(resume).sections.map(s => s.key)).toEqual(['summary', 'work'])
         })
 
-        it('rejects invalid file format', async () => {
-            const mockFile = new File(
-                [JSON.stringify({ invalid: 'data' })],
-                'resume.json',
-                { type: 'application/json' }
-            )
-
-            await expect(ResumeService.loadFromFile(mockFile)).rejects.toThrow('Invalid resume data format')
+        it('keeps the layout stored in meta', async () => {
+            const original = sampleResume()
+            settingsOf(original).template = 'OneColumnModern'
+            const resume = await ResumeService.loadFromFile(jsonFile(original))
+            expect(settingsOf(resume).template).toBe('OneColumnModern')
         })
 
-        it('rejects invalid JSON', async () => {
-            const mockFile = new File(
-                ['invalid json'],
-                'resume.json',
-                { type: 'application/json' }
-            )
-
-            await expect(ResumeService.loadFromFile(mockFile)).rejects.toThrow('Error loading file')
+        it('rejects files that are not JSON', async () => {
+            await expect(ResumeService.loadFromFile(jsonFile('not json'))).rejects.toThrow('The file is not valid JSON.')
         })
 
-        it('handles file read error', async () => {
-            const mockFile = new File(
-                ['test'],
-                'resume.json',
-                { type: 'application/json' }
-            )
-
-            // Mock FileReader to simulate error
-            const mockFileReader = {
-                readAsText: vi.fn(),
-                onerror: null,
-                onload: null
-            }
-            global.FileReader = vi.fn(() => mockFileReader)
-
-            const loadPromise = ResumeService.loadFromFile(mockFile)
-            mockFileReader.onerror()
-
-            await expect(loadPromise).rejects.toThrow('Error reading file')
+        it('rejects JSON that is not a valid JSON Resume', async () => {
+            await expect(ResumeService.loadFromFile(jsonFile({ basics: { name: 42 } })))
+                .rejects.toThrow('Not a valid JSON Resume: basics.name is not of a type(s) string')
         })
     })
 
     describe('exportToJSON', () => {
-        it('exports resume data and style to JSON', () => {
-            const resumeData = new ResumeDataV2({
-                personal: {
-                    name: 'John Doe',
-                    title: 'Software Engineer'
-                }
-            })
-            const resumeStyle = ResumeStyleV1_1.createDefault()
+        it('exports a valid JSON Resume without the empty values left by the editor', async () => {
+            const resume = sampleResume()
+            resume.basics.url = ''
+            resume.work[0].url = ''
+            resume.work[0].highlights.push('')
 
-            const blob = ResumeService.exportToJSON(resumeData, resumeStyle)
-            expect(blob).toBeInstanceOf(Blob)
-            expect(blob.type).toBe('application/json')
+            const json = await readJson(ResumeService.exportToJSON(resume))
 
-            // Test blob content
-            const reader = new FileReader()
-            reader.onload = () => {
-                const data = JSON.parse(reader.result)
-                expect(data.resumeData.personal.name).toBe('John Doe')
-                expect(data.resumeStyle.colors.primary).toBe('#08294D')
-            }
-            reader.readAsText(blob)
+            expect(validateResume(json)).toEqual([])
+            expect(json.basics.url).toBeUndefined()
+            expect(json.work[0].url).toBeUndefined()
+            expect(json.work[0].highlights).toHaveLength(2)
+            expect(json.meta.resumeBuilder).toEqual(settingsOf(resume))
+            expect(json.meta.lastModified).toMatch(/^\d{4}-\d{2}-\d{2}T/)
         })
 
-        it('handles plain object style', () => {
-            const resumeData = new ResumeDataV2({
-                personal: {
-                    name: 'John Doe',
-                    title: 'Software Engineer'
-                }
-            })
-            const resumeStyle = {
-                colors: {
-                    primary: '#000000'
-                }
-            }
-
-            const blob = ResumeService.exportToJSON(resumeData, resumeStyle)
-            expect(blob).toBeInstanceOf(Blob)
-            expect(blob.type).toBe('application/json')
-
-            // Test blob content
-            const reader = new FileReader()
-            reader.onload = () => {
-                const data = JSON.parse(reader.result)
-                expect(data.resumeData.personal.name).toBe('John Doe')
-                expect(data.resumeStyle.colors.primary).toBe('#000000')
-            }
-            reader.readAsText(blob)
+        it('keeps the photo', async () => {
+            const resume = sampleResume()
+            resume.basics.image = 'data:image/png;base64,AAAA'
+            const json = await readJson(ResumeService.exportToJSON(resume))
+            expect(json.basics.image).toBe('data:image/png;base64,AAAA')
         })
     })
-}) 
+
+    describe('loadStored', () => {
+        beforeEach(() => localStorage.clear())
+
+        it('returns the sample resume when nothing is stored', () => {
+            expect(ResumeService.loadStored().basics.name).toBe('John Doe')
+        })
+
+        it('returns the stored resume', () => {
+            const resume = sampleResume()
+            resume.basics.name = 'Stored Name'
+            ResumeService.store(resume)
+            expect(ResumeService.loadStored().basics.name).toBe('Stored Name')
+        })
+
+        it('ignores stored data that is not a valid JSON Resume', () => {
+            localStorage.setItem('resume', '{"basics": {"name": 1}}')
+            expect(ResumeService.loadStored().basics.name).toBe('John Doe')
+        })
+    })
+})

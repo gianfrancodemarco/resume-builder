@@ -1,6 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { CVConversionService } from '../CVConversionService.js'
-import { ResumeDataV2 } from '@/models/ResumeData/ResumeDataV2'
 
 // Mock fetch globally
 global.fetch = vi.fn()
@@ -47,19 +46,8 @@ describe('CVConversionService', () => {
                     choices: [{
                         message: {
                             content: JSON.stringify({
-                                version: 2,
-                                personal: {
-                                    name: 'John Doe',
-                                    title: 'Software Engineer',
-                                    visible: true
-                                },
-                                experiences: [],
-                                experiencesVisible: true,
-                                experiencesSectionName: 'Employment History',
-                                education: [],
-                                educationVisible: true,
-                                educationSectionName: 'Education',
-                                customSections: []
+                                basics: { name: 'John Doe', label: 'Software Engineer', email: '' },
+                                work: [],
                             })
                         }
                     }]
@@ -69,7 +57,7 @@ describe('CVConversionService', () => {
 
             const result = await CVConversionService.convertCV(mockFile, 'test-api-key', 'test-model')
 
-            expect(result).toBeInstanceOf(ResumeDataV2)
+            expect(result).toEqual({ basics: { name: 'John Doe', label: 'Software Engineer' } })
             expect(fetch).toHaveBeenCalledWith(
                 'https://openrouter.ai/api/v1/chat/completions',
                 expect.objectContaining({
@@ -111,19 +99,8 @@ describe('CVConversionService', () => {
                     choices: [{
                         message: {
                             content: JSON.stringify({
-                                version: 2,
-                                personal: {
-                                    name: 'Jane Doe',
-                                    title: 'Frontend Developer',
-                                    visible: true
-                                },
-                                experiences: [],
-                                experiencesVisible: true,
-                                experiencesSectionName: 'Employment History',
-                                education: [],
-                                educationVisible: true,
-                                educationSectionName: 'Education',
-                                customSections: []
+                                basics: { name: 'Jane Doe', label: 'Frontend Developer', email: '' },
+                                work: [],
                             })
                         }
                     }]
@@ -133,7 +110,7 @@ describe('CVConversionService', () => {
 
             const result = await CVConversionService.convertCV(mockFile, 'test-api-key', 'test-model')
 
-            expect(result).toBeInstanceOf(ResumeDataV2)
+            expect(result).toEqual({ basics: { name: 'Jane Doe', label: 'Frontend Developer' } })
             expect(fetch).toHaveBeenCalledWith(
                 'https://openrouter.ai/api/v1/chat/completions',
                 expect.objectContaining({
@@ -250,13 +227,7 @@ describe('CVConversionService', () => {
                 .rejects.toThrow()
         })
 
-        it('should force custom sections to sidebar position', async () => {
-            const mockFile = {
-                name: 'test.pdf',
-                type: 'application/pdf',
-                size: 1024
-            }
-
+        it('should send the JSON Resume schema in strict mode', async () => {
             const mockFileReader = {
                 onload: null,
                 readAsDataURL: vi.fn().mockImplementation(function () {
@@ -266,43 +237,18 @@ describe('CVConversionService', () => {
                 })
             }
             global.FileReader = vi.fn().mockImplementation(() => mockFileReader)
-
-            const mockResponse = {
+            global.fetch = vi.fn().mockResolvedValue({
                 status: 200,
-                json: vi.fn().mockResolvedValue({
-                    choices: [{
-                        message: {
-                            content: JSON.stringify({
-                                version: 2,
-                                personal: {
-                                    name: 'John Doe',
-                                    title: 'Software Engineer',
-                                    visible: true
-                                },
-                                experiences: [],
-                                experiencesVisible: true,
-                                experiencesSectionName: 'Employment History',
-                                education: [],
-                                educationVisible: true,
-                                educationSectionName: 'Education',
-                                customSections: [
-                                    {
-                                        title: 'Skills',
-                                        content: 'Vue.js, JavaScript',
-                                        visible: true,
-                                        position: 'main'
-                                    }
-                                ]
-                            })
-                        }
-                    }]
-                })
-            }
-            global.fetch = vi.fn().mockResolvedValue(mockResponse)
+                json: vi.fn().mockResolvedValue({ choices: [{ message: { content: '{"basics":{"name":"Jane"}}' } }] })
+            })
 
-            const result = await CVConversionService.convertCV(mockFile, 'test-api-key', 'test-model')
+            await CVConversionService.convertCV({ name: 'cv.pdf', type: 'application/pdf', size: 1 }, 'key', 'model')
 
-            expect(result.customSections[0].position).toBe('sidebar')
+            const body = JSON.parse(fetch.mock.calls[0][1].body)
+            const { schema, strict } = body.response_format.json_schema
+            expect(strict).toBe(true)
+            expect(Object.keys(schema.properties)).toEqual(expect.arrayContaining(['basics', 'work', 'education', 'skills', 'languages', 'projects']))
+            expect(schema.properties.work.items.required).toEqual(Object.keys(schema.properties.work.items.properties))
         })
     })
 
@@ -360,80 +306,6 @@ describe('CVConversionService', () => {
 
             const result = await CVConversionService.fileToBase64(mockFile)
             expect(result).toBe('data:text/plain;base64,dGVzdA==')
-        })
-    })
-
-    describe('getResumeSchema', () => {
-        it('should return the correct schema structure', () => {
-            const schema = CVConversionService.getResumeSchema()
-
-            expect(schema).toEqual({
-                type: 'object',
-                properties: {
-                    version: { type: 'number' },
-                    personal: {
-                        type: 'object',
-                        properties: {
-                            name: { type: 'string' },
-                            title: { type: 'string' },
-                            visible: { type: 'boolean' }
-                        },
-                        additionalProperties: false,
-                        required: ['name', 'title', 'visible']
-                    },
-                    experiences: {
-                        type: 'array',
-                        items: {
-                            type: 'object',
-                            properties: {
-                                title: { type: 'string' },
-                                company: { type: 'string' },
-                                period: { type: 'string' },
-                                description: { type: 'string' },
-                                visible: { type: 'boolean' }
-                            },
-                            additionalProperties: false,
-                            required: ['title', 'company', 'period', 'description', 'visible']
-                        }
-                    },
-                    experiencesVisible: { type: 'boolean' },
-                    experiencesSectionName: { type: 'string' },
-                    education: {
-                        type: 'array',
-                        items: {
-                            type: 'object',
-                            properties: {
-                                degree: { type: 'string' },
-                                school: { type: 'string' },
-                                period: { type: 'string' },
-                                mark: { type: 'string' },
-                                thesis: { type: 'string' },
-                                visible: { type: 'boolean' }
-                            },
-                            additionalProperties: false,
-                            required: ['degree', 'school', 'period', 'mark', 'thesis', 'visible']
-                        }
-                    },
-                    educationVisible: { type: 'boolean' },
-                    educationSectionName: { type: 'string' },
-                    customSections: {
-                        type: 'array',
-                        items: {
-                            type: 'object',
-                            properties: {
-                                title: { type: 'string' },
-                                content: { type: 'string' },
-                                visible: { type: 'boolean' },
-                                position: { type: 'string', enum: ['main', 'sidebar'] }
-                            },
-                            additionalProperties: false,
-                            required: ['title', 'content', 'visible', 'position']
-                        }
-                    }
-                },
-                additionalProperties: false,
-                required: ['version', 'personal', 'experiences', 'education', 'customSections', 'experiencesVisible', 'educationVisible', 'experiencesSectionName', 'educationSectionName']
-            })
         })
     })
 

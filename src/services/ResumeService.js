@@ -1,61 +1,58 @@
-import { ResumeDataV2 as ResumeDataClass } from '@/models/ResumeData/ResumeDataV2'
-import { TwoColumnsBlue as ResumeStyleClass } from '@/models/ResumeStyle/defaultTemplates/TwoColumnsBlue'
+import { prepareResume, resumeContent, sampleResume, validateResume } from '@/resume/resume'
+import { compact } from '@/resume/values'
 
-// Export the model classes
-// These always point to the latest version of the models
-// Other part of the app should only import from here
-export { ResumeDataClass, ResumeStyleClass }
+const STORAGE_KEY = 'resume'
 
 export class ResumeService {
-    // Current versions of the models
-    static CURRENT_RESUME_DATA_VERSION = ResumeDataClass.VERSION
-    static CURRENT_RESUME_STYLE_VERSION = ResumeStyleClass.VERSION
+    /** The resume saved in this browser, or the sample resume. */
+    static loadStored() {
+        try {
+            const stored = JSON.parse(localStorage.getItem(STORAGE_KEY))
+            if (stored && validateResume(stored).length === 0) return prepareResume(stored)
+        } catch {
+            // Unreadable storage: start from the sample
+        }
+        return sampleResume()
+    }
+
+    static store(resume) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(resume))
+    }
 
     /**
-     * Loads resume data from a JSON file
-     * @param {File} file - The JSON file to load
-     * @returns {Promise<{resumeData: ResumeDataClass, resumeStyle: Object}>} The loaded resume data and style
-     * @throws {Error} If the file is invalid or cannot be loaded
+     * Loads a JSON Resume file. Files from other JSON Resume tools work too.
+     * @param {File} file
+     * @returns {Promise<object>} The prepared resume
+     * @throws {Error} If the file is not valid JSON or not a valid JSON Resume
      */
     static async loadFromFile(file) {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader()
-
-            reader.onload = (e) => {
-                try {
-                    const data = JSON.parse(e.target.result)
-                    if (!data.resumeData || !data.resumeStyle) {
-                        throw new Error('Invalid resume data format')
-                    }
-
-                    const resumeData = ResumeDataClass.fromJSON(data.resumeData)
-                    const resumeStyle = data.resumeStyle
-
-                    resolve({ resumeData, resumeStyle })
-                } catch (error) {
-                    reject(new Error(`Error loading file: ${error.message}`))
-                }
-            }
-
-            reader.onerror = () => {
-                reject(new Error('Error reading file'))
-            }
-
-            reader.readAsText(file)
-        })
+        let json
+        try {
+            json = JSON.parse(await file.text())
+        } catch {
+            throw new Error('The file is not valid JSON.')
+        }
+        const errors = validateResume(json)
+        if (errors.length) {
+            throw new Error(`Not a valid JSON Resume: ${errors.slice(0, 3).join('; ')}`)
+        }
+        return prepareResume(json)
     }
 
     /**
-     * Exports resume data to a JSON file
-     * @param {ResumeDataClass} resumeData - The resume data to export
-     * @param {Object} resumeStyle - The resume style to export
-     * @returns {Blob} The JSON file as a Blob
+     * The resume as a JSON Resume file. Empty values left by the editor are
+     * removed so the file validates against the schema.
+     * @returns {Blob}
      */
-    static exportToJSON(resumeData, resumeStyle) {
-        const data = {
-            resumeData: resumeData.toJSON(),
-            resumeStyle: resumeStyle
+    static exportToJSON(resume) {
+        const image = resume.basics?.image
+        const content = compact(resumeContent(resume))
+        const json = {
+            $schema: resume.$schema,
+            ...content,
+            basics: { ...content.basics, ...(image && { image }) },
+            meta: { ...resume.meta, lastModified: new Date().toISOString() },
         }
-        return new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
+        return new Blob([JSON.stringify(json, null, 2)], { type: 'application/json' })
     }
-} 
+}

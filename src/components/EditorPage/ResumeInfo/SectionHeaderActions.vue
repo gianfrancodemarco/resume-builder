@@ -5,7 +5,7 @@
                 <v-icon v-bind="iconProps" icon="ph-pencil-simple" size="small" class="edit-icon"
                     @click.stop="$emit('edit')" />
             </template>
-            Edit section
+            Rename section
         </v-tooltip>
 
         <v-tooltip location="top">
@@ -16,13 +16,13 @@
             {{ visible ? 'Hide section' : 'Show section' }}
         </v-tooltip>
 
-        <v-tooltip location="top">
+        <v-tooltip v-if="showColumn" location="top">
             <template v-slot:activator="{ props: iconProps }">
                 <v-icon v-bind="iconProps"
-                    :icon="position === 'sidebar' ? 'ph-format-align-right' : 'ph-format-align-left'" size="small"
-                    class="position-icon" @click.stop="$emit('toggle-position')" />
+                    :icon="column === 'sidebar' ? 'ph-format-align-right' : 'ph-format-align-left'" size="small"
+                    class="position-icon" @click.stop="$emit('toggle-column')" />
             </template>
-            {{ position === 'sidebar' ? 'Move to main content' : 'Move to sidebar' }}
+            {{ column === 'sidebar' ? 'Move to main content' : 'Move to sidebar' }}
         </v-tooltip>
 
         <v-tooltip location="top">
@@ -44,34 +44,23 @@
 
         <v-tooltip location="top">
             <template v-slot:activator="{ props: iconProps }">
-                <v-icon v-bind="iconProps" icon="ph-content-copy" size="small" class="clone-icon"
-                    :class="{ 'v-icon--disabled': disabled }" @click.stop="$emit('clone')" :disabled="disabled" />
-            </template>
-            Clone section
-        </v-tooltip>
-
-        <v-tooltip location="top">
-            <template v-slot:activator="{ props: iconProps }">
                 <v-icon v-bind="iconProps" :icon="deleteConfirm ? 'ph-check' : 'ph-delete'" size="small"
-                    class="delete-icon" :class="{ 'v-icon--disabled': disabled }" @click.stop="$emit('delete')"
-                    :disabled="disabled" />
+                    class="delete-icon" @click.stop="$emit('delete')" />
             </template>
-            {{ deleteConfirm ? 'Confirm delete' : 'Delete section' }}
+            {{ deleteConfirm ? 'Confirm: remove section and its content' : 'Remove section' }}
         </v-tooltip>
     </div>
 </template>
 
 <script setup>
-const props = defineProps({
+defineProps({
     visible: { type: Boolean, default: true },
-    position: { type: String, default: 'main' },
+    column: { type: String, default: 'main' },
+    showColumn: { type: Boolean, default: false },
     canMoveUp: { type: Boolean, default: false },
     canMoveDown: { type: Boolean, default: false },
     deleteConfirm: { type: Boolean, default: false },
-    disabled: { type: Boolean, default: false }
 })
 
-defineEmits(['edit', 'toggle-visible', 'toggle-position', 'move-up', 'move-down', 'delete', 'clone'])
+defineEmits(['edit', 'toggle-visible', 'toggle-column', 'move-up', 'move-down', 'delete'])
 </script>
-
-<style scoped></style>

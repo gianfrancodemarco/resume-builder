@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createRouter, createWebHistory } from 'vue-router'
 import { createVuetify } from 'vuetify'
 import * as components from 'vuetify/components'
@@ -7,55 +7,68 @@ import * as directives from 'vuetify/directives'
 import { aliases, mdi } from 'vuetify/iconsets/mdi'
 import { ResumeService } from '@/services/ResumeService'
 import { ExporterService } from '@/services/ExporterService'
-import { CVConversionService } from '@/services/CVConversionService'
+import { prepareResume, sampleResume, settingsOf } from '@/resume/resume'
 import EditorPage from '@/views/EditorPage.vue'
-import { ResumeDataClass, ResumeStyleClass } from '@/services/ResumeService'
 
-// Mock child components to focus on EditorPage logic
-vi.mock('@/components/EditorPage/LateralMenu.vue', () => ({
-    default: {
-        name: 'LateralMenu',
-        template: '<div class="lateral-menu-mock">LateralMenu Mock</div>',
-        props: ['activeTab', 'customSections'],
-        emits: ['update:activeTab', 'scroll-to-section']
+// Mock child components to focus on EditorPage logic.
+// They use render functions: the test build of Vue has no template compiler.
+vi.mock('@/components/EditorPage/LateralMenu.vue', async () => {
+    const { h } = await import('vue')
+    return {
+        default: {
+            name: 'LateralMenu',
+            render: () => h('div', { class: 'lateral-menu-mock' }, 'LateralMenu Mock'),
+            props: ['activeTab', 'sections'],
+            emits: ['update:activeTab', 'scroll-to-section']
+        }
     }
-}))
+})
 
-vi.mock('@/components/EditorPage/ResumeEditor.vue', () => ({
-    default: {
-        name: 'ResumeEditor',
-        template: '<div class="resume-editor-mock">ResumeEditor Mock</div>',
-        props: ['resumeData', 'style', 'activeTab', 'isMobile'],
-        emits: ['update:resume-data', 'update:style', 'update:activeTab', 'save', 'change']
+vi.mock('@/components/EditorPage/ResumeEditor.vue', async () => {
+    const { h } = await import('vue')
+    return {
+        default: {
+            name: 'ResumeEditor',
+            render: () => h('div', { class: 'resume-editor-mock' }, 'ResumeEditor Mock'),
+            props: ['resume', 'isMobile', 'activeTab'],
+            emits: ['update:resume', 'update:activeTab']
+        }
     }
-}))
+})
 
-vi.mock('@/components/EditorPage/ResumePreview.vue', () => ({
-    default: {
-        name: 'ResumePreview',
-        template: '<div class="resume-preview-mock">ResumePreview Mock</div>',
-        props: ['resumeData', 'resumeStyle']
+vi.mock('@/components/EditorPage/ResumePreview.vue', async () => {
+    const { h } = await import('vue')
+    return {
+        default: {
+            name: 'ResumePreview',
+            render: () => h('div', { class: 'resume-preview-mock' }, 'ResumePreview Mock'),
+            props: ['resume']
+        }
     }
-}))
-
-vi.mock('@/components/EditorPage/ConvertCVDialog.vue', () => ({
-    default: {
-        name: 'ConvertCVDialog',
-        template: '<div class="convert-cv-dialog-mock">ConvertCVDialog Mock</div>',
-        props: ['dialog', 'models', 'loading'],
-        emits: ['close']
-    }
-}))
+})
 
 describe('EditorPage', () => {
     let wrapper
     let router
     let vuetify
 
-    const mockResumeData = ResumeDataClass.createDefault()
-    const mockResumeStyle = ResumeStyleClass.createDefault()
+    // Mounts the page; child components are replaced by the mocks above
+    const mountPage = () => mount(EditorPage, {
+        global: {
+            plugins: [router, vuetify]
+        }
+    })
 
     beforeEach(() => {
+        localStorage.clear()
+
+        // jsdom has no ResizeObserver, which Vuetify's layout components use
+        vi.stubGlobal('ResizeObserver', class {
+            observe() { }
+            unobserve() { }
+            disconnect() { }
+        })
+
         // Create a fresh Vuetify instance for each test
         vuetify = createVuetify({
             components,
@@ -73,84 +86,41 @@ describe('EditorPage', () => {
             routes: [
                 {
                     path: '/',
-                    name: 'editor',
-                    component: { template: '<div>Editor</div>' }
+                    name: 'home',
+                    component: { template: '<div>Home</div>' }
                 }
             ]
         })
 
         // Mock window.URL.createObjectURL and revokeObjectURL
-        window.URL.createObjectURL = vi.fn()
+        window.URL.createObjectURL = vi.fn(() => 'blob:test')
         window.URL.revokeObjectURL = vi.fn()
-
-        // Mock Blob and text() method
-        global.Blob = vi.fn((content) => ({
-            type: 'application/json',
-            text: () => Promise.resolve(content[0])
-        }))
 
         // Mock window.sa_event
         window.sa_event = vi.fn()
 
-        // Mock ResumeService methods
+        // Avoid the autosave interval running between tests
+        vi.spyOn(globalThis, 'setInterval').mockImplementation(() => 123)
+
+        // Mock ResumeService and ExporterService methods
         vi.spyOn(ResumeService, 'exportToJSON').mockImplementation(() => new Blob(['test']))
-        vi.spyOn(ResumeService, 'loadFromFile').mockImplementation(() => Promise.resolve({
-            resumeData: new ResumeDataClass({ personal: { name: 'Test User' } }),
-            resumeStyle: new ResumeStyleClass()
-        }))
+        vi.spyOn(ResumeService, 'loadFromFile').mockImplementation(() => Promise.resolve(
+            prepareResume({ basics: { name: 'Test User' } })
+        ))
         vi.spyOn(ExporterService, 'getFilename').mockImplementation(() => 'test.json')
+        vi.spyOn(ExporterService, 'download').mockImplementation(() => { })
         vi.spyOn(ExporterService, 'exportToPDF').mockImplementation(() => Promise.resolve())
         vi.spyOn(ExporterService, 'exportToHTML').mockImplementation(() => Promise.resolve())
         vi.spyOn(ExporterService, 'exportToTXT').mockImplementation(() => Promise.resolve())
 
-        // Mock CVConversionService methods
-        vi.spyOn(CVConversionService, 'fetchAvailableModels').mockImplementation(() => Promise.resolve(['model1', 'model2']))
-        vi.spyOn(CVConversionService, 'convertCV').mockImplementation(() => Promise.resolve(new ResumeDataClass()))
+        wrapper = mountPage()
+    })
 
-        // Mock router
-        const mockRouter = {
-            push: vi.fn()
-        }
-
-        wrapper = mount(EditorPage, {
-            global: {
-                plugins: [router, vuetify],
-                mocks: {
-                    $router: mockRouter
-                },
-                stubs: {
-                    'v-app': true,
-                    'v-main': true,
-                    'v-btn': true,
-                    'v-expansion-panels': true,
-                    'v-expansion-panel': true,
-                    'v-expansion-panel-title': true,
-                    'v-expansion-panel-text': true,
-                    'v-tabs': true,
-                    'v-tab': true,
-                    'v-slide-group': true,
-                    'LateralMenu': {
-                        template: '<div class="lateral-menu-mock">LateralMenu Mock</div>',
-                        props: ['activeTab', 'customSections'],
-                        emits: ['update:activeTab', 'scroll-to-section']
-                    },
-                    'ResumeEditor': {
-                        template: '<div class="resume-editor-mock">ResumeEditor Mock</div>',
-                        props: ['resumeData', 'style', 'activeTab', 'isMobile'],
-                        emits: ['update:resume-data', 'update:style', 'update:activeTab', 'save', 'change']
-                    },
-                    'ResumePreview': {
-                        template: '<div class="resume-preview-mock">ResumePreview Mock</div>',
-                        props: ['resumeData', 'resumeStyle']
-                    },
-                    'ConvertCVDialog': {
-                        template: '<div class="convert-cv-dialog-mock">ConvertCVDialog Mock</div>',
-                        props: ['dialog', 'models', 'loading'],
-                        emits: ['close']
-                    }
-                }
-            }
-        })
+    afterEach(() => {
+        wrapper?.unmount()
+        localStorage.clear()
+        vi.restoreAllMocks()
+        vi.unstubAllGlobals()
     })
 
     describe('Component Mounting', () => {
@@ -158,17 +128,14 @@ describe('EditorPage', () => {
             expect(wrapper.exists()).toBe(true)
         })
 
-        it('initializes with default resume data and style', () => {
-            expect(wrapper.vm.resumeData).toBeDefined()
-            expect(wrapper.vm.resumeStyle).toBeDefined()
+        it('initializes with the sample resume', () => {
+            expect(wrapper.vm.resume).toEqual(sampleResume())
         })
 
         it('initializes with correct default values', () => {
             expect(wrapper.vm.activeTab).toBe('info')
             expect(wrapper.vm.zoomLevel).toBe(100)
-            expect(wrapper.vm.showConvertDialog).toBe(false)
-            expect(wrapper.vm.isConverting).toBe(false)
-            // availableModels will be populated by the mock in onMounted
+            expect(wrapper.vm.alertMessage.show).toBe(false)
         })
     })
 
@@ -208,135 +175,112 @@ describe('EditorPage', () => {
 
             expect(wrapper.vm.zoomLevel).toBe(50)
         })
+
+        it('applies the zoom level to the preview container', async () => {
+            wrapper.vm.handleZoomIn()
+            await wrapper.vm.$nextTick()
+
+            expect(wrapper.find('.preview-container').attributes('style')).toContain('scale(1.25)')
+        })
     })
 
     describe('LocalStorage', () => {
-        beforeEach(() => {
-            // Clear localStorage before each test
-            localStorage.clear()
-            // Mock setInterval to avoid actual intervals running
-            vi.spyOn(global, 'setInterval').mockImplementation(() => 123)
+        it('initializes with the sample resume when localStorage is empty', () => {
+            expect(localStorage.getItem('resume')).toBeNull()
+            expect(wrapper.vm.resume.basics.name).toBe(sampleResume().basics.name)
         })
 
-        afterEach(() => {
-            localStorage.clear()
-            vi.restoreAllMocks()
-        })
-
-        it('initializes with default data when localStorage is empty', () => {
-            // Ensure localStorage is empty
-            expect(localStorage.getItem('resumeData')).toBeNull()
-            expect(localStorage.getItem('resumeStyle')).toBeNull()
-
-            // Component should initialize with default data
-            expect(wrapper.vm.resumeData).toBeDefined()
-            expect(wrapper.vm.resumeStyle).toBeDefined()
-        })
-
-        it('loads resume data from localStorage on initialization', () => {
-            const mockResumeData = {
-                personal: {
-                    name: 'Luke Skywalker',
-                    title: 'Jedi Knight'
-                }
-            }
-            const mockResumeStyle = {
-                spacing: { sidebarLeft: true }
-            }
-
-            // Set up localStorage before mounting
-            localStorage.setItem('resumeData', JSON.stringify(mockResumeData))
-            localStorage.setItem('resumeStyle', JSON.stringify(mockResumeStyle))
+        it('loads the resume from localStorage on initialization', () => {
+            const stored = prepareResume({
+                basics: { name: 'Luke Skywalker', label: 'Jedi Knight' }
+            })
+            settingsOf(stored).template = 'twoColumnsGreen'
+            localStorage.setItem('resume', JSON.stringify(stored))
 
             // Re-mount component to trigger initialization
             wrapper.unmount()
-            wrapper = mount(EditorPage, {
-                global: {
-                    plugins: [router, vuetify],
-                    stubs: {
-                        'v-app': true,
-                        'v-main': true,
-                        'v-btn': true,
-                        'v-expansion-panels': true,
-                        'v-expansion-panel': true,
-                        'v-expansion-panel-title': true,
-                        'v-expansion-panel-text': true,
-                        'v-tabs': true,
-                        'v-tab': true,
-                        'v-slide-group': true
-                    }
-                }
-            })
+            wrapper = mountPage()
 
             // Verify data was loaded from localStorage
-            expect(wrapper.vm.resumeData.personal.name).toBe('Luke Skywalker')
-            expect(wrapper.vm.resumeData.personal.title).toBe('Jedi Knight')
-            expect(wrapper.vm.resumeStyle.spacing.sidebarLeft).toBe(true)
+            expect(wrapper.vm.resume.basics.name).toBe('Luke Skywalker')
+            expect(wrapper.vm.resume.basics.label).toBe('Jedi Knight')
+            expect(settingsOf(wrapper.vm.resume).template).toBe('twoColumnsGreen')
+        })
+
+        it('ignores the old resumeData/resumeStyle keys', () => {
+            localStorage.setItem('resumeData', JSON.stringify({ personal: { name: 'Old Format' } }))
+            localStorage.setItem('resumeStyle', JSON.stringify({ spacing: { sidebarLeft: true } }))
+
+            wrapper.unmount()
+            wrapper = mountPage()
+
+            expect(wrapper.vm.resume).toEqual(sampleResume())
+        })
+
+        it('saves the resume to localStorage periodically', () => {
+            // The autosave callback is registered with setInterval on mount
+            const [callback, delay] = setInterval.mock.calls.at(-1)
+            expect(delay).toBe(1000)
+
+            wrapper.vm.resume.basics.name = 'Saved Name'
+            callback()
+
+            expect(JSON.parse(localStorage.getItem('resume')).basics.name).toBe('Saved Name')
         })
     })
 
     describe('Export JSON', () => {
-        it('exports resume data as JSON file', async () => {
-            // Set resume data
-            wrapper.vm.resumeData = new ResumeDataClass({
-                personal: {
-                    name: 'Luke Skywalker',
-                    title: 'Jedi Knight'
-                }
+        it('exports the resume as a JSON file', async () => {
+            wrapper.vm.resume = prepareResume({
+                basics: { name: 'Luke Skywalker', label: 'Jedi Knight' }
             })
 
             // Trigger export
             await wrapper.vm.handleExportJSON()
 
-            // Verify ResumeService was called
-            expect(ResumeService.exportToJSON).toHaveBeenCalledWith(
-                wrapper.vm.resumeData,
-                wrapper.vm.resumeStyle
-            )
+            // Verify ResumeService was called with the resume
+            expect(ResumeService.exportToJSON).toHaveBeenCalledWith(wrapper.vm.resume)
 
-            // Verify createObjectURL was called
-            expect(window.URL.createObjectURL).toHaveBeenCalled()
+            // Verify the file was downloaded with the generated filename
+            expect(ExporterService.download).toHaveBeenCalledWith(expect.any(Blob), 'test.json')
 
             // Verify sa_event was called
             expect(window.sa_event).toHaveBeenCalledWith('export_json')
-
-            // Verify cleanup
-            expect(window.URL.revokeObjectURL).toHaveBeenCalled()
+            expect(wrapper.vm.alertMessage.title).toBe('Export Successful')
         })
 
-        it('generates correct filename from resume data', async () => {
-            // Set resume data
-            wrapper.vm.resumeData = new ResumeDataClass({
-                personal: {
-                    name: 'Luke Skywalker',
-                    title: 'Jedi Knight'
-                }
+        it('creates and revokes an object URL for the download', async () => {
+            // Use the real download implementation
+            ExporterService.download.mockRestore()
+            const clickSpy = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => { })
+
+            await wrapper.vm.handleExportJSON()
+
+            expect(window.URL.createObjectURL).toHaveBeenCalled()
+            expect(clickSpy).toHaveBeenCalled()
+            expect(window.URL.revokeObjectURL).toHaveBeenCalledWith('blob:test')
+        })
+
+        it('generates the filename from the resume', async () => {
+            wrapper.vm.resume = prepareResume({
+                basics: { name: 'Luke Skywalker', label: 'Jedi Knight' }
             })
 
             // Trigger export
             await wrapper.vm.handleExportJSON()
 
             // Verify ExporterService.getFilename was called
-            expect(ExporterService.getFilename).toHaveBeenCalledWith(
-                wrapper.vm.resumeData,
-                'json'
-            )
+            expect(ExporterService.getFilename).toHaveBeenCalledWith(wrapper.vm.resume, 'json')
         })
 
-        it('generates fallback filename when name/title is missing', async () => {
-            // Set resume data with missing name/title
-            wrapper.vm.resumeData = new ResumeDataClass({
-                personal: {}
-            })
+        it('generates fallback filename when name/label is missing', async () => {
+            ExporterService.getFilename.mockRestore()
+            wrapper.vm.resume = prepareResume({})
 
             // Trigger export
             await wrapper.vm.handleExportJSON()
 
-            // Verify ExporterService.getFilename was called
-            expect(ExporterService.getFilename).toHaveBeenCalledWith(
-                wrapper.vm.resumeData,
-                'json'
-            )
+            expect(ExporterService.download).toHaveBeenCalledWith(expect.any(Blob), 'resume.json')
         })
 
         it('handles export JSON error gracefully', async () => {
@@ -344,25 +288,23 @@ describe('EditorPage', () => {
             const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => { })
 
             // Mock ResumeService to throw error
-            vi.spyOn(ResumeService, 'exportToJSON').mockImplementation(() => {
+            ResumeService.exportToJSON.mockImplementation(() => {
                 throw new Error('Export failed')
             })
 
             // Trigger export
             await wrapper.vm.handleExportJSON()
 
-            // Verify error was logged
+            // Verify error was logged and shown
             expect(consoleSpy).toHaveBeenCalledWith('Error exporting JSON:', expect.any(Error))
-
-            consoleSpy.mockRestore()
+            expect(wrapper.vm.alertMessage.title).toBe('Export Failed')
+            expect(wrapper.vm.alertMessage.type).toBe('error')
         })
     })
 
     describe('Import JSON', () => {
-        it('triggers file input click when import is called', async () => {
-            // Mock file input click
-            const clickSpy = vi.fn()
-            wrapper.vm.fileInput = { click: clickSpy }
+        it('triggers file input click when import is called', () => {
+            const clickSpy = vi.spyOn(wrapper.vm.fileInput, 'click').mockImplementation(() => { })
 
             // Trigger import
             wrapper.vm.handleImportJSON()
@@ -373,8 +315,8 @@ describe('EditorPage', () => {
         })
 
         it('handles file upload successfully', async () => {
-            const mockFile = new File(['{"test": "data"}'], 'test.json', { type: 'application/json' })
-            const mockEvent = { target: { files: [mockFile] } }
+            const mockFile = new File(['{"basics": {}}'], 'test.json', { type: 'application/json' })
+            const mockEvent = { target: { files: [mockFile], value: 'C:\\fakepath\\test.json' } }
 
             // Trigger file upload
             await wrapper.vm.handleFileUpload(mockEvent)
@@ -382,21 +324,21 @@ describe('EditorPage', () => {
             // Verify ResumeService.loadFromFile was called
             expect(ResumeService.loadFromFile).toHaveBeenCalledWith(mockFile)
 
-            // Verify data was updated
-            expect(wrapper.vm.resumeData.personal.name).toBe('Test User')
+            // Verify the resume was replaced
+            expect(wrapper.vm.resume.basics.name).toBe('Test User')
+            expect(wrapper.vm.alertMessage.title).toBe('Import Successful')
 
-            // Verify input was reset
-            expect(mockEvent.target.files[0]).toBe(mockFile)
+            // Verify input was reset so the same file can be selected again
+            expect(mockEvent.target.value).toBe('')
         })
 
         it('handles file upload error', async () => {
             const mockFile = new File(['invalid json'], 'test.json', { type: 'application/json' })
-            const mockEvent = { target: { files: [mockFile] } }
+            const mockEvent = { target: { files: [mockFile], value: 'test.json' } }
+            const before = wrapper.vm.resume
 
-            // Mock ResumeService to throw error
-            vi.spyOn(ResumeService, 'loadFromFile').mockImplementation(() => {
-                throw new Error('Invalid file format')
-            })
+            // Mock ResumeService to reject
+            ResumeService.loadFromFile.mockRejectedValue(new Error('The file is not valid JSON.'))
 
             // Mock console.error to avoid noise in tests
             const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => { })
@@ -404,14 +346,16 @@ describe('EditorPage', () => {
             // Trigger file upload
             await wrapper.vm.handleFileUpload(mockEvent)
 
-            // Verify error was logged
+            // Verify error was logged and shown, and the resume kept
             expect(consoleSpy).toHaveBeenCalledWith('Error importing file:', expect.any(Error))
-
-            consoleSpy.mockRestore()
+            expect(wrapper.vm.alertMessage.title).toBe('Import Failed')
+            expect(wrapper.vm.alertMessage.message).toBe('The file is not valid JSON.')
+            expect(wrapper.vm.resume).toBe(before)
+            expect(mockEvent.target.value).toBe('')
         })
 
         it('handles no file selected', async () => {
-            const mockEvent = { target: { files: [] } }
+            const mockEvent = { target: { files: [], value: '' } }
 
             // Trigger file upload with no file
             await wrapper.vm.handleFileUpload(mockEvent)
@@ -427,20 +371,16 @@ describe('EditorPage', () => {
             await wrapper.vm.handleDownloadPDF()
 
             // Verify ExporterService.exportToPDF was called
-            expect(ExporterService.exportToPDF).toHaveBeenCalledWith(
-                wrapper.vm.resumeData,
-                wrapper.vm.resumeStyle
-            )
+            expect(ExporterService.exportToPDF).toHaveBeenCalledWith(wrapper.vm.resume)
 
             // Verify sa_event was called
             expect(window.sa_event).toHaveBeenCalledWith('download_pdf')
+            expect(wrapper.vm.alertMessage.title).toBe('PDF Generated')
         })
 
         it('handles PDF export error', async () => {
-            // Mock ExporterService to throw error
-            vi.spyOn(ExporterService, 'exportToPDF').mockImplementation(() => {
-                throw new Error('PDF generation failed')
-            })
+            // Mock ExporterService to reject
+            ExporterService.exportToPDF.mockRejectedValue(new Error('PDF generation failed'))
 
             // Mock console.error to avoid noise in tests
             const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => { })
@@ -450,8 +390,7 @@ describe('EditorPage', () => {
 
             // Verify error was logged
             expect(consoleSpy).toHaveBeenCalledWith('Error generating PDF:', expect.any(Error))
-
-            consoleSpy.mockRestore()
+            expect(wrapper.vm.alertMessage.title).toBe('PDF Generation Failed')
         })
     })
 
@@ -461,20 +400,16 @@ describe('EditorPage', () => {
             await wrapper.vm.handleDownloadHTML()
 
             // Verify ExporterService.exportToHTML was called
-            expect(ExporterService.exportToHTML).toHaveBeenCalledWith(
-                wrapper.vm.resumeData,
-                wrapper.vm.resumeStyle
-            )
+            expect(ExporterService.exportToHTML).toHaveBeenCalledWith(wrapper.vm.resume)
 
             // Verify sa_event was called
             expect(window.sa_event).toHaveBeenCalledWith('download_html')
+            expect(wrapper.vm.alertMessage.title).toBe('HTML Generated')
         })
 
         it('handles HTML export error', async () => {
-            // Mock ExporterService to throw error
-            vi.spyOn(ExporterService, 'exportToHTML').mockImplementation(() => {
-                throw new Error('HTML generation failed')
-            })
+            // Mock ExporterService to reject
+            ExporterService.exportToHTML.mockRejectedValue(new Error('HTML generation failed'))
 
             // Mock console.error to avoid noise in tests
             const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => { })
@@ -484,8 +419,7 @@ describe('EditorPage', () => {
 
             // Verify error was logged
             expect(consoleSpy).toHaveBeenCalledWith('Error generating HTML:', expect.any(Error))
-
-            consoleSpy.mockRestore()
+            expect(wrapper.vm.alertMessage.title).toBe('HTML Generation Failed')
         })
     })
 
@@ -495,19 +429,16 @@ describe('EditorPage', () => {
             await wrapper.vm.handleDownloadTXT()
 
             // Verify ExporterService.exportToTXT was called
-            expect(ExporterService.exportToTXT).toHaveBeenCalledWith(
-                wrapper.vm.resumeData
-            )
+            expect(ExporterService.exportToTXT).toHaveBeenCalledWith(wrapper.vm.resume)
 
             // Verify sa_event was called
             expect(window.sa_event).toHaveBeenCalledWith('download_txt')
+            expect(wrapper.vm.alertMessage.title).toBe('TXT Generated')
         })
 
         it('handles TXT export error', async () => {
-            // Mock ExporterService to throw error
-            vi.spyOn(ExporterService, 'exportToTXT').mockImplementation(() => {
-                throw new Error('TXT generation failed')
-            })
+            // Mock ExporterService to reject
+            ExporterService.exportToTXT.mockRejectedValue(new Error('TXT generation failed'))
 
             // Mock console.error to avoid noise in tests
             const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => { })
@@ -517,104 +448,22 @@ describe('EditorPage', () => {
 
             // Verify error was logged
             expect(consoleSpy).toHaveBeenCalledWith('Error generating TXT:', expect.any(Error))
-
-            consoleSpy.mockRestore()
+            expect(wrapper.vm.alertMessage.title).toBe('TXT Generation Failed')
         })
 
-        it('passes correct resume data to TXT export', async () => {
-            // Set specific resume data
-            const testResumeData = new ResumeDataClass({
-                personal: {
-                    name: 'Luke Skywalker',
-                    title: 'Jedi Knight'
-                },
-                experiences: [{
-                    title: 'Jedi Knight',
-                    company: 'Rebel Alliance',
-                    period: '2019-2023'
-                }]
+        it('passes the current resume to TXT export', async () => {
+            // Set a specific resume
+            const testResume = prepareResume({
+                basics: { name: 'Luke Skywalker', label: 'Jedi Knight' },
+                work: [{ position: 'Jedi Knight', name: 'Rebel Alliance', startDate: '2019', endDate: '2023' }]
             })
-            wrapper.vm.resumeData = testResumeData
+            wrapper.vm.resume = testResume
 
             // Trigger TXT export
             await wrapper.vm.handleDownloadTXT()
 
             // Verify ExporterService.exportToTXT was called with correct data
-            expect(ExporterService.exportToTXT).toHaveBeenCalledWith(testResumeData)
-        })
-    })
-
-    describe('CV Conversion', () => {
-        it('loads available models on mount', async () => {
-            // Component should have loaded models in onMounted
-            expect(CVConversionService.fetchAvailableModels).toHaveBeenCalled()
-        })
-
-        it('opens convert dialog when button is clicked', () => {
-            // Trigger convert CV button click
-            wrapper.vm.handleConvertCVButtonClick()
-
-            // Verify dialog is shown
-            expect(wrapper.vm.showConvertDialog).toBe(true)
-            expect(window.sa_event).toHaveBeenCalledWith('convert_cv_button_click')
-        })
-
-        it('handles CV conversion successfully', async () => {
-            const mockFile = new File(['test'], 'test.pdf')
-            const mockParams = { file: mockFile, apiKey: 'test-key', model: 'test-model' }
-
-            // Trigger conversion
-            await wrapper.vm.handleConvert(mockParams)
-
-            // Verify CVConversionService.convertCV was called
-            expect(CVConversionService.convertCV).toHaveBeenCalledWith(mockFile, 'test-key', 'test-model')
-
-            // Verify dialog is closed
-            expect(wrapper.vm.showConvertDialog).toBe(false)
-
-            // Verify sa_event was called
-            expect(window.sa_event).toHaveBeenCalledWith('convert_cv')
-        })
-
-        it('handles CV conversion error', async () => {
-            const mockFile = new File(['test'], 'test.pdf')
-            const mockParams = { file: mockFile, apiKey: 'test-key', model: 'test-model' }
-
-            // Mock CVConversionService to throw error
-            vi.spyOn(CVConversionService, 'convertCV').mockImplementation(() => {
-                throw new Error('Conversion failed')
-            })
-
-            // Trigger conversion
-            await wrapper.vm.handleConvert(mockParams)
-
-            // Verify error was handled (should show alert)
-            expect(wrapper.vm.isConverting).toBe(false)
-        })
-
-        it('sets converting state correctly during conversion', async () => {
-            const mockFile = new File(['test'], 'test.pdf')
-            const mockParams = { file: mockFile, apiKey: 'test-key', model: 'test-model' }
-
-            // Mock CVConversionService to delay
-            vi.spyOn(CVConversionService, 'convertCV').mockImplementation(() =>
-                new Promise(resolve => {
-                    // Use a microtask instead of setTimeout to avoid navigation issues
-                    Promise.resolve().then(() => resolve(new ResumeDataClass()))
-                })
-            )
-
-            // Start conversion
-            const conversionPromise = wrapper.vm.handleConvert(mockParams)
-
-            // Verify converting state is true
-            expect(wrapper.vm.isConverting).toBe(true)
-
-            // Wait for conversion to complete
-            await conversionPromise
-
-            // Verify converting state is false
-            expect(wrapper.vm.isConverting).toBe(false)
+            expect(ExporterService.exportToTXT).toHaveBeenCalledWith(testResume)
         })
     })
 
@@ -641,18 +490,56 @@ describe('EditorPage', () => {
             expect(wrapper.vm.alertMessage.show).toBe(false)
         })
 
-        it('auto-hides alert after timeout', async () => {
-            // Mock setTimeout
-            vi.spyOn(global, 'setTimeout').mockImplementation((fn) => {
-                fn()
-                return 123
-            })
+        it('auto-hides alert after timeout', () => {
+            vi.useFakeTimers()
+            try {
+                wrapper.vm.showAlert('Test Title', 'Test Message')
+                expect(wrapper.vm.alertMessage.show).toBe(true)
 
-            // Show alert
+                vi.advanceTimersByTime(3000)
+                expect(wrapper.vm.alertMessage.show).toBe(false)
+            } finally {
+                vi.useRealTimers()
+            }
+        })
+
+        it('restarts the timer when a new alert is shown', () => {
+            vi.useFakeTimers()
+            try {
+                wrapper.vm.showAlert('Alert 1', 'Message 1')
+                vi.advanceTimersByTime(2000)
+                wrapper.vm.showAlert('Alert 2', 'Message 2')
+
+                // The first alert's timer must not hide the second one
+                vi.advanceTimersByTime(2000)
+                expect(wrapper.vm.alertMessage.show).toBe(true)
+
+                vi.advanceTimersByTime(1000)
+                expect(wrapper.vm.alertMessage.show).toBe(false)
+            } finally {
+                vi.useRealTimers()
+            }
+        })
+    })
+
+    describe('Alert System Edge Cases', () => {
+        it('handles multiple rapid alerts', () => {
+            // Show multiple alerts rapidly
+            wrapper.vm.showAlert('Alert 1', 'Message 1')
+            wrapper.vm.showAlert('Alert 2', 'Message 2')
+            wrapper.vm.showAlert('Alert 3', 'Message 3')
+
+            // Verify the last alert is shown
+            expect(wrapper.vm.alertMessage.title).toBe('Alert 3')
+            expect(wrapper.vm.alertMessage.message).toBe('Message 3')
+        })
+
+        it('handles alert with default type', () => {
+            // Show alert without specifying type
             wrapper.vm.showAlert('Test Title', 'Test Message')
 
-            // Verify setTimeout was called
-            expect(setTimeout).toHaveBeenCalledWith(expect.any(Function), 3000)
+            // Verify default type is 'success'
+            expect(wrapper.vm.alertMessage.type).toBe('success')
         })
     })
 
@@ -682,92 +569,7 @@ describe('EditorPage', () => {
             expect(document.querySelector).toHaveBeenCalledWith('.editor-window')
             expect(mockEditorContent.querySelector).toHaveBeenCalledWith('[data-section="test-section"]')
         })
-    })
 
-    describe('Mobile Responsiveness', () => {
-        it('computes mobile state correctly', () => {
-            // Test that isMobile is a computed property
-            expect(typeof wrapper.vm.isMobile).toBe('boolean')
-        })
-    })
-
-    describe('Alert System Edge Cases', () => {
-        it('handles multiple rapid alerts', () => {
-            // Show multiple alerts rapidly
-            wrapper.vm.showAlert('Alert 1', 'Message 1')
-            wrapper.vm.showAlert('Alert 2', 'Message 2')
-            wrapper.vm.showAlert('Alert 3', 'Message 3')
-
-            // Verify the last alert is shown
-            expect(wrapper.vm.alertMessage.title).toBe('Alert 3')
-            expect(wrapper.vm.alertMessage.message).toBe('Message 3')
-        })
-
-        it('handles alert with default type', () => {
-            // Show alert without specifying type
-            wrapper.vm.showAlert('Test Title', 'Test Message')
-
-            // Verify default type is 'success'
-            expect(wrapper.vm.alertMessage.type).toBe('success')
-        })
-    })
-
-    describe('Component Lifecycle and Initialization', () => {
-        it('loads available models on mount', async () => {
-            // Verify CVConversionService.fetchAvailableModels was called during mount
-            expect(CVConversionService.fetchAvailableModels).toHaveBeenCalled()
-        })
-
-        it('handles CV conversion service error gracefully', async () => {
-            // Mock CVConversionService to throw error
-            vi.spyOn(CVConversionService, 'fetchAvailableModels').mockImplementation(() => {
-                throw new Error('Service unavailable')
-            })
-
-            // Mock console.error to avoid noise in tests
-            const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => { })
-
-            // Re-mount component to trigger the error
-            wrapper.unmount()
-            wrapper = mount(EditorPage, {
-                global: {
-                    plugins: [router, vuetify],
-                    mocks: {
-                        $router: { push: vi.fn() }
-                    },
-                    stubs: {
-                        'v-app': true,
-                        'v-main': true,
-                        'v-btn': true,
-                        'v-expansion-panels': true,
-                        'v-expansion-panel': true,
-                        'v-expansion-panel-title': true,
-                        'v-expansion-panel-text': true,
-                        'v-tabs': true,
-                        'v-tab': true,
-                        'v-slide-group': true
-                    }
-                }
-            })
-
-            // Verify error was logged
-            expect(consoleSpy).toHaveBeenCalledWith('Error fetching models:', expect.any(Error))
-
-            consoleSpy.mockRestore()
-        })
-    })
-
-    describe('Template Rendering and DOM Elements', () => {
-        it('renders all child components with correct props', () => {
-            // Check that all child components are rendered
-            expect(wrapper.findComponent({ name: 'LateralMenu' })).toBeTruthy()
-            expect(wrapper.findComponent({ name: 'ResumeEditor' })).toBeTruthy()
-            expect(wrapper.findComponent({ name: 'ResumePreview' })).toBeTruthy()
-            expect(wrapper.findComponent({ name: 'ConvertCVDialog' })).toBeTruthy()
-        })
-    })
-
-    describe('Scroll Functionality Extended', () => {
         it('handles scroll to section when element exists', () => {
             // Mock document.querySelector to return an element with querySelector method
             const mockTargetElement = {
@@ -781,22 +583,123 @@ describe('EditorPage', () => {
             // Trigger scroll to section
             wrapper.vm.handleScrollToSection('test-section')
 
-            // Verify querySelector was called
-            expect(document.querySelector).toHaveBeenCalledWith('.editor-window')
-            expect(mockEditorContent.querySelector).toHaveBeenCalledWith('[data-section="test-section"]')
-
             // Verify scrollIntoView was called
             expect(mockTargetElement.scrollIntoView).toHaveBeenCalledWith({
                 behavior: 'smooth',
                 block: 'start'
             })
         })
+
+        it('scrolls when the lateral menu emits scroll-to-section', () => {
+            const spy = vi.spyOn(document, 'querySelector').mockReturnValue(null)
+
+            wrapper.findComponent({ name: 'LateralMenu' }).vm.$emit('scroll-to-section', 'work')
+
+            expect(spy).toHaveBeenCalledWith('.editor-window')
+        })
+    })
+
+    describe('Tooltips', () => {
+        // Builds a lateral menu with one button inside a tooltip and one outside
+        const addMenu = () => {
+            const menu = document.createElement('div')
+            menu.className = 'lateral-menu'
+            menu.innerHTML = '<div class="v-tooltip"><button class="v-btn" id="in"></button></div><button class="v-btn" id="out"></button>'
+            document.body.appendChild(menu)
+            return menu
+        }
+
+        it('dispatches mouseenter on tooltip buttons when showing tooltips', () => {
+            const menu = addMenu()
+            const inside = vi.fn()
+            const outside = vi.fn()
+            menu.querySelector('#in').addEventListener('mouseenter', inside)
+            menu.querySelector('#out').addEventListener('mouseenter', outside)
+
+            wrapper.vm.handleShowTooltipsStart()
+
+            expect(inside).toHaveBeenCalled()
+            expect(outside).not.toHaveBeenCalled()
+            menu.remove()
+        })
+
+        it('dispatches mouseleave on tooltip buttons when hiding tooltips', () => {
+            const menu = addMenu()
+            const inside = vi.fn()
+            menu.querySelector('#in').addEventListener('mouseleave', inside)
+
+            wrapper.vm.handleShowTooltipsEnd()
+
+            expect(inside).toHaveBeenCalled()
+            menu.remove()
+        })
+    })
+
+    describe('Navigation', () => {
+        it('navigates to the home page', () => {
+            const pushSpy = vi.spyOn(router, 'push').mockResolvedValue()
+
+            wrapper.vm.handleHome()
+
+            expect(pushSpy).toHaveBeenCalledWith('/')
+        })
+    })
+
+    describe('Mobile Responsiveness', () => {
+        it('computes mobile state correctly', () => {
+            // Test that isMobile is a computed property
+            expect(typeof wrapper.vm.isMobile).toBe('boolean')
+        })
+    })
+
+    describe('Template Rendering and DOM Elements', () => {
+        it('renders all child components with correct props', () => {
+            const lateralMenu = wrapper.findComponent({ name: 'LateralMenu' })
+            const editor = wrapper.findComponent({ name: 'ResumeEditor' })
+            const preview = wrapper.findComponent({ name: 'ResumePreview' })
+
+            expect(lateralMenu.exists()).toBe(true)
+            expect(editor.exists()).toBe(true)
+            expect(preview.exists()).toBe(true)
+
+            expect(lateralMenu.props('activeTab')).toBe('info')
+            expect(lateralMenu.props('sections')).toBe(settingsOf(wrapper.vm.resume).sections)
+            expect(editor.props('resume')).toBe(wrapper.vm.resume)
+            expect(editor.props('activeTab')).toBe('info')
+            expect(editor.props('isMobile')).toBe(wrapper.vm.isMobile)
+            expect(preview.props('resume')).toBe(wrapper.vm.resume)
+        })
+
+        it('renders a hidden JSON file input', () => {
+            const input = wrapper.find('input[type="file"]')
+            expect(input.exists()).toBe(true)
+            expect(input.attributes('accept')).toBe('.json')
+        })
+
+        it('updates the resume when the editor emits update:resume', async () => {
+            const updated = prepareResume({ basics: { name: 'Edited' } })
+
+            wrapper.findComponent({ name: 'ResumeEditor' }).vm.$emit('update:resume', updated)
+            await wrapper.vm.$nextTick()
+
+            expect(wrapper.vm.resume.basics.name).toBe('Edited')
+            expect(wrapper.findComponent({ name: 'ResumePreview' }).props('resume').basics.name).toBe('Edited')
+        })
+
+        it('updates the active tab from child components', async () => {
+            wrapper.findComponent({ name: 'LateralMenu' }).vm.$emit('update:activeTab', 'style')
+            await wrapper.vm.$nextTick()
+            expect(wrapper.vm.activeTab).toBe('style')
+            expect(wrapper.findComponent({ name: 'ResumeEditor' }).props('activeTab')).toBe('style')
+
+            wrapper.findComponent({ name: 'ResumeEditor' }).vm.$emit('update:activeTab', 'ai')
+            await wrapper.vm.$nextTick()
+            expect(wrapper.vm.activeTab).toBe('ai')
+        })
     })
 
     describe('Export Functionality Extended', () => {
         it('handles export JSON with missing sa_event', async () => {
-            // Temporarily remove sa_event
-            const originalSaEvent = window.sa_event
             delete window.sa_event
 
             // Trigger export
@@ -804,33 +707,20 @@ describe('EditorPage', () => {
 
             // Verify export still works without sa_event
             expect(ResumeService.exportToJSON).toHaveBeenCalled()
-
-            // Restore sa_event
-            window.sa_event = originalSaEvent
         })
 
         it('handles import JSON with missing sa_event', () => {
-            // Temporarily remove sa_event
-            const originalSaEvent = window.sa_event
             delete window.sa_event
-
-            // Mock file input click
-            const clickSpy = vi.fn()
-            wrapper.vm.fileInput = { click: clickSpy }
+            const clickSpy = vi.spyOn(wrapper.vm.fileInput, 'click').mockImplementation(() => { })
 
             // Trigger import
             wrapper.vm.handleImportJSON()
 
             // Verify import still works without sa_event
             expect(clickSpy).toHaveBeenCalled()
-
-            // Restore sa_event
-            window.sa_event = originalSaEvent
         })
 
         it('handles PDF export with missing sa_event', async () => {
-            // Temporarily remove sa_event
-            const originalSaEvent = window.sa_event
             delete window.sa_event
 
             // Trigger PDF export
@@ -838,14 +728,9 @@ describe('EditorPage', () => {
 
             // Verify PDF export still works without sa_event
             expect(ExporterService.exportToPDF).toHaveBeenCalled()
-
-            // Restore sa_event
-            window.sa_event = originalSaEvent
         })
 
         it('handles HTML export with missing sa_event', async () => {
-            // Temporarily remove sa_event
-            const originalSaEvent = window.sa_event
             delete window.sa_event
 
             // Trigger HTML export
@@ -853,63 +738,51 @@ describe('EditorPage', () => {
 
             // Verify HTML export still works without sa_event
             expect(ExporterService.exportToHTML).toHaveBeenCalled()
+        })
 
-            // Restore sa_event
-            window.sa_event = originalSaEvent
+        it('handles TXT export with missing sa_event', async () => {
+            delete window.sa_event
+
+            // Trigger TXT export
+            await wrapper.vm.handleDownloadTXT()
+
+            // Verify TXT export still works without sa_event
+            expect(ExporterService.exportToTXT).toHaveBeenCalled()
         })
     })
 
     describe('Error Handling Extended', () => {
-        it('handles JSON parsing errors in localStorage', () => {
-            // Mock JSON.parse to throw error
-            const originalParse = JSON.parse
-            JSON.parse = vi.fn().mockImplementation(() => {
-                throw new Error('JSON parse error')
-            })
+        it('falls back to the sample resume when localStorage holds invalid JSON', () => {
+            localStorage.setItem('resume', '{not json')
 
-            // Re-mount component to trigger the error
+            // Re-mount component to read the corrupted value
             wrapper.unmount()
-            wrapper = mount(EditorPage, {
-                global: {
-                    plugins: [router, vuetify],
-                    mocks: {
-                        $router: { push: vi.fn() }
-                    },
-                    stubs: {
-                        'v-app': true,
-                        'v-main': true,
-                        'v-btn': true,
-                        'v-expansion-panels': true,
-                        'v-expansion-panel': true,
-                        'v-expansion-panel-title': true,
-                        'v-expansion-panel-text': true,
-                        'v-tabs': true,
-                        'v-tab': true,
-                        'v-slide-group': true
-                    }
-                }
-            })
+            wrapper = mountPage()
 
-            // Component should still mount successfully with default data
-            expect(wrapper.vm.resumeData).toBeDefined()
-            expect(wrapper.vm.resumeStyle).toBeDefined()
+            // Component should still mount successfully with the sample resume
+            expect(wrapper.vm.resume).toEqual(sampleResume())
+        })
 
-            // Restore JSON.parse
-            JSON.parse = originalParse
+        it('falls back to the sample resume when the stored resume is not a valid JSON Resume', () => {
+            localStorage.setItem('resume', JSON.stringify({ basics: { name: 42 } }))
+
+            wrapper.unmount()
+            wrapper = mountPage()
+
+            expect(wrapper.vm.resume).toEqual(sampleResume())
         })
     })
 
     describe('Component State Management', () => {
-        it('updates resume data correctly', () => {
-            const newData = new ResumeDataClass({ personal: { name: 'New Name' } })
-            wrapper.vm.resumeData = newData
+        it('updates the resume correctly', () => {
+            wrapper.vm.resume = prepareResume({ basics: { name: 'New Name' } })
 
-            expect(wrapper.vm.resumeData.personal.name).toBe('New Name')
+            expect(wrapper.vm.resume.basics.name).toBe('New Name')
         })
 
         it('updates active tab correctly', () => {
-            wrapper.vm.activeTab = 'experience'
-            expect(wrapper.vm.activeTab).toBe('experience')
+            wrapper.vm.activeTab = 'style'
+            expect(wrapper.vm.activeTab).toBe('style')
         })
 
         it('updates zoom level correctly', () => {
@@ -931,48 +804,23 @@ describe('EditorPage', () => {
             expect(wrapper.vm.zoomLevel).toBe(200)
         })
 
-        it('handles empty resume data gracefully', () => {
-            const emptyData = new ResumeDataClass({})
-            wrapper.vm.resumeData = emptyData
+        it('handles an empty resume gracefully', () => {
+            wrapper.vm.resume = prepareResume({})
 
-            // Should not throw when accessing properties
-            expect(wrapper.vm.resumeData.personal).toBeDefined()
+            // prepareResume fills in basics and the app settings
+            expect(wrapper.vm.resume.basics).toBeDefined()
+            expect(settingsOf(wrapper.vm.resume).sections).toEqual([])
         })
 
-        it('handles null/undefined values in localStorage', () => {
-            // Mock localStorage.getItem to return null
-            const originalGetItem = localStorage.getItem
-            localStorage.getItem = vi.fn().mockReturnValue(null)
+        it('handles null values in localStorage', () => {
+            vi.spyOn(Storage.prototype, 'getItem').mockReturnValue(null)
 
             // Re-mount component
             wrapper.unmount()
-            wrapper = mount(EditorPage, {
-                global: {
-                    plugins: [router, vuetify],
-                    mocks: {
-                        $router: { push: vi.fn() }
-                    },
-                    stubs: {
-                        'v-app': true,
-                        'v-main': true,
-                        'v-btn': true,
-                        'v-expansion-panels': true,
-                        'v-expansion-panel': true,
-                        'v-expansion-panel-title': true,
-                        'v-expansion-panel-text': true,
-                        'v-tabs': true,
-                        'v-tab': true,
-                        'v-slide-group': true
-                    }
-                }
-            })
+            wrapper = mountPage()
 
-            // Component should initialize with default data
-            expect(wrapper.vm.resumeData).toBeDefined()
-            expect(wrapper.vm.resumeStyle).toBeDefined()
-
-            // Restore localStorage
-            localStorage.getItem = originalGetItem
+            // Component should initialize with the sample resume
+            expect(wrapper.vm.resume).toEqual(sampleResume())
         })
     })
-}) 
+})

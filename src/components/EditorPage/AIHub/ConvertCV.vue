@@ -39,7 +39,7 @@ const props = defineProps({
     }
 })
 
-const emit = defineEmits(['update:resumeData', 'conversion-started', 'conversion-finished', 'conversion-error'])
+const emit = defineEmits(['update:resume-info', 'conversion-started', 'conversion-finished', 'conversion-error'])
 
 const form = ref(null)
 const formValid = ref(false)
@@ -88,8 +88,7 @@ const handleConvert = async ({ file, apiKey, model }) => {
     loading.value = true
     emit('conversion-started')
     try {
-        const newResumeData = await CVConversionService.convertCV(file, apiKey, model)
-        emit('update:resumeData', newResumeData)
+        emit('update:resume-info', await CVConversionService.convertCV(file, apiKey, model))
         showAlert('CV successfully converted!', 'Your CV has been successfully converted.', 'success')
     } catch (error) {
         showAlert('Error converting CV', error.message, 'error')

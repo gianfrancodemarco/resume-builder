@@ -25,11 +25,7 @@ import { TypstService } from '@/typst/TypstService'
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
 
 const props = defineProps({
-    resumeData: {
-        type: Object,
-        required: true
-    },
-    resumeStyle: {
+    resume: {
         type: Object,
         required: true
     },
@@ -59,7 +55,7 @@ const render = async () => {
     const request = ++latestRequest
     updating.value = true
     try {
-        const { svg, size, pages: info } = await TypstService.renderSvg(props.resumeData, props.resumeStyle)
+        const { svg, size, pages: info } = await TypstService.renderSvg(props.resume)
         if (request !== latestRequest) return // a newer edit superseded this render
 
         let top = 0
@@ -83,7 +79,7 @@ const render = async () => {
 }
 
 watch(
-    () => [props.resumeData, props.resumeStyle],
+    () => props.resume,
     () => {
         clearTimeout(timer)
         timer = setTimeout(render, props.debounce)
