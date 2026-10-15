@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest'
 import {
-    SCHEMA_URL, addSection, applyTemplate, availableSections, isItemHidden, moveItem, moveSection, prepareResume,
+    SCHEMA_URL, addSection, availableSections, isItemHidden, moveHidden, moveItem, moveSection, prepareResume,
     removeItem, removeSection, resumeContent, sampleResume, settingsOf, toggleItemHidden, validateResume,
-    withContent, withTemplate,
+    withContent, withDesign,
 } from '@/resume/resume'
-import { TEMPLATES } from '@/resume/templates'
+import { DEFAULT_DESIGN } from '@/resume/design'
 
 const resumeWithJobs = (...names) => prepareResume({ basics: { name: 'X' }, work: names.map(name => ({ name })) })
 const jobNames = resume => resume.work.map(w => w.name)
@@ -17,8 +17,7 @@ describe('prepareResume', () => {
 
         expect(resume.$schema).toBe(SCHEMA_URL)
         expect(resume.basics).toEqual({ location: {} })
-        expect(settings.template).toBe('TwoColumnsBlue')
-        expect(settings.colors).toEqual(TEMPLATES.TwoColumnsBlue.style.colors)
+        expect(settings.design).toEqual(DEFAULT_DESIGN)
         expect(settings.sections).toEqual([
             { key: 'work', title: 'Work Experience', visible: true, column: 'main' },
             { key: 'skills', title: 'Skills', visible: true, column: 'sidebar' },
@@ -28,8 +27,8 @@ describe('prepareResume', () => {
     })
 
     it('keeps existing settings and fills only the missing ones', () => {
-        const resume = prepareResume({ meta: { resumeBuilder: { template: 'OneColumnModern', sections: [] } } })
-        expect(settingsOf(resume).template).toBe('OneColumnModern')
+        const resume = prepareResume({ meta: { resumeBuilder: { design: { layout: 'classic' }, sections: [] } } })
+        expect(settingsOf(resume).design).toEqual({ ...DEFAULT_DESIGN, layout: 'classic' })
         expect(settingsOf(resume).sections).toEqual([])
         expect(settingsOf(resume).photo).toBeDefined()
     })
@@ -68,8 +67,19 @@ describe('sections', () => {
         expect(availableSections(resume)).not.toContain('projects')
     })
 
-    it('adds sidebar sections to the main column on templates without a sidebar', () => {
-        const resume = prepareResume({ meta: { resumeBuilder: { template: 'OneColumnModern', sections: [] } } })
+    it('drops settings the app does not know', () => {
+        const resume = prepareResume({ meta: { resumeBuilder: { template: 'TwoColumnsBlue', colors: {}, sections: [] }, version: '1' } })
+        expect(Object.keys(settingsOf(resume))).toEqual(['design', 'sections', 'hidden', 'photo'])
+        expect(resume.meta.version).toBe('1') // other meta fields are kept
+    })
+
+    it('replaces invalid design values with defaults', () => {
+        const resume = prepareResume({ meta: { resumeBuilder: { design: { layout: 'nope', accent: 'red', size: 'xl', sidebarLeft: 'yes' } } } })
+        expect(settingsOf(resume).design).toEqual(DEFAULT_DESIGN)
+    })
+
+    it('adds sidebar sections to the main column on layouts without a sidebar', () => {
+        const resume = prepareResume({ meta: { resumeBuilder: { design: { layout: 'classic' }, sections: [] } } })
         addSection(resume, 'skills')
         expect(settingsOf(resume).sections[0].column).toBe('main')
     })
@@ -92,11 +102,11 @@ describe('sections', () => {
     it('moves sections and ignores moves past the ends', () => {
         const resume = sampleResume()
         const keys = () => settingsOf(resume).sections.map(s => s.key)
-        const [first, second] = keys()
-        moveSection(resume, second, 'up')
-        expect(keys().slice(0, 2)).toEqual([second, first])
-        moveSection(resume, second, 'up')
-        expect(keys()[0]).toBe(second)
+        const [first, second, third] = keys()
+        moveSection(resume, 0, 2)
+        expect(keys().slice(0, 3)).toEqual([second, third, first])
+        moveSection(resume, 0, 99) // out of range: nothing happens
+        expect(keys().slice(0, 3)).toEqual([second, third, first])
     })
 })
 
@@ -113,11 +123,20 @@ describe('items', () => {
     it('keeps hidden items hidden when they move', () => {
         const resume = resumeWithJobs('a', 'b', 'c')
         toggleItemHidden(resume, 'work', 0)
-        moveItem(resume, 'work', 0, 'down')
-        expect(jobNames(resume)).toEqual(['b', 'a', 'c'])
-        expect(hidden(resume)).toEqual([1])
-        moveItem(resume, 'work', 2, 'down') // past the end: nothing happens
-        expect(jobNames(resume)).toEqual(['b', 'a', 'c'])
+        moveItem(resume, 'work', 0, 2)
+        expect(jobNames(resume)).toEqual(['b', 'c', 'a'])
+        expect(hidden(resume)).toEqual([2])
+        moveItem(resume, 'work', 2, 3) // past the end: nothing happens
+        expect(jobNames(resume)).toEqual(['b', 'c', 'a'])
+    })
+
+    it('remaps hidden indices for items reordered elsewhere (drag and drop)', () => {
+        const resume = resumeWithJobs('a', 'b', 'c')
+        toggleItemHidden(resume, 'work', 2)
+        resume.work = [resume.work[2], resume.work[0], resume.work[1]] // what the drag library does
+        moveHidden(resume, 'work', 2, 0)
+        expect(hidden(resume)).toEqual([0])
+        expect(resume.work[0].name).toBe('c')
     })
 
     it('shifts hidden indices when an earlier item is removed', () => {
@@ -144,7 +163,7 @@ describe('content', () => {
     it('replaces content keeping settings and photo, adding sections that gained content', () => {
         const resume = sampleResume()
         resume.basics.image = 'data:image/png;base64,AAAA'
-        settingsOf(resume).template = 'OneColumnModern'
+        settingsOf(resume).design.layout = 'classic'
         toggleItemHidden(resume, 'work', 1)
         toggleItemHidden(resume, 'education', 0)
         const content = resumeContent(resume)
@@ -154,27 +173,17 @@ describe('content', () => {
         const next = withContent(resume, content)
 
         expect(next.basics.image).toBe('data:image/png;base64,AAAA')
-        expect(settingsOf(next).template).toBe('OneColumnModern')
+        expect(settingsOf(next).design.layout).toBe('classic')
         expect(settingsOf(next).sections.at(-1).key).toBe('projects')
         expect(settingsOf(next).hidden).toEqual({ education: [0] }) // work changed length: reset
     })
 })
 
-describe('templates', () => {
-    it('applies a template, resetting style but keeping layout', () => {
+describe('design', () => {
+    it('builds a preview copy with other design values without changing the resume', () => {
         const resume = sampleResume()
-        const sections = structuredClone(settingsOf(resume).sections)
-        settingsOf(resume).colors.primary = '#ff0000'
-        applyTemplate(resume, 'TwoColumnsGreen')
-        expect(settingsOf(resume).template).toBe('TwoColumnsGreen')
-        expect(settingsOf(resume).colors.primary).toBe('#27AE60')
-        expect(settingsOf(resume).sections).toEqual(sections)
-    })
-
-    it('builds a preview copy with another template without changing the resume', () => {
-        const resume = sampleResume()
-        const preview = withTemplate(resume, 'OneColumnModern')
-        expect(settingsOf(preview).template).toBe('OneColumnModern')
-        expect(settingsOf(resume).template).toBe('TwoColumnsBlue')
+        const preview = withDesign(resume, { layout: 'classic' })
+        expect(settingsOf(preview).design).toEqual({ ...DEFAULT_DESIGN, layout: 'classic' })
+        expect(settingsOf(resume).design.layout).toBe('sidebar')
     })
 })

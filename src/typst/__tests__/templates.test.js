@@ -8,9 +8,9 @@ import { createTypstCompiler, createTypstFontBuilder, loadFonts } from '@myriadd
 import sample from '@jsonresume/schema/sample.resume.json'
 import { AVATAR_PATH, buildDocument } from '@/typst/document'
 import { FONT_FAMILIES } from '@/typst/fonts'
-import { addSection, applyTemplate, prepareResume, sampleResume, settingsOf } from '@/resume/resume'
+import { addSection, prepareResume, sampleResume, settingsOf } from '@/resume/resume'
 import { SECTION_KEYS } from '@/resume/sections'
-import { TEMPLATES } from '@/resume/templates'
+import { FONT_PAIRINGS, LAYOUTS } from '@/resume/design'
 
 const ROOT = path.resolve(__dirname, '../../..')
 const TEMPLATES_DIR = path.resolve(__dirname, '../templates')
@@ -62,39 +62,41 @@ function fullResume() {
     return resume
 }
 
+const withDesign = (resume, changes) => {
+    Object.assign(settingsOf(resume).design, changes)
+    return resume
+}
+
 describe('Typst templates', () => {
-    for (const key of Object.keys(TEMPLATES)) {
-        it(`compiles ${key} with the sample resume`, async () => {
-            const resume = sampleResume()
-            applyTemplate(resume, key)
-            const { result, diagnostics } = await compilePdf(resume)
+    for (const layout of Object.keys(LAYOUTS)) {
+        it(`compiles the ${layout} layout with the sample resume`, async () => {
+            const { result, diagnostics } = await compilePdf(withDesign(sampleResume(), { layout }))
             expect(diagnostics ?? []).toEqual([])
             expect(new TextDecoder().decode(result.slice(0, 5))).toBe('%PDF-')
         })
 
-        it(`compiles ${key} with every section and Markdown feature`, async () => {
-            const resume = fullResume()
-            applyTemplate(resume, key)
-            const { result, diagnostics } = await compilePdf(resume)
+        it(`compiles the ${layout} layout with every section and Markdown feature`, async () => {
+            const { result, diagnostics } = await compilePdf(withDesign(fullResume(), { layout }))
             expect(diagnostics ?? []).toEqual([])
             expect(result.length).toBeGreaterThan(0)
         })
+
+        it(`compiles the ${layout} layout with an empty resume`, async () => {
+            const { diagnostics } = await compilePdf(withDesign(prepareResume({}), { layout }))
+            expect(diagnostics ?? []).toEqual([])
+        })
     }
 
-    it('compiles with the sidebar on the left and with no sidebar', async () => {
-        for (const sidebarWidth of [280, 0]) {
-            const resume = fullResume()
-            Object.assign(settingsOf(resume).spacing, { sidebarLeft: true, sidebarWidth })
-            const { diagnostics } = await compilePdf(resume)
-            expect(diagnostics ?? []).toEqual([])
-        }
-    })
-
-    it('compiles an empty resume', async () => {
-        for (const key of Object.keys(TEMPLATES)) {
-            const resume = prepareResume({})
-            applyTemplate(resume, key)
-            const { diagnostics } = await compilePdf(resume)
+    it('compiles every font pairing, size and density, with the sidebar on either side', async () => {
+        const options = Object.keys(FONT_PAIRINGS).map((fonts, i) => ({
+            fonts,
+            size: ['s', 'm', 'l'][i % 3],
+            density: ['compact', 'normal', 'airy'][i % 3],
+            sidebarLeft: i % 2 === 0,
+            accent: '#F2C94C',
+        }))
+        for (const design of options) {
+            const { diagnostics } = await compilePdf(withDesign(fullResume(), design))
             expect(diagnostics ?? []).toEqual([])
         }
     })

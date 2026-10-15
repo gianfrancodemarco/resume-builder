@@ -1,19 +1,12 @@
 import { describe, expect, it } from 'vitest'
-import { FALLBACK_SCRIPTS, fallbackFont, resolveFont } from '@/typst/fonts'
+import { FALLBACK_SCRIPTS, fallbackFonts } from '@/typst/fonts'
 
-describe('resolveFont', () => {
-    it('picks the first bundled family of a CSS font stack', () => {
-        expect(resolveFont("'Comic Sans MS', lora, serif")).toBe('Lora')
-        expect(resolveFont('Comic Sans MS')).toBe('Inter')
-        expect(resolveFont('')).toBe('Inter')
-    })
-})
-
-describe('fallbackFont', () => {
-    it('matches the style of the family', () => {
-        expect(fallbackFont('Gelasio')).toBe('Tinos')
-        expect(fallbackFont('Lato')).toBe('Arimo')
-        expect(fallbackFont('Cousine')).toBe('Cousine')
+describe('fallbackFonts', () => {
+    it('matches the style of the family and never repeats it', () => {
+        expect(fallbackFonts('Gelasio')).toEqual(['Source Serif 4', 'Arimo'])
+        expect(fallbackFonts('Source Serif 4')).toEqual(['Arimo'])
+        expect(fallbackFonts('Inter')).toEqual(['Arimo'])
+        expect(fallbackFonts('Arimo')).toEqual([])
     })
 })
 

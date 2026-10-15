@@ -1,7 +1,7 @@
 <template>
     <div class="resume-pages" :class="{ updating }">
         <div v-for="(page, i) in visiblePages" :key="i" class="resume-page"
-            :style="{ aspectRatio: `${page.width} / ${page.height}` }">
+            :style="{ aspectRatio: `${page.width} / ${page.height}`, width: pageWidth }">
             <!-- One SVG holds every page stacked; each sheet shows its own slice -->
             <img :src="svgUrl" alt="" draggable="false" :style="{
                 width: `${docSize.width / page.width * 100}%`,
@@ -10,8 +10,9 @@
             }" />
         </div>
 
-        <div v-if="!pages.length && !error" class="resume-page resume-page-placeholder">
+        <div v-if="!pages.length && !error" class="resume-page resume-page-placeholder" :style="{ width: pageWidth }">
             <v-progress-circular indeterminate color="primary" />
+            <span v-if="loadingLabel" class="loading-label">{{ loadingLabel }}</span>
         </div>
 
         <v-alert v-if="error" type="error" variant="tonal" density="compact" class="preview-error">
@@ -37,8 +38,20 @@ const props = defineProps({
     debounce: {
         type: Number,
         default: 150
+    },
+    // Shown under the spinner until the first render (e.g. while the compiler downloads)
+    loadingLabel: {
+        type: String,
+        default: ''
+    },
+    // CSS width of each page, e.g. 100% for thumbnails
+    pageWidth: {
+        type: String,
+        default: '210mm'
     }
 })
+
+const emit = defineEmits(['rendered'])
 
 const svgUrl = ref('')
 const pages = ref([])
@@ -65,6 +78,7 @@ const render = async () => {
             return page
         })
         docSize.value = size
+        emit('rendered', { pages: info.length })
         if (svgUrl.value) URL.revokeObjectURL(svgUrl.value)
         svgUrl.value = URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml' }))
         error.value = ''
@@ -106,7 +120,6 @@ onBeforeUnmount(() => {
 
 .resume-page {
     position: relative;
-    width: 210mm;
     overflow: hidden;
     background: white;
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
@@ -123,8 +136,15 @@ onBeforeUnmount(() => {
 .resume-page-placeholder {
     aspect-ratio: 210 / 297;
     display: flex;
+    flex-direction: column;
+    gap: 16px;
     align-items: center;
     justify-content: center;
+}
+
+.loading-label {
+    font-size: 0.9rem;
+    color: #6B7280;
 }
 
 .updating .resume-page img {

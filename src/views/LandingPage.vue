@@ -11,6 +11,8 @@
 
         <!-- Main content -->
         <div class="content-wrapper">
+            <v-btn class="theme-toggle" :icon="isDark ? 'ph-sun' : 'ph-moon'" variant="text"
+                :aria-label="isDark ? 'Light theme' : 'Dark theme'" @click="toggleTheme" />
             <main class="hero-section">
                 <div class="hero-content">
                     <h1 class="hero-title">
@@ -19,8 +21,8 @@
                         in Minutes
                     </h1>
 
-                    <p class="hero-description">Build professional resumes with our modern, intuitive editor.
-                        Export to PDF, customize styles, and stand out from the crowd.
+                    <p class="hero-description">Write it once, pick a design, and download a PDF that looks
+                        exactly like the preview. No account, nothing leaves your browser.
                     </p>
 
                     <div class="typing-container">
@@ -37,31 +39,28 @@
 
                     <div class="features-grid">
                         <div class="feature-card">
+                            <div class="feature-icon">📐</div>
+                            <div class="feature-content">
+                                <h3 class="feature-title">Pixel-perfect PDF</h3>
+                                <p class="feature-description">What you see is exactly what you download, on every
+                                    device and browser</p>
+                            </div>
+                        </div>
+
+                        <div class="feature-card">
+                            <div class="feature-icon">🔓</div>
+                            <div class="feature-content">
+                                <h3 class="feature-title">Open format, private by design</h3>
+                                <p class="feature-description">Your resume is a JSON Resume file that stays in your
+                                    browser. Import it, export it, take it anywhere</p>
+                            </div>
+                        </div>
+
+                        <div class="feature-card">
                             <div class="feature-icon">🚀</div>
                             <div class="feature-content">
                                 <h3 class="feature-title">Free & Open Source</h3>
-                                <p class="feature-description">Completely free to use with full source code available on
-                                    GitHub</p>
-                            </div>
-                        </div>
-
-                        <div class="feature-card">
-                            <div class="feature-icon">📄</div>
-                            <div class="feature-content">
-                                <h3 class="feature-title">Multiple Export Formats</h3>
-                                <p class="feature-description">Export to PDF, HTML, or JSON for later editing and
-                                    sharing</p>
-                            </div>
-                        </div>
-
-                        <div class="feature-card">
-                            <div class="feature-icon">🎨</div>
-                            <div class="feature-content">
-                                <h3 class="feature-title">
-                                    Professional Templates
-                                </h3>
-                                <p class="feature-description">Choose from multiple templates designed for different
-                                    industries</p>
+                                <p class="feature-description">No sign-up. The full source code is on GitHub</p>
                             </div>
                         </div>
 
@@ -80,56 +79,10 @@
                     </div>
                 </div>
 
-                <div class="hero-visual">
-                    <div class="mockup-container">
-                        <div class="mockup-screen">
-                            <div class="mockup-header">
-                                <div class="mockup-dots">
-                                    <div class="dot"></div>
-                                    <div class="dot"></div>
-                                    <div class="dot"></div>
-                                </div>
-                            </div>
-                            <div class="mockup-content">
-                                <!-- Left Column -->
-                                <div class="mockup-left-column">
-                                    <div class="mockup-section">
-                                        <div class="mockup-section-title"></div>
-                                        <div class="mockup-line"></div>
-                                        <div class="mockup-line short"></div>
-                                        <div class="mockup-line"></div>
-                                    </div>
-                                    <div class="mockup-section">
-                                        <div class="mockup-section-title short"></div>
-                                        <div class="mockup-line"></div>
-                                        <div class="mockup-line short"></div>
-                                    </div>
-                                    <div class="mockup-section">
-                                        <div class="mockup-section-title short"></div>
-                                        <div class="mockup-line"></div>
-                                        <div class="mockup-line"></div>
-                                    </div>
-                                </div>
-
-                                <!-- Right Column -->
-                                <div class="mockup-right-column">
-                                    <div class="mockup-section">
-                                        <div class="mockup-section-title"></div>
-                                        <div class="mockup-line"></div>
-                                        <div class="mockup-line short"></div>
-                                        <div class="mockup-line"></div>
-                                        <div class="mockup-line short"></div>
-                                    </div>
-                                    <div class="mockup-section">
-                                        <div class="mockup-section-title short"></div>
-                                        <div class="mockup-line"></div>
-                                        <div class="mockup-line"></div>
-                                        <div class="mockup-line short"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <div class="hero-visual" aria-hidden="true">
+                    <!-- Rendered by the app itself (sample resume), see public/landing -->
+                    <img src="/landing/classic.png" alt="" class="resume-shot back" />
+                    <img src="/landing/sidebar.png" alt="" class="resume-shot front" />
                 </div>
             </main>
 
@@ -156,17 +109,18 @@
 </template>
 
 <script setup>
+import { useThemeToggle } from '@/composables/useThemeToggle'
 import { onMounted } from 'vue'
 
+const { isDark, toggleTheme } = useThemeToggle()
+
 const sentences = [
-    "Professional templates for every industry",
-    "Real-time preview as you type",
-    "Export to PDF with perfect formatting",
-    "Customizable colors and layouts",
-    "Mobile-friendly responsive design",
+    "Live preview of the real PDF as you type",
+    "Clean layouts that look right with any color",
+    "Import your old CV with AI",
+    "Works on your phone too",
     "No registration required",
     "Open source and completely free",
-    "Built with modern web technologies"
 ]
 
 onMounted(() => {
@@ -211,7 +165,7 @@ onMounted(() => {
     width: 100%;
     position: relative;
     overflow-x: hidden;
-    background: #0a0a0a;
+    background: rgb(var(--v-theme-background));
     display: flex;
     flex-direction: column;
 }
@@ -232,7 +186,7 @@ onMounted(() => {
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, rgb(var(--v-theme-primary)) 0%, rgb(var(--v-theme-secondary)) 100%);
     opacity: 0.08;
 }
 
@@ -247,7 +201,7 @@ onMounted(() => {
 .shape {
     position: absolute;
     border-radius: 50%;
-    background: linear-gradient(45deg, #667eea, #764ba2);
+    background: linear-gradient(45deg, rgb(var(--v-theme-primary)), rgb(var(--v-theme-secondary)));
     opacity: 0.08;
     animation: float 8s ease-in-out infinite;
 }
@@ -287,7 +241,7 @@ onMounted(() => {
     flex: 1;
     display: flex;
     flex-direction: column;
-    color: #ffffff;
+    color: rgb(var(--v-theme-on-background));
     justify-content: space-between;
     min-height: 100vh;
 }
@@ -320,7 +274,7 @@ onMounted(() => {
 }
 
 .title-highlight {
-    background: linear-gradient(135deg, #667eea, #764ba2);
+    background: linear-gradient(135deg, rgb(var(--v-theme-primary)), rgb(var(--v-theme-secondary)));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -329,7 +283,7 @@ onMounted(() => {
 .hero-description {
     font-size: 1.1rem;
     line-height: 1.5;
-    color: rgba(255, 255, 255, 0.8);
+    color: rgba(var(--v-theme-on-background), 0.8);
     margin: 0;
 }
 
@@ -337,7 +291,7 @@ onMounted(() => {
     min-height: 1.5rem;
     font-size: 1rem;
     font-weight: 500;
-    color: rgba(255, 255, 255, 0.9);
+    color: rgba(var(--v-theme-on-background), 0.9);
     font-style: italic;
 }
 
@@ -363,7 +317,7 @@ onMounted(() => {
 }
 
 .primary-btn {
-    background: linear-gradient(135deg, #667eea, #764ba2) !important;
+    background: linear-gradient(135deg, rgb(var(--v-theme-primary)), rgb(var(--v-theme-secondary))) !important;
     border-radius: 12px !important;
     font-weight: 600 !important;
     text-transform: none !important;
@@ -374,7 +328,7 @@ onMounted(() => {
 
 .primary-btn:hover {
     transform: translateY(-2px) !important;
-    box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3) !important;
+    box-shadow: 0 10px 25px rgba(var(--v-theme-primary), 0.3) !important;
 }
 
 .btn-icon {
@@ -394,8 +348,8 @@ onMounted(() => {
 }
 
 .feature-card {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(var(--v-theme-surface), 0.6);
+    border: 1px solid rgba(var(--v-theme-on-background), 0.1);
     border-radius: 16px;
     padding: 1rem;
     backdrop-filter: blur(10px);
@@ -407,8 +361,8 @@ onMounted(() => {
 }
 
 .feature-card:hover {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: rgba(255, 255, 255, 0.2);
+    background: rgba(var(--v-theme-on-background), 0.08);
+    border-color: rgba(var(--v-theme-on-background), 0.2);
     transform: translateY(-4px);
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
 }
@@ -428,7 +382,7 @@ onMounted(() => {
 .feature-title {
     font-size: 1rem;
     font-weight: 600;
-    color: #ffffff;
+    color: rgb(var(--v-theme-on-background));
     margin: 0;
     display: flex;
     align-items: center;
@@ -437,8 +391,8 @@ onMounted(() => {
 }
 
 .coming-soon-badge {
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    color: #ffffff;
+    background: linear-gradient(135deg, rgb(var(--v-theme-primary)), rgb(var(--v-theme-secondary)));
+    color: rgb(var(--v-theme-on-background));
     font-size: 0.6rem;
     font-weight: 600;
     padding: 0.15rem 0.5rem;
@@ -464,161 +418,64 @@ onMounted(() => {
 
 .feature-description {
     font-size: 0.85rem;
-    color: rgba(255, 255, 255, 0.7);
+    color: rgba(var(--v-theme-on-background), 0.7);
     line-height: 1.3;
     margin: 0;
     flex: 1;
 }
 
+/* Softer shadows on a light background */
+:global(.v-theme--light) .landing-container {
+    --shot-shadow: 0.18;
+}
+
+.theme-toggle {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    z-index: 3;
+}
+
 /* Hero Visual */
 .hero-visual {
+    position: relative;
     display: flex;
     justify-content: center;
     align-items: center;
+    min-height: 560px;
 }
 
-.mockup-container {
-    position: relative;
-    perspective: 1200px;
+.resume-shot {
+    position: absolute;
+    width: min(360px, 38vw);
+    border-radius: 6px;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, var(--shot-shadow, 0.45));
+    transition: transform 0.4s ease;
 }
 
-.mockup-screen {
-    width: 320px;
-    height: 420px;
-    background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
-    border-radius: 12px;
-    padding: 1.5rem;
-    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
-    transform: rotateY(-20deg) rotateX(8deg);
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+.resume-shot.back {
+    transform: translate(70px, 20px) rotate(6deg);
+    opacity: 0.85;
 }
 
-.mockup-screen:hover {
-    transform: rotateY(-15deg) rotateX(5deg) translateY(-10px);
-    box-shadow: 0 35px 70px rgba(0, 0, 0, 0.4);
+.resume-shot.front {
+    transform: translate(-40px, -10px) rotate(-3deg);
 }
 
-.mockup-header {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 1.5rem;
+.hero-visual:hover .resume-shot.back {
+    transform: translate(110px, 24px) rotate(8deg);
 }
 
-.mockup-dots {
-    display: flex;
-    gap: 0.5rem;
-}
-
-.dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.3);
-}
-
-.mockup-content {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1.5rem;
-    height: calc(100% - 3rem);
-}
-
-.mockup-left-column {
-    display: flex;
-    flex-direction: column;
-    gap: 1.2rem;
-}
-
-.mockup-right-column {
-    display: flex;
-    flex-direction: column;
-    gap: 1.2rem;
-}
-
-.mockup-section {
-    display: flex;
-    flex-direction: column;
-    gap: 0.6rem;
-}
-
-.mockup-section-title {
-    height: 14px;
-    background: rgba(255, 255, 255, 0.15);
-    border-radius: 3px;
-    width: 80%;
-}
-
-.mockup-section-title.short {
-    width: 60%;
-}
-
-.mockup-line {
-    height: 6px;
-    background: rgba(255, 255, 255, 0.08);
-    border-radius: 3px;
-    animation: pulse 2s ease-in-out infinite;
-}
-
-.mockup-line:nth-child(2) {
-    animation-delay: 0.2s;
-}
-
-.mockup-line:nth-child(3) {
-    animation-delay: 0.4s;
-}
-
-.mockup-line:nth-child(4) {
-    animation-delay: 0.6s;
-}
-
-.mockup-line:nth-child(5) {
-    animation-delay: 0.8s;
-}
-
-.mockup-line.short {
-    width: 70%;
-}
-
-@keyframes pulse {
-
-    0%,
-    100% {
-        opacity: 0.6;
-    }
-
-    50% {
-        opacity: 1;
-    }
-}
-
-/* Add floating animation to the entire mockup */
-.mockup-container {
-    animation: float-mockup 6s ease-in-out infinite;
-}
-
-@keyframes float-mockup {
-
-    0%,
-    100% {
-        transform: translateY(0px) rotateY(-20deg) rotateX(8deg);
-    }
-
-    50% {
-        transform: translateY(-15px) rotateY(-18deg) rotateX(6deg);
-    }
-}
-
-.mockup-container:hover {
-    animation-play-state: paused;
+.hero-visual:hover .resume-shot.front {
+    transform: translate(-70px, -14px) rotate(-4deg);
 }
 
 /* Footer */
 .footer {
     padding: 2rem 4rem;
     backdrop-filter: blur(10px);
-    background: rgba(255, 255, 255, 0.03);
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(var(--v-theme-on-background), 0.03);
+    border-top: 1px solid rgba(var(--v-theme-on-background), 0.08);
 }
 
 .footer-content {
@@ -636,7 +493,7 @@ onMounted(() => {
 }
 
 .footer-link {
-    color: rgba(255, 255, 255, 0.7);
+    color: rgba(var(--v-theme-on-background), 0.7);
     text-decoration: none;
     font-weight: 500;
     transition: color 0.3s ease;
@@ -646,15 +503,15 @@ onMounted(() => {
 }
 
 .footer-link:hover {
-    color: #ffffff;
+    color: rgb(var(--v-theme-on-background));
 }
 
 .footer-separator {
-    color: rgba(255, 255, 255, 0.4);
+    color: rgba(var(--v-theme-on-background), 0.4);
 }
 
 .footer-tagline {
-    color: rgba(255, 255, 255, 0.6);
+    color: rgba(var(--v-theme-on-background), 0.6);
     font-size: 0.9rem;
 }
 
@@ -836,27 +693,27 @@ onMounted(() => {
 }
 
 .guide-card {
-    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
-    border: 1px solid rgba(102, 126, 234, 0.2);
+    background: linear-gradient(135deg, rgba(var(--v-theme-primary), 0.1), rgba(var(--v-theme-secondary), 0.1));
+    border: 1px solid rgba(var(--v-theme-primary), 0.2);
 }
 
 .guide-card:hover {
-    background: linear-gradient(135deg, rgba(102, 126, 234, 0.15), rgba(118, 75, 162, 0.15));
-    border-color: rgba(102, 126, 234, 0.3);
+    background: linear-gradient(135deg, rgba(var(--v-theme-primary), 0.15), rgba(var(--v-theme-secondary), 0.15));
+    border-color: rgba(var(--v-theme-primary), 0.3);
     transform: translateY(-4px);
-    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.2);
+    box-shadow: 0 8px 25px rgba(var(--v-theme-primary), 0.2);
 }
 
 .guide-link {
-    color: #667eea;
+    color: rgb(var(--v-theme-primary));
     text-decoration: none;
     font-weight: 600;
     font-size: 0.8rem;
     margin-top: auto;
     padding: 0.3rem 0.6rem;
-    background: rgba(102, 126, 234, 0.1);
+    background: rgba(var(--v-theme-primary), 0.1);
     border-radius: 6px;
-    border: 1px solid rgba(102, 126, 234, 0.2);
+    border: 1px solid rgba(var(--v-theme-primary), 0.2);
     transition: all 0.3s ease;
     display: inline-block;
     width: fit-content;
@@ -864,9 +721,9 @@ onMounted(() => {
 }
 
 .guide-link:hover {
-    background: rgba(102, 126, 234, 0.2);
-    border-color: rgba(102, 126, 234, 0.4);
-    color: #ffffff;
+    background: rgba(var(--v-theme-primary), 0.2);
+    border-color: rgba(var(--v-theme-primary), 0.4);
+    color: rgb(var(--v-theme-on-background));
     transform: translateY(-1px);
 }
 </style>

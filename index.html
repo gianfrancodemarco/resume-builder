@@ -6,11 +6,98 @@
   <link rel="icon" type="image/svg+xml" href="/logo.svg" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Resume Builder</title>
-  <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin />
   <script async data-auto-collect="false" src="https://scripts.simpleanalyticscdn.com/latest.js"></script>
+  <script>
+    // Theme for the loading screen, before the app starts (same rule as useThemeToggle)
+    (function () {
+      var saved = null
+      try { saved = localStorage.getItem('theme') } catch (e) { }
+      var light = saved ? saved === 'light' : window.matchMedia && matchMedia('(prefers-color-scheme: light)').matches
+      document.documentElement.dataset.splashTheme = light ? 'light' : 'dark'
+    })()
+  </script>
+  <style>
+    /* Loading screen, removed by src/main.js once the app is mounted */
+    #splash {
+      --splash-bg: #0E1117;
+      --splash-fg: #E6EDF3;
+      --splash-accent: #8B9AFF;
+      position: fixed;
+      inset: 0;
+      z-index: 10000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+      background: var(--splash-bg);
+      color: var(--splash-fg);
+      font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+      transition: opacity 0.3s ease;
+    }
+
+    [data-splash-theme="light"] #splash {
+      --splash-bg: #F4F5F8;
+      --splash-fg: #1F2328;
+      --splash-accent: #4C5BD4;
+    }
+
+    #splash.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    #splash img {
+      width: 56px;
+      height: 56px;
+      animation: splash-pop 0.5s ease-out both;
+    }
+
+    #splash .name {
+      font-size: 1.05rem;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+    }
+
+    #splash .bar {
+      width: 120px;
+      height: 3px;
+      border-radius: 3px;
+      overflow: hidden;
+      background: color-mix(in srgb, var(--splash-fg) 12%, transparent);
+    }
+
+    #splash .bar::after {
+      content: '';
+      display: block;
+      width: 40%;
+      height: 100%;
+      border-radius: inherit;
+      background: var(--splash-accent);
+      animation: splash-slide 1s ease-in-out infinite;
+    }
+
+    @keyframes splash-pop {
+      from { transform: scale(0.85); opacity: 0; }
+    }
+
+    @keyframes splash-slide {
+      from { transform: translateX(-100%); }
+      to { transform: translateX(250%); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      #splash img, #splash .bar::after { animation: none; }
+    }
+  </style>
 </head>
 
 <body>
+  <div id="splash" role="status" aria-label="Loading Resume Builder">
+    <img src="/logo.svg" alt="" />
+    <span class="name">Resume Builder</span>
+    <span class="bar"></span>
+  </div>
   <div id="app"></div>
   <script type="module" src="/src/main.js"></script>
 </body>

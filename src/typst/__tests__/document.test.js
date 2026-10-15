@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { buildDocument, buildSections } from '@/typst/document'
-import { addSection, applyTemplate, prepareResume, sampleResume, settingsOf, toggleItemHidden } from '@/resume/resume'
+import { addSection, prepareResume, sampleResume, settingsOf, toggleItemHidden } from '@/resume/resume'
 
 const keys = sections => sections.map(s => s.key)
 
@@ -58,49 +58,57 @@ describe('buildSections', () => {
 })
 
 describe('buildDocument', () => {
-    it('splits sidebar and main sections for two-column templates', () => {
+    const design = (resume, changes) => Object.assign(settingsOf(resume).design, changes)
+
+    it('splits sidebar and main sections for the sidebar layout', () => {
         const { data } = buildDocument(sampleResume())
         expect(data.template).toBe('two-column')
         expect(keys(data.main)).toEqual(['work', 'education'])
         expect(keys(data.sidebar)).toEqual(['summary', 'contact', 'profiles', 'skills', 'languages'])
+        expect(data.sizes.sidebar).toBe(210)
     })
 
-    it('puts everything in the main column when the sidebar is hidden or absent', () => {
+    it('puts everything in the main column for the classic layout', () => {
         const resume = sampleResume()
-        settingsOf(resume).spacing.sidebarWidth = 0
-        expect(buildDocument(resume).data.sidebar).toEqual([])
-        expect(buildDocument(resume).data.sizes.sidebar).toBe(0)
-
-        applyTemplate(resume, 'OneColumnModern')
+        design(resume, { layout: 'classic' })
         const { data } = buildDocument(resume)
         expect(data.template).toBe('one-column-modern')
         expect(data.sidebar).toEqual([])
         expect(data.main).toHaveLength(7)
+        expect(data.sizes.sidebar).toBe(0)
     })
 
-    it('converts px sizes to pt', () => {
-        expect(buildDocument(sampleResume()).data.sizes).toEqual({ base: 10.5, heading: 19.5, section: 18, content: 9, sidebar: 210 })
+    it('converts the size and density choices to pt', () => {
+        const resume = sampleResume()
+        expect(buildDocument(resume).data.sizes).toEqual({ base: 10.5, heading: 19.5, section: 18, content: 9, sidebar: 210 })
+        design(resume, { size: 'l', density: 'airy' })
+        expect(buildDocument(resume).data.sizes).toEqual({ base: 11.25, heading: 21, section: 24, content: 12, sidebar: 210 })
     })
 
-    it('reports the fonts it uses, including Cousine for inline code', () => {
+    it('uses the fonts of the chosen pairing', () => {
         const resume = sampleResume()
         expect(buildDocument(resume).fonts).toEqual(['Arimo', 'Gelasio'])
-        settingsOf(resume).typography.bodyFont = 'Comic Sans MS'
-        resume.basics.summary = 'Uses `code`'
-        expect(buildDocument(resume).fonts).toEqual(['Arimo', 'Inter', 'Cousine'])
+        design(resume, { fonts: 'editorial' })
+        expect(buildDocument(resume).data.fonts).toEqual({ heading: ['Source Sans 3'], body: ['Source Serif 4'] })
     })
 
-    it('adds a matching fallback font only when the text uses Greek, Cyrillic, Hebrew or Vietnamese', () => {
+    it('adds matching fallback fonts only when the text uses Greek, Cyrillic, Hebrew or Vietnamese', () => {
         const resume = sampleResume()
-        expect(buildDocument(resume).data.fonts).toEqual({ heading: ['Arimo'], body: ['Gelasio'] })
-
         resume.languages.push({ language: 'Русский', fluency: 'A2' })
         const { data, fonts } = buildDocument(resume)
-        expect(data.fonts).toEqual({ heading: ['Arimo'], body: ['Gelasio', 'Tinos'] }) // Arimo needs no fallback
-        expect(fonts).toEqual(['Arimo', 'Gelasio', 'Tinos'])
+        expect(data.fonts).toEqual({ heading: ['Arimo'], body: ['Gelasio', 'Source Serif 4', 'Arimo'] })
+        expect(fonts).toEqual(['Arimo', 'Gelasio', 'Source Serif 4'])
 
-        settingsOf(resume).typography.bodyFont = 'Lato'
-        expect(buildDocument(resume).data.fonts.body).toEqual(['Lato', 'Arimo'])
+        design(resume, { fonts: 'modern' })
+        expect(buildDocument(resume).data.fonts.body).toEqual(['Inter', 'Arimo'])
+    })
+
+    it('derives the colors from the accent and passes the sidebar side', () => {
+        const resume = sampleResume()
+        design(resume, { accent: '#7A1F3D', sidebarLeft: true })
+        const { data } = buildDocument(resume)
+        expect(data.colors).toMatchObject({ primary: '#7a1f3d', sidebarBackground: '#7A1F3D', sidebarText: '#FFFFFF' })
+        expect(data.sidebarLeft).toBe(true)
     })
 
     it('includes the photo with its crop settings', () => {
@@ -115,14 +123,5 @@ describe('buildDocument', () => {
         const { data } = buildDocument(prepareResume({ basics: { label: 'Engineer' } }))
         expect(data.personal).toEqual({ name: 'Your Name', title: 'Engineer' })
         expect(data.title).toBe('Engineer')
-    })
-
-    it('falls back to valid colors', () => {
-        const resume = sampleResume()
-        settingsOf(resume).colors.link = ''
-        settingsOf(resume).colors.text = 'not-a-color'
-        const { data } = buildDocument(resume)
-        expect(data.colors.link).toBe('#08294d')
-        expect(data.colors.text).toBe('#08294d')
     })
 })

@@ -2,189 +2,202 @@ import { createApp, h } from 'vue'
 import App from './App.vue'
 import router from './router'
 import { registerFontFaces } from './typst/fonts'
+import { initialTheme } from './composables/useThemeToggle'
 
 // Vuetify imports
 import 'vuetify/styles'
 import { createVuetify } from 'vuetify'
 import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
+import { aliases, mdi } from 'vuetify/iconsets/mdi'
 import '@mdi/font/css/materialdesignicons.css'
 
 // Phosphor Icons
-import { PhEye, PhEyeSlash, PhPencilSimple, PhCheck, PhTrash, PhPlus, PhTextAlignRight, PhTextAlignLeft, PhArrowUp, PhArrowDown, PhCopy, PhPalette, PhTextT, PhArrowsOutLineVertical, PhGlobe, PhLink, PhX, PhArrowCounterClockwise, PhArrowClockwise, PhTextB, PhTextItalic, PhTextStrikethrough, PhTextUnderline, PhListBullets, PhListNumbers, PhList, PhBracketsCurly, PhUpload, PhFilePdf, PhFileCode, PhFileText, PhLightning, PhUser, PhUserCircle, PhBriefcase, PhGraduationCap, PhPlusCircle, PhTranslate, PhCertificate, PhFolder, PhBookOpen, PhTrophy, PhHeart, PhStar, PhUsers, PhTarget, PhMedal, PhGameController, PhBuildings, PhLightbulb, PhPhone, PhMagnifyingGlassPlus, PhMagnifyingGlassMinus, PhHouse, PhSun, PhMoon, PhCaretUp, PhCaretDown, PhLayout, PhArticleNyTimes, PhSparkle, PhPaperPlaneRight, PhClockCounterClockwise, PhMicrophone, PhStop } from '@phosphor-icons/vue'
-const savedTheme = localStorage.getItem('theme') || 'dark';
+import {
+    PhArrowsHorizontal,
+    PhArrowsLeftRight,
+    PhArticleNyTimes,
+    PhBookOpen,
+    PhBracketsCurly,
+    PhBriefcase,
+    PhCaretDown,
+    PhCaretUp,
+    PhCertificate,
+    PhChatCircleText,
+    PhCheck,
+    PhClockCounterClockwise,
+    PhCloudCheck,
+    PhDotsSixVertical,
+    PhDotsThreeVertical,
+    PhDownloadSimple,
+    PhEye,
+    PhEyeSlash,
+    PhFileArrowUp,
+    PhFilePdf,
+    PhFileText,
+    PhFolder,
+    PhGear,
+    PhGraduationCap,
+    PhHeart,
+    PhImage,
+    PhLightning,
+    PhLink,
+    PhListBullets,
+    PhMagicWand,
+    PhMicrophone,
+    PhMinus,
+    PhMoon,
+    PhNotePencil,
+    PhPaintBrush,
+    PhPaperPlaneRight,
+    PhPencilSimple,
+    PhPhone,
+    PhPlus,
+    PhSparkle,
+    PhStar,
+    PhStop,
+    PhSun,
+    PhTextB,
+    PhTextItalic,
+    PhTranslate,
+    PhTrash,
+    PhTrophy,
+    PhUploadSimple,
+    PhUser,
+    PhUsers,
+    PhWarningCircle,
+    PhX,
+} from '@phosphor-icons/vue'
+
+// Icons used as icon="ph-…" in the app
+const PHOSPHOR_ICONS = {
+    'ph-arrows-horizontal': PhArrowsHorizontal,
+    'ph-arrows-left-right': PhArrowsLeftRight,
+    'ph-article-nytimes': PhArticleNyTimes,
+    'ph-book-open': PhBookOpen,
+    'ph-brackets-curly': PhBracketsCurly,
+    'ph-briefcase': PhBriefcase,
+    'ph-caret-down': PhCaretDown,
+    'ph-caret-up': PhCaretUp,
+    'ph-certificate': PhCertificate,
+    'ph-chat-circle-text': PhChatCircleText,
+    'ph-check': PhCheck,
+    'ph-clock-counter-clockwise': PhClockCounterClockwise,
+    'ph-cloud-check': PhCloudCheck,
+    'ph-dots-six-vertical': PhDotsSixVertical,
+    'ph-dots-three-vertical': PhDotsThreeVertical,
+    'ph-download-simple': PhDownloadSimple,
+    'ph-eye': PhEye,
+    'ph-eye-slash': PhEyeSlash,
+    'ph-file-arrow-up': PhFileArrowUp,
+    'ph-file-pdf': PhFilePdf,
+    'ph-file-text': PhFileText,
+    'ph-folder': PhFolder,
+    'ph-gear': PhGear,
+    'ph-graduation-cap': PhGraduationCap,
+    'ph-heart': PhHeart,
+    'ph-image': PhImage,
+    'ph-lightning': PhLightning,
+    'ph-link': PhLink,
+    'ph-list-bullets': PhListBullets,
+    'ph-magic-wand': PhMagicWand,
+    'ph-microphone': PhMicrophone,
+    'ph-minus': PhMinus,
+    'ph-moon': PhMoon,
+    'ph-note-pencil': PhNotePencil,
+    'ph-paint-brush': PhPaintBrush,
+    'ph-paper-plane-right': PhPaperPlaneRight,
+    'ph-pencil-simple': PhPencilSimple,
+    'ph-phone': PhPhone,
+    'ph-plus': PhPlus,
+    'ph-sparkle': PhSparkle,
+    'ph-star': PhStar,
+    'ph-stop': PhStop,
+    'ph-sun': PhSun,
+    'ph-text-b': PhTextB,
+    'ph-text-italic': PhTextItalic,
+    'ph-translate': PhTranslate,
+    'ph-trash': PhTrash,
+    'ph-trophy': PhTrophy,
+    'ph-upload-simple': PhUploadSimple,
+    'ph-user': PhUser,
+    'ph-users': PhUsers,
+    'ph-warning-circle': PhWarningCircle,
+    'ph-x': PhX,
+}
+
+// Editor tokens on top of Vuetify's: borders, field and item backgrounds,
+// secondary text, and the backdrop behind the resume preview
+const THEMES = {
+    dark: {
+        dark: true,
+        colors: {
+            primary: '#8B9AFF',
+            'on-primary': '#0E1117',
+            secondary: '#B39DFF',
+            background: '#0E1117',
+            surface: '#161B22',
+            'on-background': '#E6EDF3',
+            'on-surface': '#E6EDF3',
+            'editor-border': '#2B3440',
+            'editor-field-bg': '#0F141A',
+            'editor-item-bg': '#1A2029',
+            'editor-item-hover': '#212935',
+            'editor-text-secondary': '#B1BAC4',
+            'editor-text-muted': '#7D8590',
+            'editor-preview-bg': '#0A0D12',
+        },
+    },
+    light: {
+        dark: false,
+        colors: {
+            primary: '#4C5BD4',
+            secondary: '#7B5BD6',
+            background: '#F4F5F8',
+            surface: '#FFFFFF',
+            'on-background': '#1F2328',
+            'on-surface': '#1F2328',
+            'editor-border': '#DDE1E7',
+            'editor-field-bg': '#FFFFFF',
+            'editor-item-bg': '#F8F9FB',
+            'editor-item-hover': '#EEF0F4',
+            'editor-text-secondary': '#4B5563',
+            'editor-text-muted': '#6B7280',
+            'editor-preview-bg': '#E6E9EF',
+        },
+    },
+}
+
+// One look for every form field
+const FIELD_DEFAULTS = { variant: 'outlined', density: 'compact', color: 'primary', rounded: 'lg' }
+
 const vuetify = createVuetify({
     components,
     directives,
     theme: {
-        defaultTheme: savedTheme,
-        themes: {
-            dark: {
-                dark: true,
-                colors: {
-                    // Primary colors
-                    primary: '#667eea',
-                    secondary: '#764ba2',
-
-                    // Background colors
-                    background: '#0f172a',
-                    surface: '#1e293b',
-                    'surface-variant': 'rgba(30, 41, 59, 0.4)',
-
-                    // Text colors
-                    'on-surface': '#e2e8f0',
-                    'on-surface-variant': '#cbd5e1',
-                    'on-background': '#f8fafc',
-
-                    // Custom theme colors
-                    'editor-bg': 'rgba(30, 41, 59, 0.3)',
-                    'editor-border': 'rgba(51, 65, 85, 0.6)',
-                    'editor-section-bg': 'rgba(30, 41, 59, 0.4)',
-                    'editor-section-border': 'rgba(51, 65, 85, 0.6)',
-                    'editor-section-hover': 'rgba(51, 65, 85, 0.8)',
-                    'editor-field-bg': 'rgba(15, 23, 42, 0.5)',
-                    'editor-field-border': 'rgba(51, 65, 85, 0.8)',
-                    'editor-text-primary': '#e2e8f0',
-                    'editor-text-secondary': '#cbd5e1',
-                    'editor-text-muted': '#94a3b8',
-                    'editor-preview-bg': 'rgba(15, 23, 42, 0.5)',
-                    'editor-preview-content': 'rgba(30, 41, 59, 0.4)',
-                    'editor-scrollbar-track': 'rgba(15, 23, 42, 0.3)',
-                    'editor-scrollbar-thumb': '#334155',
-                    'editor-scrollbar-hover': '#475569',
-                    'editor-item-bg': 'rgba(51, 65, 85, 0.3)',
-                    'editor-item-border': 'rgba(51, 65, 85, 0.8)',
-                    'editor-item-hover': 'rgba(51, 65, 85, 0.5)',
-                    'editor-divider': 'rgba(71, 85, 105, 0.6)',
-                    'editor-code-bg': 'rgba(51, 65, 85, 0.6)',
-                    'editor-blockquote-bg': 'rgba(var(--v-theme-primary), 0.1)',
-                    'editor-table-border': 'rgba(51, 65, 85, 0.6)',
-                    'editor-table-header': 'rgba(var(--v-theme-primary), 0.2)',
-                    'editor-table-hover': 'rgba(var(--v-theme-primary), 0.1)',
-                }
-            },
-            light: {
-                dark: false,
-                colors: {
-                    // Primary colors
-                    primary: '#667eea',
-                    secondary: '#764ba2',
-
-                    // Background colors
-                    background: '#ffffff',
-                    surface: '#f8fafc',
-                    'surface-variant': 'rgba(248, 250, 252, 0.8)',
-
-                    // Text colors
-                    'on-surface': '#1e293b',
-                    'on-surface-variant': '#475569',
-                    'on-background': '#0f172a',
-
-                    // Custom theme colors
-                    'editor-bg': 'rgba(248, 250, 252, 0.8)',
-                    'editor-border': 'rgba(203, 213, 225, 0.6)',
-                    'editor-section-bg': 'rgba(255, 255, 255, 0.8)',
-                    'editor-section-border': 'rgba(203, 213, 225, 0.6)',
-                    'editor-section-hover': 'rgba(203, 213, 225, 0.8)',
-                    'editor-field-bg': 'rgba(248, 250, 252, 0.8)',
-                    'editor-field-border': 'rgba(203, 213, 225, 0.8)',
-                    'editor-text-primary': '#1e293b',
-                    'editor-text-secondary': '#475569',
-                    'editor-text-muted': '#64748b',
-                    'editor-preview-bg': 'rgba(248, 250, 252, 0.8)',
-                    'editor-preview-content': 'rgba(255, 255, 255, 0.9)',
-                    'editor-scrollbar-track': 'rgba(248, 250, 252, 0.5)',
-                    'editor-scrollbar-thumb': '#cbd5e1',
-                    'editor-scrollbar-hover': '#94a3b8',
-                    'editor-item-bg': 'rgba(248, 250, 252, 0.6)',
-                    'editor-item-border': 'rgba(203, 213, 225, 0.8)',
-                    'editor-item-hover': 'rgba(241, 245, 249, 0.8)',
-                    'editor-divider': 'rgba(203, 213, 225, 0.6)',
-                    'editor-code-bg': 'rgba(241, 245, 249, 0.8)',
-                    'editor-blockquote-bg': 'rgba(var(--v-theme-primary), 0.05)',
-                    'editor-table-border': 'rgba(203, 213, 225, 0.6)',
-                    'editor-table-header': 'rgba(var(--v-theme-primary), 0.1)',
-                    'editor-table-hover': 'rgba(var(--v-theme-primary), 0.02)',
-                }
-            }
-        }
+        defaultTheme: initialTheme(),
+        themes: THEMES,
+    },
+    // Phone layout below 960px; Vuetify's default (1280px) would hit many laptops
+    display: { mobileBreakpoint: 'md' },
+    defaults: {
+        VTextField: FIELD_DEFAULTS,
+        VSelect: FIELD_DEFAULTS,
+        VAutocomplete: FIELD_DEFAULTS,
+        VFileInput: FIELD_DEFAULTS,
+        VTextarea: FIELD_DEFAULTS,
+        VCheckbox: { color: 'primary' },
     },
     icons: {
         defaultSet: 'ph',
+        // Vuetify's own icons (checkbox, dropdown arrow, close…) come from MDI
+        aliases,
         sets: {
+            mdi,
             ph: {
-                component: (props) => {
-                    const iconMap = {
-                        'ph-eye': PhEye,
-                        'ph-eye-slash': PhEyeSlash,
-                        'ph-pencil-simple': PhPencilSimple,
-                        'ph-check': PhCheck,
-                        'ph-trash': PhTrash,
-                        'ph-delete': PhTrash,
-                        'ph-plus': PhPlus,
-                        'ph-format-align-right': PhTextAlignRight,
-                        'ph-format-align-left': PhTextAlignLeft,
-                        'ph-arrow-up': PhArrowUp,
-                        'ph-arrow-down': PhArrowDown,
-                        'ph-content-copy': PhCopy,
-                        'ph-palette': PhPalette,
-                        'ph-text-t': PhTextT,
-                        'ph-arrows-out-line-vertical': PhArrowsOutLineVertical,
-                        'ph-globe': PhGlobe,
-                        'ph-link': PhLink,
-                        'ph-x': PhX,
-                        'ph-arrow-counter-clockwise': PhArrowCounterClockwise,
-                        'ph-arrow-clockwise': PhArrowClockwise,
-                        'ph-text-b': PhTextB,
-                        'ph-text-italic': PhTextItalic,
-                        'ph-text-strikethrough': PhTextStrikethrough,
-                        'ph-text-underline': PhTextUnderline,
-                        'ph-list-bullets': PhListBullets,
-                        'ph-list-numbers': PhListNumbers,
-                        'ph-list': PhList,
-                        'ph-brackets-curly': PhBracketsCurly,
-                        'ph-upload': PhUpload,
-                        'ph-file-pdf': PhFilePdf,
-                        'ph-file-code': PhFileCode,
-                        'ph-article-nytimes': PhArticleNyTimes,
-                        'ph-file-text': PhFileText,
-                        'ph-lightning': PhLightning,
-                        'ph-user': PhUser,
-                        'ph-user-circle': PhUserCircle,
-                        'ph-briefcase': PhBriefcase,
-                        'ph-graduation-cap': PhGraduationCap,
-                        'ph-plus-circle': PhPlusCircle,
-                        'ph-translate': PhTranslate,
-                        'ph-certificate': PhCertificate,
-                        'ph-folder': PhFolder,
-                        'ph-book-open': PhBookOpen,
-                        'ph-trophy': PhTrophy,
-                        'ph-heart': PhHeart,
-                        'ph-star': PhStar,
-                        'ph-users': PhUsers,
-                        'ph-target': PhTarget,
-                        'ph-medal': PhMedal,
-                        'ph-game-controller': PhGameController,
-                        'ph-buildings': PhBuildings,
-                        'ph-lightbulb': PhLightbulb,
-                        'ph-phone': PhPhone,
-                        'ph-magnifying-glass-plus': PhMagnifyingGlassPlus,
-                        'ph-magnifying-glass-minus': PhMagnifyingGlassMinus,
-                        'ph-house': PhHouse,
-                        'ph-sun': PhSun,
-                        'ph-moon': PhMoon,
-                        'ph-caret-up': PhCaretUp,
-                        'ph-caret-down': PhCaretDown,
-                        'ph-layout': PhLayout,
-                        'ph-article-nytimes': PhArticleNyTimes,
-                        'ph-sparkle': PhSparkle,
-                        'ph-paper-plane-right': PhPaperPlaneRight,
-                        'ph-clock-counter-clockwise': PhClockCounterClockwise,
-                        'ph-microphone': PhMicrophone,
-                        'ph-stop': PhStop
-                    }
-                    const IconComponent = iconMap[props.icon]
-                    return IconComponent ? h(IconComponent, { ...props, icon: undefined }) : null
+                component: props => {
+                    const IconComponent = PHOSPHOR_ICONS[props.icon]
+                    return IconComponent ? h(IconComponent, { ...props, icon: undefined }) : h(mdi.component, props)
                 }
             }
         }
@@ -197,3 +210,14 @@ const app = createApp(App)
 app.use(vuetify)
 app.use(router)
 app.mount('#app')
+
+// Fade out the loading screen from index.html, keeping it at least briefly
+// so it does not just flicker on fast loads
+const SPLASH_MIN_MS = 500
+const splash = document.getElementById('splash')
+if (splash) {
+    setTimeout(() => {
+        splash.classList.add('hidden')
+        setTimeout(() => splash.remove(), 400)
+    }, Math.max(0, SPLASH_MIN_MS - performance.now()))
+}

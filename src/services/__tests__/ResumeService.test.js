@@ -25,9 +25,9 @@ describe('ResumeService', () => {
 
         it('keeps the layout stored in meta', async () => {
             const original = sampleResume()
-            settingsOf(original).template = 'OneColumnModern'
+            settingsOf(original).design.layout = 'classic'
             const resume = await ResumeService.loadFromFile(jsonFile(original))
-            expect(settingsOf(resume).template).toBe('OneColumnModern')
+            expect(settingsOf(resume).design.layout).toBe('classic')
         })
 
         it('rejects files that are not JSON', async () => {

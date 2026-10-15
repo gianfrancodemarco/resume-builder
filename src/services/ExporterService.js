@@ -40,36 +40,6 @@ export class ExporterService {
         this.download(new Blob([pdf], { type: 'application/pdf' }), this.getFilename(resume, 'pdf'))
     }
 
-    /**
-     * Export resume as a standalone HTML page showing the same pages as the PDF
-     * @param {object} resume
-     */
-    static async exportToHTML(resume) {
-        const { svg, size, pages } = await TypstService.renderSvg(resume)
-        const title = this.escapeHtml([resume.basics?.name, resume.basics?.label].filter(Boolean).join(' - ') || 'Resume')
-        const { width, height } = size
-        // Pages are stacked in one SVG; the page size makes print break between them
-        const html = `<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>${title}</title>
-<style>
-@page { size: ${width}pt ${pages[0].height}pt; margin: 0; }
-html, body { margin: 0; padding: 0; background: #e5e7eb; }
-.resume { width: ${width}pt; max-width: 100%; margin: 0 auto; background: white; }
-.resume > svg { display: block; width: 100%; height: auto; }
-@media print { html, body { background: none; } .resume { width: ${width}pt; } }
-</style>
-</head>
-<body>
-<div class="resume" style="aspect-ratio: ${width} / ${height}">${svg}</div>
-</body>
-</html>`
-        this.download(new Blob([html], { type: 'text/html' }), this.getFilename(resume, 'html').replace(/\s+/g, '_'))
-    }
-
     static download(blob, filename) {
         const url = URL.createObjectURL(blob)
         const a = document.createElement('a')
@@ -79,10 +49,6 @@ html, body { margin: 0; padding: 0; background: #e5e7eb; }
         a.click()
         document.body.removeChild(a)
         URL.revokeObjectURL(url)
-    }
-
-    static escapeHtml(text) {
-        return text.replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[ch])
     }
 }
 

@@ -3,7 +3,7 @@ import { flushPromises, mount } from '@vue/test-utils'
 import { createVuetify } from 'vuetify'
 import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
-import ConvertCV from '@/components/EditorPage/AIHub/ConvertCV.vue'
+import ConvertCV from '@/components/EditorPage/ai/ConvertCV.vue'
 import { CVConversionService } from '@/services/CVConversionService'
 
 vi.mock('@/services/CVConversionService', () => ({
@@ -75,9 +75,12 @@ describe('ConvertCV', () => {
         expect(wrapper.vm.alertMessage).toMatchObject({ show: true, type: 'error', message: 'File is too large' })
     })
 
-    it('cannot convert without an API key', () => {
+    it('asks for the AI settings instead of converting without an API key', () => {
         wrapper = mountConvertCV({ apiKey: '' })
-        const button = wrapper.findAll('button').find(b => b.text().includes('Convert'))
-        expect(button.attributes('disabled')).toBeDefined()
+
+        wrapper.vm.convert()
+
+        expect(wrapper.emitted('need-settings')).toHaveLength(1)
+        expect(CVConversionService.convertCV).not.toHaveBeenCalled()
     })
 })

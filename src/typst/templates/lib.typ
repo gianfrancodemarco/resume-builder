@@ -44,7 +44,9 @@
     } else if node.t == "s" {
       strike(rich(node.c, lk))
     } else if node.t == "code" {
-      text(font: "Cousine", size: 0.9em, rich(node.c, lk))
+      // No monospace font is bundled: mark code with a light background instead
+      context box(fill: text.fill.transparentize(88%), inset: (x: 2pt), outset: (y: 2.5pt), radius: 2pt,
+        rich(node.c, lk))
     } else if node.t == "a" {
       let body = underline(rich(node.c, lk))
       maybe-link(node.href, if lk.link == auto { body } else { text(fill: lk.link, body) })

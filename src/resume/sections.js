@@ -230,6 +230,19 @@ export function sectionItems(resume, key) {
     return node[path.at(-1)] ??= []
 }
 
+/** Replaces the items of a list section (e.g. after drag and drop). */
+export function setSectionItems(resume, key, items) {
+    const path = SECTIONS[key].path
+    let node = resume
+    for (const part of path.slice(0, -1)) node = node[part] ??= {}
+    node[path.at(-1)] = items
+}
+
+/** Whether an item has no value in any field (e.g. added and left blank). */
+export function isEmptyItem(item) {
+    return Object.values(item || {}).every(v => (Array.isArray(v) ? v.every(x => !String(x).trim()) : !String(v ?? '').trim()))
+}
+
 /** An empty item with every field of the section. */
 export function newItem(key) {
     return Object.fromEntries(SECTIONS[key].fields.map(f => [f.key, f.type === 'list' ? [] : '']))

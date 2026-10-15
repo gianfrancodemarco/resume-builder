@@ -12,18 +12,17 @@ A modern, single-page resume builder application built with Vue 3 and Vuetify. C
 ![Resume Builder Screenshot](screenshot.png)
 
 - 🎨 **Modern UI**: Clean and intuitive interface built with Vuetify 3
-- 📝 **Real-time Preview**: See your changes instantly with live preview
 - 🔄 **Dynamic Sections**: Add, remove, reorder and hide any JSON Resume section, and place it in the main column or the sidebar
 - 🎯 **Customizable Details**: Flexible detail fields with link support
-- 🎭 **Style Customization**: Customize colors, typography, and layout
-- 💾 **Multiple Export Formats**: Download as HTML, PDF, JSON or TXT (plain text)
+- 🎨 **Simple Design Choices**: Two layouts, an accent color (all other colors are derived to stay readable), five font pairings, text size and density
+- 💾 **Export**: Download as PDF, JSON Resume or plain text
 - 📐 **Pixel-Perfect PDF**: Resumes are typeset with [Typst](https://typst.app) compiled to WebAssembly, right in the browser. The preview and the PDF come from the same compiled document, with embedded fonts, so the output is identical on every device
 - 🔒 **Privacy First**: Everything stays in your browser
-- 💾 **JSON Resume**: Resumes are stored in the open [JSON Resume](https://jsonresume.org/schema) format. Import a resume.json from any JSON Resume tool, and export one that other tools accept; the template, style and layout travel along in its `meta` field
+- 💾 **JSON Resume**: Resumes are stored in the open [JSON Resume](https://jsonresume.org/schema) format. Import a resume.json from any JSON Resume tool, and export one that other tools accept; the design and layout travel along in its `meta` field
 - 🤖 **AI CV Conversion**: Convert existing CVs using AI models
-- 🔍 **Zoom Controls**: Zoom in/out for better editing experience
+- 📝 **Live Preview**: Real pages as you type, with zoom, fit-to-width and page count
 - 📱 **Mobile Responsive**: Works seamlessly on desktop and mobile devices
-- 🎯 **Section Navigation**: Quick navigation between resume sections
+- ✋ **Drag and Drop**: Reorder sections and entries, edit entries inline
 - 📚 **CV Writing Guide**: Access to comprehensive CV writing resources
 
 ## Getting Started
