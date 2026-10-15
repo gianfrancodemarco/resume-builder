@@ -1,84 +1,30 @@
+import { buildSections } from '@/typst/document'
 import { TypstService } from '@/typst/TypstService'
 
 export class ExporterService {
     /**
-     * Export resume as plain text (.txt)
-     * @param {ResumeData} resumeData - The resume data
-     * @returns {Promise<void>}
+     * Export resume as plain text (.txt), following the resume layout
+     * @param {object} resume
      */
-    static async exportToTXT(resumeData) {
-        let txt = '';
-        // Personal Info
-        if (resumeData.personal) {
-            if (resumeData.personal.name) txt += `${resumeData.personal.name}\n`;
-            if (resumeData.personal.title) txt += `${resumeData.personal.title}\n`;
-            txt += '\n';
+    static async exportToTXT(resume) {
+        const basics = resume.basics || {}
+        const blocks = [[basics.name, basics.label].filter(Boolean).join('\n')]
+        for (const section of buildSections(resume)) {
+            blocks.push(`${section.title.toUpperCase()}\n${sectionText(section)}`)
         }
-        // Experiences
-        if (Array.isArray(resumeData.experiences) && resumeData.experiences.length > 0) {
-            txt += (resumeData.experiencesSectionName || 'Employment History') + '\n';
-            resumeData.experiences.forEach(exp => {
-                if (exp.title || exp.company) {
-                    txt += `${exp.title || ''}`;
-                    if (exp.company) txt += ` - ${exp.company}`;
-                    txt += '\n';
-                }
-                if (exp.period) txt += `${exp.period}\n`;
-                if (exp.description) txt += `\n${exp.description}\n`;
-                txt += '\n';
-            });
-        }
-        // Education
-        if (Array.isArray(resumeData.education) && resumeData.education.length > 0) {
-            txt += (resumeData.educationSectionName || 'Education') + '\n';
-            resumeData.education.forEach(edu => {
-                if (edu.degree || edu.school) {
-                    txt += `${edu.degree || ''}`;
-                    if (edu.school) txt += ` - ${edu.school}`;
-                    txt += '\n';
-                }
-                if (edu.period) txt += `${edu.period}\n`;
-                if (edu.mark) txt += `${edu.mark}\n`;
-                if (edu.thesis) txt += `${edu.thesis}\n`;
-                if (edu.description) txt += `${edu.description}\n`;
-                txt += '\n';
-            });
-        }
-        // Custom Sections (sidebar and main)
-        if (Array.isArray(resumeData.customSections)) {
-            resumeData.customSections.forEach(section => {
-                if (section.title && section.content) {
-                    txt += `${section.title}\n`;
-                    txt += this.htmlToText(section.content) + '\n\n';
-                }
-            });
-        }
-        // Remove debug output
-        let filename;
-        try {
-            filename = this.getFilename(resumeData, 'txt');
-        } catch (e) {
-            filename = 'resume.txt'; // fallback if personal info is missing
-        }
-        const blob = new Blob([txt.trim()], { type: 'text/plain' });
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        window.URL.revokeObjectURL(url);
+        const txt = blocks.filter(Boolean).join('\n\n')
+        this.download(new Blob([txt], { type: 'text/plain' }), this.getFilename(resume, 'txt'))
     }
+
     /**
-     * Gets a filename for the resume based on personal info
-     * @param {ResumeData} resumeData - The resume data containing personal info
+     * Gets a filename for the resume based on name and title
+     * @param {object} resume
      * @param {string} extension - The file extension to use
      * @returns {string} The generated filename
      */
-    static getFilename(resumeData, extension) {
-        const name = resumeData.personal.name?.trim()
-        const position = resumeData.personal.title?.trim()
+    static getFilename(resume, extension) {
+        const name = resume.basics?.name?.trim()
+        const position = resume.basics?.label?.trim()
 
         return (name && position)
             ? `${name}_${position}.${extension}`
@@ -87,24 +33,20 @@ export class ExporterService {
 
     /**
      * Export resume as PDF, compiled by Typst: identical to the preview on every device
-     * @param {ResumeData} resumeData - The resume data
-     * @param {Object} resumeStyle - The resume style
-     * @returns {Promise<void>}
+     * @param {object} resume
      */
-    static async exportToPDF(resumeData, resumeStyle) {
-        const pdf = await TypstService.renderPdf(resumeData, resumeStyle)
-        this.download(new Blob([pdf], { type: 'application/pdf' }), this.getFilename(resumeData, 'pdf'))
+    static async exportToPDF(resume) {
+        const pdf = await TypstService.renderPdf(resume)
+        this.download(new Blob([pdf], { type: 'application/pdf' }), this.getFilename(resume, 'pdf'))
     }
 
     /**
      * Export resume as a standalone HTML page showing the same pages as the PDF
-     * @param {ResumeData} resumeData - The resume data
-     * @param {Object} resumeStyle - The resume style
-     * @returns {Promise<void>}
+     * @param {object} resume
      */
-    static async exportToHTML(resumeData, resumeStyle) {
-        const { svg, size, pages } = await TypstService.renderSvg(resumeData, resumeStyle)
-        const title = this.escapeHtml([resumeData.personal?.name, resumeData.personal?.title].filter(Boolean).join(' - ') || 'Resume')
+    static async exportToHTML(resume) {
+        const { svg, size, pages } = await TypstService.renderSvg(resume)
+        const title = this.escapeHtml([resume.basics?.name, resume.basics?.label].filter(Boolean).join(' - ') || 'Resume')
         const { width, height } = size
         // Pages are stacked in one SVG; the page size makes print break between them
         const html = `<!DOCTYPE html>
@@ -125,7 +67,7 @@ html, body { margin: 0; padding: 0; background: #e5e7eb; }
 <div class="resume" style="aspect-ratio: ${width} / ${height}">${svg}</div>
 </body>
 </html>`
-        this.download(new Blob([html], { type: 'text/html' }), this.getFilename(resumeData, 'html').replace(/\s+/g, '_'))
+        this.download(new Blob([html], { type: 'text/html' }), this.getFilename(resume, 'html').replace(/\s+/g, '_'))
     }
 
     static download(blob, filename) {
@@ -142,12 +84,49 @@ html, body { margin: 0; padding: 0; background: #e5e7eb; }
     static escapeHtml(text) {
         return text.replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[ch])
     }
+}
 
-    static htmlToText(html) {
-        // Simple HTML to text conversion
-        if (!html) return '';
-        let tmp = document.createElement('div');
-        tmp.innerHTML = html;
-        return tmp.innerText.replace(/\n{2,}/g, '\n').trim();
+// ---- Plain text -------------------------------------------------------------
+
+function sectionText(section) {
+    switch (section.kind) {
+        case 'text':
+            return nodesText(section.content)
+        case 'contact':
+            return section.items.map(i => i.text).join('\n')
+        case 'links':
+            return section.items.map(i => [i.label && `${i.label}:`, i.href || i.text].filter(Boolean).join(' ')).join('\n')
+        case 'tags':
+            return section.items.map(i => [i.name, i.keywords.join(', ')].filter(Boolean).join(': ')).join('\n')
+        case 'languages':
+            return section.items.map(i => [i.name, i.fluency].filter(Boolean).join(': ')).join('\n')
+        default:
+            return section.items.map(entryText).join('\n\n')
     }
+}
+
+function entryText(e) {
+    return [
+        [e.title, e.subtitle].filter(Boolean).join(' - '),
+        [e.date, e.location].filter(Boolean).join(' | '),
+        ...e.details,
+        nodesText(e.summary),
+        ...e.highlights.map(h => `- ${nodesText(h)}`),
+        e.keywords.join(', '),
+    ].filter(Boolean).join('\n')
+}
+
+// Markdown node tree (see typst/markdown.js) to plain text
+function nodesText(nodes) {
+    return nodes.map(node => {
+        if (typeof node === 'string') return node
+        if (node.t === 'br') return '\n'
+        if (node.t === 'hr') return '\n'
+        if (node.t === 'ul' || node.t === 'ol') {
+            return node.items.map((item, i) => `${node.t === 'ol' ? `${i + 1}.` : '-'} ${nodesText(item)}`).join('\n') + '\n'
+        }
+        if (node.t === 'a') return `${nodesText(node.c)}${node.href ? ` (${node.href})` : ''}`
+        const text = nodesText(node.c || [])
+        return ['p', 'h', 'quote'].includes(node.t) ? `${text}\n` : text
+    }).join('').trim()
 }

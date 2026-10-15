@@ -13,13 +13,13 @@ A modern, single-page resume builder application built with Vue 3 and Vuetify. C
 
 - 🎨 **Modern UI**: Clean and intuitive interface built with Vuetify 3
 - 📝 **Real-time Preview**: See your changes instantly with live preview
-- 🔄 **Dynamic Sections**: Add, remove, and reorder sections as needed
+- 🔄 **Dynamic Sections**: Add, remove, reorder and hide any JSON Resume section, and place it in the main column or the sidebar
 - 🎯 **Customizable Details**: Flexible detail fields with link support
 - 🎭 **Style Customization**: Customize colors, typography, and layout
 - 💾 **Multiple Export Formats**: Download as HTML, PDF, JSON or TXT (plain text)
 - 📐 **Pixel-Perfect PDF**: Resumes are typeset with [Typst](https://typst.app) compiled to WebAssembly, right in the browser. The preview and the PDF come from the same compiled document, with embedded fonts, so the output is identical on every device
 - 🔒 **Privacy First**: Everything stays in your browser
-- 💾 **Save/Load**: Import and export your resume data as JSON
+- 💾 **JSON Resume**: Resumes are stored in the open [JSON Resume](https://jsonresume.org/schema) format. Import a resume.json from any JSON Resume tool, and export one that other tools accept; the template, style and layout travel along in its `meta` field
 - 🤖 **AI CV Conversion**: Convert existing CVs using AI models
 - 🔍 **Zoom Controls**: Zoom in/out for better editing experience
 - 📱 **Mobile Responsive**: Works seamlessly on desktop and mobile devices
@@ -28,13 +28,15 @@ A modern, single-page resume builder application built with Vue 3 and Vuetify. C
 
 ## Getting Started
 
-### How rendering works
+### How it works
 
-Templates live in `src/typst/templates` as Typst files. `src/typst/document.js` turns the resume data and style into JSON that the templates read, and `src/typst/TypstService.js` runs the compiler in the browser to produce the SVG preview and the PDF. Fonts are bundled as TTF files in `public/fonts` (Typst cannot use system fonts in the browser); to change the set, edit `src/typst/fonts.js` and run `node scripts/fetch-fonts.mjs`.
+The resume is a [JSON Resume](https://jsonresume.org/schema) document; `src/resume/` holds the section definitions (which drive the editor forms, the renderer and the AI output schema) and the app settings stored under `meta.resumeBuilder`. Text fields use Markdown.
+
+Templates live in `src/typst/templates` as Typst files. `src/typst/document.js` turns the resume into JSON that the templates read, and `src/typst/TypstService.js` runs the compiler in the browser to produce the SVG preview and the PDF. Fonts are bundled as TTF files in `public/fonts` (Typst cannot use system fonts in the browser); to change the set, edit `src/typst/fonts.js` and run `node scripts/fetch-fonts.mjs`.
 
 ### Prerequisites
 
-- Node.js (v16 or higher) and npm/yarn, OR
+- Node.js (v20 or higher) and npm/yarn, OR
 - Docker and Docker Compose (v2.22.0 or later)
 
 ### Installation

@@ -1,6 +1,6 @@
 // Runs the Typst compiler (WebAssembly) in the browser. The same compiled
 // document feeds the SVG preview and the PDF export, so they always match.
-import { AVATAR_PATH, buildDocument, imageDataUrlToBytes } from './document'
+import { AVATAR_PATH, buildDocument, imageToBytes } from './document'
 import { fontUrls } from './fonts'
 import mainTyp from './templates/main.typ?raw'
 import libTyp from './templates/lib.typ?raw'
@@ -93,18 +93,18 @@ async function ensureFonts(engine, families) {
     await engine.setFonts()
 }
 
-async function syncAvatar(engine, dataUrl) {
-    if (!dataUrl || dataUrl === avatarSource) return
-    engine.compiler.mapShadow(AVATAR_PATH, await imageDataUrlToBytes(dataUrl))
-    avatarSource = dataUrl
+async function syncAvatar(engine, src) {
+    if (!src || src === avatarSource) return
+    engine.compiler.mapShadow(AVATAR_PATH, await imageToBytes(src))
+    avatarSource = src
 }
 
-async function compile(resumeData, resumeStyle, format) {
+async function compile(resume, format) {
     const engine = await getEngine()
     return enqueue(async () => {
-        const { data, fonts } = buildDocument(resumeData, resumeStyle)
+        const { data, fonts } = buildDocument(resume)
         await ensureFonts(engine, fonts)
-        await syncAvatar(engine, resumeData.personal?.image?.data)
+        await syncAvatar(engine, resume.basics?.image)
         engine.compiler.mapShadow('/data.json', new TextEncoder().encode(JSON.stringify(data)))
 
         const { result, diagnostics } = await engine.compiler.compile({
@@ -134,8 +134,8 @@ export class TypstService {
      * @returns {Promise<{ svg: string, size: { width: number, height: number }, pages: Array<{ width: number, height: number }> }>}
      *   One SVG with all pages stacked vertically, its size, and each page's size, all in pt
      */
-    static async renderSvg(resumeData, resumeStyle) {
-        const { engine, result } = await compile(resumeData, resumeStyle, FORMAT_VECTOR)
+    static async renderSvg(resume) {
+        const { engine, result } = await compile(resume, FORMAT_VECTOR)
         const { renderer } = engine
         return renderer.runWithSession(async session => {
             renderer.manipulateData({ renderSession: session, action: 'reset', data: result })
@@ -153,8 +153,8 @@ export class TypstService {
     }
 
     /** @returns {Promise<Uint8Array>} */
-    static async renderPdf(resumeData, resumeStyle) {
-        const { result } = await compile(resumeData, resumeStyle, FORMAT_PDF)
+    static async renderPdf(resume) {
+        const { result } = await compile(resume, FORMAT_PDF)
         return result
     }
 }

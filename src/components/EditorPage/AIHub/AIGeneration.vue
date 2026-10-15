@@ -63,7 +63,6 @@
 <script>
 import AIGenerationService from "../../../services/AIGenerationService";
 import TranscriptionService from "../../../services/TranscriptionService";
-import { ResumeDataV2 } from '@/models/ResumeData/ResumeDataV2';
 
 const PROMPT_EDIT = `
 You are an experienced HR and career consultant helping a user improve an existing resume.
@@ -75,9 +74,9 @@ Goals:
 
 Instructions:
 1. Start by asking the user what specific parts of their resume they want to improve (e.g., formatting, phrasing, adding achievements).
-2. The resume may contain the following sections: Name, Title, Work History, Education, and custom sections like Skills, Hobbies, Contacts, Projects, etc.
+2. The resume follows the JSON Resume format: basics (name, title, contacts, summary, profiles), work, education, skills, languages, projects, volunteer, awards, certificates, publications, interests and references.
 3. When the user provides information, incorporate it into your suggestions and show an updated draft.
-4. Use HTML tags for formatting (headings, lists, emphasis) when presenting changes or examples.
+4. Text fields may use Markdown (bold, italic, links); put bullet points in the "highlights" arrays.
 5. Stay collaborative: confirm changes with the user before finalizing.
 6. Do not show the resume draft or raw text to the user.
 
@@ -99,7 +98,7 @@ Instructions:
 3. Be specific in your requests (e.g., "Could you list your most recent job title and employer?").
 4. If any information is unclear or missing, ask for clarification before adding it.
 5. As soon as you receive new information, add it to the resume draft (use placeholders if necessary).
-6. Use HTML tags to format the resume content as you build it (headings for sections, lists for items).
+6. Put the information in the matching JSON Resume fields; text may use Markdown and bullet points go in the "highlights" arrays.
 7. Do not show the resume draft or raw text to the user.
 
 Example:
@@ -178,7 +177,6 @@ export default {
             this.history = [];
             this.activePrompt = null;
             localStorage.removeItem("ai-generation-state");
-            localStorage.removeItem("ai-generation-history"); // for migration
             this.stopRecording();
         },
         async toggleRecording() {
@@ -279,13 +277,13 @@ export default {
         formatMessage(text) {
             return text.replace(/\n/g, '<br>');
         },
-        async startConversation(prompt, resumeData) {
+        async startConversation(prompt, resumeInfo) {
             if (this.isLoading) return;
             this.isLoading = true;
             this.activePrompt = prompt;
 
             try {
-                const response = await AIGenerationService.generate(resumeData, [], this.generationApiKey, this.generationModel, prompt);
+                const response = await AIGenerationService.generate(resumeInfo, [], this.generationApiKey, this.generationModel, prompt);
                 const assistantMessage = {
                     sender: "assistant",
                     text: response.answer,
@@ -309,7 +307,7 @@ export default {
             if (window.sa_event) {
                 window.sa_event("ai_start_from_scratch");
             }
-            const newResume = new ResumeDataV2();
+            const newResume = { basics: {} };
             this.$emit("update:resumeInfo", newResume);
             this.startConversation(PROMPT_SCRATCH, newResume);
         },

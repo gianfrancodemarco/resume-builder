@@ -43,37 +43,16 @@
                         </template>
                         Personal Info
                     </v-tooltip>
-                    <v-tooltip location="right" :model-value="showAllTooltips">
+                    <v-tooltip v-for="section in sections" :key="section.key" location="right"
+                        :model-value="showAllTooltips">
                         <template v-slot:activator="{ props: tooltipProps }">
-                            <v-btn v-bind="tooltipProps" icon="ph-briefcase"
-                                :color="currentSection === 'experience' ? 'primary' : 'grey'" variant="text"
-                                class="menu-btn" @click="scrollToSection('experience')"
-                                :class="{ 'active': currentSection === 'experience' }" />
+                            <v-btn v-bind="tooltipProps" :icon="SECTIONS[section.key].icon"
+                                :color="currentSection === section.key ? 'primary' : 'grey'" variant="text"
+                                class="menu-btn" @click="scrollToSection(section.key)"
+                                :class="{ 'active': currentSection === section.key }" />
                         </template>
-                        Experience
+                        {{ section.title }}
                     </v-tooltip>
-                    <v-tooltip location="right" :model-value="showAllTooltips">
-                        <template v-slot:activator="{ props: tooltipProps }">
-                            <v-btn v-bind="tooltipProps" icon="ph-graduation-cap"
-                                :color="currentSection === 'education' ? 'primary' : 'grey'" variant="text"
-                                class="menu-btn" @click="scrollToSection('education')"
-                                :class="{ 'active': currentSection === 'education' }" />
-                        </template>
-                        Education
-                    </v-tooltip>
-
-                    <!-- Custom Sections -->
-                    <template v-for="(section, index) in (customSections || [])" :key="`custom-${index}`">
-                        <v-tooltip location="right" :model-value="showAllTooltips" v-if="section && section.title">
-                            <template v-slot:activator="{ props: tooltipProps }">
-                                <v-btn v-bind="tooltipProps" :icon="getCustomSectionIcon(section)"
-                                    :color="currentSection === `custom-${index}` ? 'primary' : 'grey'" variant="text"
-                                    class="menu-btn" @click="scrollToSection(`custom-${index}`)"
-                                    :class="{ 'active': currentSection === `custom-${index}` }" />
-                            </template>
-                            {{ section.title }}
-                        </v-tooltip>
-                    </template>
                 </template>
 
                 <!-- Style sections -->
@@ -198,6 +177,7 @@
 <script setup>
 import { ref, watch, onMounted, onBeforeUnmount, computed } from 'vue'
 import { useTheme } from 'vuetify'
+import { SECTIONS } from '@/resume/sections'
 
 const theme = useTheme()
 const isDark = computed(() => theme.global.current.value.dark)
@@ -207,7 +187,8 @@ const props = defineProps({
         type: String,
         default: 'info'
     },
-    customSections: {
+    // Section layout from the resume settings: [{ key, title, ... }]
+    sections: {
         type: Array,
         default: () => []
     },
@@ -237,11 +218,6 @@ const toggleTheme = () => {
     theme.global.name.value = newTheme;
     localStorage.setItem('theme', newTheme);
 }
-
-// Computed property to safely handle customSections
-const safeCustomSections = computed(() => {
-    return props.customSections?.filter(section => section && section.title) || []
-})
 
 // Scroll detection setup
 let scrollTimeout = null
@@ -357,49 +333,6 @@ const handleHome = () => props.handleHome && props.handleHome()
 // Scroll to section function
 const scrollToSection = (sectionName) => {
     emit('scrollToSection', sectionName)
-}
-
-// Get icon for custom section based on title or type
-const getCustomSectionIcon = (section) => {
-    if (!section || !section.title) {
-        return 'ph-plus-circle'
-    }
-
-    const title = section.title.toLowerCase().trim()
-
-    // Map common section titles to icons
-    const iconMap = {
-        'skills': 'ph-lightning',
-        'languages': 'ph-translate',
-        'certifications': 'ph-certificate',
-        'projects': 'ph-folder',
-        'publications': 'ph-book-open',
-        'awards': 'ph-trophy',
-        'volunteer': 'ph-heart',
-        'interests': 'ph-star',
-        'hobby': 'ph-star',
-        'hobbies': 'ph-star',
-        'references': 'ph-users',
-        'contacts': 'ph-phone',
-        'contact': 'ph-phone',
-        'summary': 'ph-text-align-left',
-        'objective': 'ph-target',
-        'achievements': 'ph-medal',
-        'activities': 'ph-game-controller',
-        'memberships': 'ph-buildings',
-        'patents': 'ph-lightbulb'
-    }
-
-    // Simple word matching
-    const words = title.split(/\s+/)
-    for (const word of words) {
-        if (iconMap[word]) {
-            return iconMap[word]
-        }
-    }
-
-    // Default icon for unknown sections
-    return 'ph-plus-circle'
 }
 </script>
 
