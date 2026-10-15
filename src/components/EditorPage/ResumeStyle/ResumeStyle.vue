@@ -20,8 +20,8 @@
                                 :class="['template-item', { 'template-item-active': isActiveTemplate(template.key) }]"
                                 @click="confirmTemplateChange(template.key)">
                                 <div class="template-preview">
-                                    <TemplateFactory :resume-data="props.resumeData" :style="template.instance"
-                                        :sidebar-position="template.instance.spacing.sidebarLeft ? 'left' : 'right'" />
+                                    <ResumePreview v-if="templatesExpanded" :resume-data="props.resumeData"
+                                        :resume-style="template.instance" :max-pages="1" :debounce="600" />
                                 </div>
                                 <div class="template-name">
                                     {{ template.name }}
@@ -184,48 +184,13 @@
                 </div>
             </div>
         </div>
-
-        <!-- Advanced Section -->
-        <div class="editor-section" data-section="advanced">
-            <div class="section-header">
-                <div class="d-flex align-center w-100">
-                    <span class="section-title">
-                        <v-icon icon="ph-code" class="mr-2" /> Advanced
-                    </span>
-                </div>
-            </div>
-            <div class="section-content">
-                <div class="d-flex flex-column gap-4">
-                    <div>
-                        <div class="text-subtitle-2 mb-2">Custom CSS</div>
-                        <div class="custom-css-info mb-3">
-                            <v-alert type="info" variant="tonal" density="compact" class="mb-3">
-                                <template v-slot:prepend>
-                                    <v-icon icon="ph-info" size="small" />
-                                </template>
-                                Add custom CSS that will be embedded in your resume. Use this to override default styles
-                                or add
-                                new styling.
-                            </v-alert>
-                        </div>
-                        <v-textarea v-model="styleData.customCSS"
-                            placeholder="/* Add your custom CSS here */&#10;.resume-preview h1 {&#10;  color: #ff0000;&#10;}&#10;.resume-preview .sidebar {&#10;  background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);&#10;}"
-                            variant="outlined" density="comfortable" rows="8" auto-grow hide-details
-                            class="custom-css-textarea" @input="handleCustomCSSChange"></v-textarea>
-                        <div class="text-caption mt-2 text-medium-emphasis">
-                            CSS will be applied to the resume preview and exported PDF
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
 </template>
 
 <script setup>
 import { ResumeStyleV1_1 } from '@/models/ResumeStyle/ResumeStyleV1_1'
 import { TemplateService } from '@/services/TemplateService'
-import TemplateFactory from './templates/TemplateFactory.vue'
+import ResumePreview from '../ResumePreview.vue'
 import { computed, ref } from 'vue'
 
 const props = defineProps({
@@ -338,10 +303,6 @@ const applyTemplateChange = () => {
     }
 }
 
-const handleCustomCSSChange = () => {
-    emit('update:style-data', props.styleData)
-    emit('change')
-}
 
 </script>
 
@@ -471,16 +432,23 @@ const handleCustomCSSChange = () => {
     height: 59mm;
     overflow: hidden;
     border-radius: 8px;
-    background-color: white;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     margin-bottom: 12px;
     position: relative;
 }
 
-.template-preview :deep(.resume-preview) {
-    transform: scale(0.2);
+.template-preview :deep(.resume-pages) {
+    width: 210mm;
+    align-items: flex-start;
+    /* Slightly over 42mm / 210mm so the page always covers the frame; no edge shows through */
+    transform: scale(0.201);
     transform-origin: top left;
-    height: 100%;
+}
+
+.template-preview :deep(.resume-page) {
+    box-shadow: none;
+    /* At this scale the image edge lands between pixels; a white page behind it would show */
+    background: none;
 }
 
 .template-name {
@@ -526,36 +494,5 @@ const handleCustomCSSChange = () => {
         transform: translateX(0);
         opacity: 1;
     }
-}
-
-/* Custom CSS textarea styles */
-.custom-css-textarea {
-    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace !important;
-    font-size: 0.9rem !important;
-    line-height: 1.4 !important;
-}
-
-:deep(.custom-css-textarea .v-field__input) {
-    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace !important;
-    font-size: 0.9rem !important;
-    line-height: 1.4 !important;
-    padding: 12px !important;
-}
-
-:deep(.custom-css-textarea .v-field__outline) {
-    border-color: rgb(var(--v-theme-editor-border)) !important;
-}
-
-:deep(.custom-css-textarea .v-field--focused .v-field__outline) {
-    border-color: rgb(var(--v-theme-primary)) !important;
-}
-
-.custom-css-info {
-    margin-bottom: 16px;
-}
-
-:deep(.custom-css-info .v-alert) {
-    border-radius: 8px;
-    border: 1px solid rgba(var(--v-theme-primary), 0.2);
 }
 </style>

@@ -16,6 +16,9 @@
     "@headlessui/vue": "^1.7.23",
     "@heroicons/vue": "^2.2.0",
     "@mdi/font": "^7.4.47",
+    "@myriaddreamin/typst-ts-renderer": "^0.7.0",
+    "@myriaddreamin/typst-ts-web-compiler": "^0.7.0",
+    "@myriaddreamin/typst.ts": "^0.7.0",
     "@phosphor-icons/vue": "^2.2.1",
     "@tiptap/extension-color": "^2.14.0",
     "@tiptap/extension-font-family": "^2.14.0",
@@ -40,7 +43,7 @@
     "sass": "^1.89.2",
     "sass-loader": "^13.3.3",
     "vite": "^6.3.5",
-    "vite-plugin-vue-devtools": "^7.7.7",
+    "vite-plugin-vue-devtools": "^8.2.1",
     "vitest": "^1.6.1"
   }
 }

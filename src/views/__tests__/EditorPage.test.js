@@ -30,11 +30,11 @@ vi.mock('@/components/EditorPage/ResumeEditor.vue', () => ({
     }
 }))
 
-vi.mock('@/components/EditorPage/templates/TemplateFactory.vue', () => ({
+vi.mock('@/components/EditorPage/ResumePreview.vue', () => ({
     default: {
-        name: 'TemplateFactory',
-        template: '<div class="template-factory-mock">TemplateFactory Mock</div>',
-        props: ['resumeData', 'style', 'sidebarPosition']
+        name: 'ResumePreview',
+        template: '<div class="resume-preview-mock">ResumePreview Mock</div>',
+        props: ['resumeData', 'resumeStyle']
     }
 }))
 
@@ -139,9 +139,9 @@ describe('EditorPage', () => {
                         props: ['resumeData', 'style', 'activeTab', 'isMobile'],
                         emits: ['update:resume-data', 'update:style', 'update:activeTab', 'save', 'change']
                     },
-                    'TemplateFactory': {
-                        template: '<div class="template-factory-mock">TemplateFactory Mock</div>',
-                        props: ['resumeData', 'style', 'sidebarPosition']
+                    'ResumePreview': {
+                        template: '<div class="resume-preview-mock">ResumePreview Mock</div>',
+                        props: ['resumeData', 'resumeStyle']
                     },
                     'ConvertCVDialog': {
                         template: '<div class="convert-cv-dialog-mock">ConvertCVDialog Mock</div>',
@@ -762,7 +762,7 @@ describe('EditorPage', () => {
             // Check that all child components are rendered
             expect(wrapper.findComponent({ name: 'LateralMenu' })).toBeTruthy()
             expect(wrapper.findComponent({ name: 'ResumeEditor' })).toBeTruthy()
-            expect(wrapper.findComponent({ name: 'TemplateFactory' })).toBeTruthy()
+            expect(wrapper.findComponent({ name: 'ResumePreview' })).toBeTruthy()
             expect(wrapper.findComponent({ name: 'ConvertCVDialog' })).toBeTruthy()
         })
     })
