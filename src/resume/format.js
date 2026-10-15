@@ -15,10 +15,10 @@ export function formatDate(date) {
     return month >= 1 && month <= 12 ? `${MONTHS[month - 1]} ${match[1]}` : match[1]
 }
 
-/** "Mar 2020 - Present", "2016 - 2018", or a single date. */
+/** "Mar 2020 – Present", "2016 – 2018", or a single date. */
 export function formatRange(start, end) {
     if (!start) return formatDate(end)
-    return `${formatDate(start)} - ${end ? formatDate(end) : 'Present'}`
+    return `${formatDate(start)} – ${end ? formatDate(end) : 'Present'}`
 }
 
 // Proficiency used to draw language bars: CEFR levels, LinkedIn wording and

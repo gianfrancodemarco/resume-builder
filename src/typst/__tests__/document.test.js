@@ -35,7 +35,7 @@ describe('buildSections', () => {
             title: 'Senior Software Engineer',
             subtitle: 'Tech Solutions Inc.',
             location: 'Milan',
-            date: 'Mar 2020 - Present',
+            date: 'Mar 2020 – Present',
             href: '',
             details: [],
             keywords: [],
@@ -45,7 +45,7 @@ describe('buildSections', () => {
 
     it('maps education, contact, profiles, skills and languages', () => {
         const sections = Object.fromEntries(buildSections(sampleResume()).map(s => [s.key, s]))
-        expect(sections.education.items[0]).toMatchObject({ title: 'Master in Computer Science', subtitle: 'University of Milan', date: '2016 - 2018', details: ['110/110'] })
+        expect(sections.education.items[0]).toMatchObject({ title: 'Master in Computer Science', subtitle: 'University of Milan', date: '2016 – 2018', details: ['110/110'] })
         expect(sections.contact.items).toEqual([
             { text: 'New York, US', href: '' },
             { text: 'john.doe@example.com', href: 'mailto:john.doe@example.com' },
@@ -76,6 +76,29 @@ describe('buildDocument', () => {
         expect(data.sidebar).toEqual([])
         expect(data.main).toHaveLength(7)
         expect(data.sizes.sidebar).toBe(0)
+    })
+
+    it('moves contact details and profiles to the header for layouts that show them there', () => {
+        const resume = sampleResume()
+        design(resume, { layout: 'minimal' })
+        const { data } = buildDocument(resume)
+        expect(data.template).toBe('minimal')
+        expect(keys(data.main)).toEqual(['summary', 'work', 'education', 'skills', 'languages'])
+        expect(data.header.contact.map(c => c.text)).toEqual(['New York, US', 'john.doe@example.com', '+1 555 0100'])
+        expect(data.header.links.map(l => l.href)).toEqual(['https://github.com/johndoe', 'https://linkedin.com/in/johndoe'])
+    })
+
+    it('leaves the header empty when contact and profiles are hidden', () => {
+        const resume = sampleResume()
+        design(resume, { layout: 'banner' })
+        for (const section of settingsOf(resume).sections) {
+            if (section.key === 'contact' || section.key === 'profiles') section.visible = false
+        }
+        expect(buildDocument(resume).data.header).toEqual({ contact: [], links: [] })
+    })
+
+    it('keeps contact and profiles as sections in the sidebar and classic layouts', () => {
+        expect(buildDocument(sampleResume()).data.header).toEqual({ contact: [], links: [] })
     })
 
     it('converts the size and density choices to pt', () => {

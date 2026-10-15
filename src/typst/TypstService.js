@@ -6,12 +6,18 @@ import mainTyp from './templates/main.typ?raw'
 import libTyp from './templates/lib.typ?raw'
 import twoColumnTyp from './templates/two-column.typ?raw'
 import oneColumnModernTyp from './templates/one-column-modern.typ?raw'
+import minimalTyp from './templates/minimal.typ?raw'
+import bannerTyp from './templates/banner.typ?raw'
+import timelineTyp from './templates/timeline.typ?raw'
 
 const SOURCES = {
     '/main.typ': mainTyp,
     '/lib.typ': libTyp,
     '/two-column.typ': twoColumnTyp,
     '/one-column-modern.typ': oneColumnModernTyp,
+    '/minimal.typ': minimalTyp,
+    '/banner.typ': bannerTyp,
+    '/timeline.typ': timelineTyp,
 }
 
 // Typst formats: vector is rendered to SVG for the preview, pdf is downloaded

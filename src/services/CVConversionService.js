@@ -2,7 +2,10 @@ import { resumeContentSchema } from '@/resume/llmSchema'
 import { compact } from '@/resume/values'
 
 export class CVConversionService {
-    static async convertCV(file, apiKey, model) {
+    /**
+     * @param {AbortSignal} [options.signal] - Cancels the request; the promise then rejects with an AbortError
+     */
+    static async convertCV(file, apiKey, model, { signal } = {}) {
         try {
             // Convert file to base64
             const base64File = await this.fileToBase64(file)
@@ -50,6 +53,7 @@ export class CVConversionService {
             // Make the API request to OpenRouter
             const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
                 method: 'POST',
+                signal,
                 headers: {
                     'Authorization': `Bearer ${apiKey}`,
                     'Content-Type': 'application/json',
@@ -93,6 +97,7 @@ export class CVConversionService {
             // Strict mode returns every field; drop the empty ones
             return compact(convertedData)
         } catch (error) {
+            if (error.name === 'AbortError') throw error
             throw new Error(error.message)
         }
     }

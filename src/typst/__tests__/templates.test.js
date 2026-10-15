@@ -87,8 +87,10 @@ describe('Typst templates', () => {
         })
     }
 
-    it('compiles every font pairing, size and density, with the sidebar on either side', async () => {
+    it('compiles every font pairing, size and density across layouts, with the sidebar on either side', async () => {
+        const layouts = Object.keys(LAYOUTS)
         const options = Object.keys(FONT_PAIRINGS).map((fonts, i) => ({
+            layout: layouts[(i + 1) % layouts.length],
             fonts,
             size: ['s', 'm', 'l'][i % 3],
             density: ['compact', 'normal', 'airy'][i % 3],

@@ -16,8 +16,8 @@ describe('formatDate', () => {
 
 describe('formatRange', () => {
     it('uses Present for missing end dates', () => {
-        expect(formatRange('2020-03', '')).toBe('Mar 2020 - Present')
-        expect(formatRange('2016', '2018')).toBe('2016 - 2018')
+        expect(formatRange('2020-03', '')).toBe('Mar 2020 – Present')
+        expect(formatRange('2016', '2018')).toBe('2016 – 2018')
         expect(formatRange('', '2018')).toBe('2018')
         expect(formatRange('', '')).toBe('')
     })

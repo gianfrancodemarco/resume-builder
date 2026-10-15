@@ -44,7 +44,7 @@ describe('ConvertCV', () => {
         await wrapper.vm.handleConvert({ file: pdf, apiKey: 'key', model: 'model' })
         await flushPromises()
 
-        expect(CVConversionService.convertCV).toHaveBeenCalledWith(pdf, 'key', 'model')
+        expect(CVConversionService.convertCV).toHaveBeenCalledWith(pdf, 'key', 'model', { signal: expect.any(AbortSignal) })
         expect(wrapper.emitted('conversion-started')).toHaveLength(1)
         expect(wrapper.emitted('update:resume-info')).toEqual([[{ basics: { name: 'Jane Doe' } }]])
         expect(wrapper.emitted('conversion-finished')).toHaveLength(1)
@@ -63,6 +63,23 @@ describe('ConvertCV', () => {
         expect(wrapper.emitted('conversion-error')[0][0].message).toBe('Invalid API key')
         expect(wrapper.emitted('conversion-finished')).toHaveLength(1)
         expect(wrapper.vm.alertMessage).toMatchObject({ show: true, type: 'error', message: 'Invalid API key' })
+    })
+
+    it('cancels a conversion without reporting an error', async () => {
+        CVConversionService.convertCV.mockImplementation((file, key, model, { signal }) => new Promise((_, reject) => {
+            signal.addEventListener('abort', () => reject(Object.assign(new Error('Aborted'), { name: 'AbortError' })))
+        }))
+        wrapper = mountConvertCV()
+
+        const conversion = wrapper.vm.handleConvert({ file: pdf, apiKey: 'key', model: 'model' })
+        expect(wrapper.vm.loading).toBe(true)
+        wrapper.vm.cancel()
+        await conversion
+
+        expect(wrapper.vm.loading).toBe(false)
+        expect(wrapper.emitted('update:resume-info')).toBeUndefined()
+        expect(wrapper.emitted('conversion-error')).toBeUndefined()
+        expect(wrapper.vm.alertMessage.show).toBe(false)
     })
 
     it('rejects invalid files', () => {

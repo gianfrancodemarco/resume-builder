@@ -55,7 +55,7 @@ describe('ExporterService', () => {
             expect(text).toContain('using Vue.js and other') // Markdown removed
             expect(text).toContain('CONTACT\nNew York, US\njohn.doe@example.com\n+1 555 0100')
             expect(text).toContain('PROFILES\nGitHub: https://github.com/johndoe')
-            expect(text).toContain('WORK EXPERIENCE\nSenior Software Engineer - Tech Solutions Inc.\nMar 2020 - Present | Milan')
+            expect(text).toContain('WORK EXPERIENCE\nSenior Software Engineer - Tech Solutions Inc.\nMar 2020 – Present | Milan')
             expect(text).toContain('- Improved application performance by 40%')
             expect(text).toContain('SKILLS\nFrontend: Vue.js, JavaScript, TypeScript, HTML/CSS')
             expect(text).toContain('LANGUAGES\nItalian: Native speaker')

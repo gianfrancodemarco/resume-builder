@@ -1,6 +1,7 @@
 <template>
     <div class="editor-page" :class="{ mobile: isMobile }">
-        <TopBar :resume="resume" :saved="saved" :downloading="downloading" :compact="isMobile" @home="router.push('/')"
+        <TopBar :resume="resume" :saved="saved" :downloading="downloading" :downloaded="downloaded"
+            :compact="isMobile" @home="router.push('/')"
             @download-pdf="handleDownloadPDF" @import="handleImportJSON" @export-json="handleExportJSON"
             @export-txt="handleDownloadTXT" />
 
@@ -85,6 +86,9 @@ watch(panel, value => {
 
 const fileInput = ref(null)
 const downloading = ref(false)
+// Shown on the download button for a moment after a successful download
+const downloaded = ref(false)
+let downloadedTimer = null
 const saved = ref(true)
 
 const toast = ref({ show: false, title: '', message: '', type: 'success' })
@@ -119,6 +123,7 @@ onMounted(() => {
 
 onUnmounted(() => {
     clearInterval(autosaveTimer)
+    clearTimeout(downloadedTimer)
     window.removeEventListener('beforeunload', autosave)
     // ...or when leaving the editor (e.g. to the home page)
     autosave()
@@ -129,8 +134,12 @@ onUnmounted(() => {
 const handleDownloadPDF = async () => {
     track('download_pdf')
     downloading.value = true
+    downloaded.value = false
     try {
         await ExporterService.exportToPDF(resume.value)
+        downloaded.value = true
+        clearTimeout(downloadedTimer)
+        downloadedTimer = setTimeout(() => { downloaded.value = false }, 2000)
     } catch (error) {
         console.error('Error generating PDF:', error)
         notify('PDF generation failed', 'Please try again.', 'error')
