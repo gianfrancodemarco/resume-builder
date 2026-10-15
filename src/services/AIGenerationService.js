@@ -1,9 +1,10 @@
-import { ResumeDataV2 } from '@/models/ResumeData/ResumeDataV2';
+import { resumeContentSchema } from '@/resume/llmSchema';
+import { compact } from '@/resume/values';
 
 class AIGenerationService {
     /**
      * Calls an LLM to get an updated resume and a textual answer.
-     * @param {object} resumeInfo - The current resume data.
+     * @param {object} resumeInfo - The current resume content (JSON Resume, without meta).
      * @param {Array<{sender: string, text: string}>} history - The conversation history.
      * @param {string} apiKey - The OpenRouter API key.
      * @param {string} model - The selected model.
@@ -18,7 +19,7 @@ class AIGenerationService {
             throw new Error("Model is required.");
         }
 
-        const resumeSchema = ResumeDataV2.getResumeSchema();
+        const resumeSchema = resumeContentSchema();
 
         const historyMessages = history.map(h => ({
             role: h.sender,
@@ -28,7 +29,7 @@ class AIGenerationService {
         const messages = [
             {
                 role: 'system',
-                content: `${systemMessage} The user's current resume data is: ${JSON.stringify(resumeInfo)}`
+                content: `${systemMessage} The resume uses the JSON Resume format (https://jsonresume.org/schema). The user's current resume is: ${JSON.stringify(resumeInfo)}`
             },
             ...historyMessages
         ];
@@ -85,7 +86,7 @@ class AIGenerationService {
 
         return {
             answer: content.answer,
-            resumeInfo: ResumeDataV2.fromJSON(content.resumeInfo),
+            resumeInfo: compact(content.resumeInfo),
         };
     }
 }

@@ -1,5 +1,5 @@
 // "1 Column Modern" template: framed page, section titles in a narrow left column.
-#import "lib.typ": rich, rich-style, joined
+#import "lib.typ": look, section-body, rich, highlights, joined, maybe-link
 
 #let render(d) = {
   let colors = d.colors.pairs().map(((k, v)) => (k, rgb(v))).to-dict()
@@ -20,16 +20,34 @@
   set par(leading: 0.65em, spacing: 0.65em)
 
   let heading-text(body, ..args) = text(font: d.fonts.heading, weight: "bold", ..args, body)
-  let st = rich-style(
+  let lk = look(
     link: colors.link,
+    muted: colors.dates,
     bar-fill: colors.primary,
     bar-track: colors.primary.transparentize(85%),
+    gap: 0.55em,
+    item-gap: content-gap,
+    strong-font: d.fonts.heading,
   )
   let small(body) = {
     set text(size: 0.9em)
     set par(leading: 0.55em)
     body
   }
+
+  // Title and date on one line, organization below, content in smaller text
+  let entry(e, lk) = block(width: 100%, below: lk.item-gap, {
+    let title = joined(" | ", e.title, e.date)
+    if title != none { block(below: 0.5em, maybe-link(e.href, heading-text(title))) }
+    let org = joined(" - ", e.subtitle, e.location)
+    if org != none { block(below: 0.8em, org) }
+    small({
+      for detail in e.details { block(below: 0.6em, detail) }
+      rich(e.summary, lk)
+      highlights(e.highlights, lk)
+      if e.keywords.len() > 0 { block(above: lk.gap, text(fill: lk.muted, e.keywords.join(" · "))) }
+    })
+  })
 
   // Header: name on the left, title on the right
   block(width: 100%, inset: (bottom: content-gap), stroke: (bottom: rule), below: section-gap, grid(
@@ -50,28 +68,7 @@
       grid(
         columns: (25%, 75%),
         pad(right: 15pt, heading-text(upper(section.title), fill: colors.primary)),
-        {
-          if section.type == "experiences" {
-            for e in section.items {
-              block(width: 100%, below: content-gap, {
-                block(below: 0.5em, heading-text(joined(" | ", e.title, e.period)))
-                if e.company != "" { block(below: 0.8em, e.company) }
-                small(rich(e.description, st))
-              })
-            }
-          } else if section.type == "education" {
-            for e in section.items {
-              block(width: 100%, below: content-gap, {
-                block(below: 0.5em, heading-text(joined(" | ", e.school, e.period)))
-                if e.degree != "" { block(below: 0.8em, e.degree) }
-                if e.mark != "" { block(below: 0.6em, small(e.mark)) }
-                if e.thesis.len() > 0 { block(above: 0.6em, small(rich(e.thesis, st))) }
-              })
-            }
-          } else {
-            rich(section.content, st)
-          }
-        },
+        section-body(section, lk, entry: entry),
       ),
     )
   }

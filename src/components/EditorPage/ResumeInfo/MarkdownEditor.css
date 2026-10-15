@@ -37,12 +37,6 @@
     /* slate-700 */
 }
 
-.toolbar-select {
-    background-color: rgb(var(--v-theme-surface)) !important;
-    color: rgb(var(--v-theme-editor-text-secondary)) !important;
-    border: 1px solid rgb(var(--v-theme-editor-border)) !important;
-}
-
 /* Editor Content Area */
 .tiptap-editor-content {
     background: rgb(var(--v-theme-background)) !important;
@@ -120,23 +114,6 @@
     display: inline-block;
 }
 
-.toolbar-select {
-    padding: 2px 6px;
-    border-radius: 4px;
-    border: 1px solid #ccc;
-    font-size: 1rem;
-    margin-right: 4px;
-}
-
-.toolbar-color {
-    width: 28px;
-    height: 28px;
-    border: none;
-    background: none;
-    margin-right: 4px;
-    cursor: pointer;
-}
-
 .tiptap-editor-content {
     border: 1px solid #e0e0e0;
     border-radius: 0 0 6px 6px;
@@ -144,35 +121,3 @@
     background: #fff;
 }
 
-[data-type="proficiency-bar-container"] {
-    position: relative;
-    margin: 16px 0;
-    padding: 8px;
-    border: 1px solid #e0e0e0;
-    border-radius: 4px;
-    background: #f8f8f8;
-    cursor: pointer;
-}
-
-[data-type="proficiency-bar-container"]:hover {
-    background: #f0f0f0;
-}
-
-.delete-language-btn {
-    position: absolute;
-    right: 8px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: none;
-    border: none;
-    color: #666;
-    font-size: 18px;
-    cursor: pointer;
-    padding: 0 4px;
-    border-radius: 4px;
-}
-
-.delete-language-btn:hover {
-    background: #e0e0e0;
-    color: #333;
-}

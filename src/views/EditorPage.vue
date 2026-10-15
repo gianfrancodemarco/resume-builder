@@ -4,7 +4,7 @@
             <div class="editor-content" :class="{ 'mobile-view': isMobile }">
                 <!-- Lateral Menu -->
 
-                <LateralMenu v-model:active-tab="activeTab" :custom-sections="resumeData.customSections"
+                <LateralMenu v-model:active-tab="activeTab" :sections="settingsOf(resume).sections"
                     :handleShowAll="handleShowAllTooltips" :handleShowTooltipsStart="handleShowTooltipsStart"
                     :handleShowTooltipsEnd="handleShowTooltipsEnd" :handleZoomIn="handleZoomIn"
                     :handleZoomOut="handleZoomOut" :handleExportJSON="handleExportJSON"
@@ -14,14 +14,13 @@
                     @update:active-tab="activeTab = $event" />
 
                 <div class="editor-col" :style="isMobile ? { width: '100%' } : { width: '35%' }">
-                    <ResumeEditor v-model:resume-data="resumeData" v-model:style="resumeStyle"
-                        v-model:active-tab="activeTab"
+                    <ResumeEditor v-model:resume="resume" v-model:active-tab="activeTab"
                         :is-mobile="isMobile" />
                 </div>
                 <div class="preview-col" :class="{ 'hidden': isMobile }" :style="!isMobile ? { width: '65%' } : {}">
                     <div class="preview-container"
                         :style="{ transform: `scale(${zoomLevel / 100})`, transformOrigin: 'top center' }">
-                        <ResumePreview :resume-data="resumeData" :resume-style="resumeStyle" />
+                        <ResumePreview :resume="resume" />
                     </div>
                 </div>
             </div>
@@ -40,20 +39,17 @@ import LateralMenu from '@/components/EditorPage/LateralMenu.vue'
 import ResumeEditor from '@/components/EditorPage/ResumeEditor.vue'
 import ResumePreview from '@/components/EditorPage/ResumePreview.vue'
 import { ExporterService } from '@/services/ExporterService'
-import { ResumeDataClass, ResumeService, ResumeStyleClass } from '@/services/ResumeService'
-import { computed, onMounted, ref } from 'vue'
+import { settingsOf } from '@/resume/resume'
+import { ResumeService } from '@/services/ResumeService'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useDisplay } from 'vuetify'
 
 const { mobile } = useDisplay()
 const router = useRouter()
 
-// Replace the resumeData ref with the ResumeDataClass factory
-// We use from JSON so that if an older version of the resume data is loaded, it will be converted to the latest version
-const resumeData = ref(localStorage.getItem('resumeData') ? ResumeDataClass.fromJSON(JSON.parse(localStorage.getItem('resumeData'))) : ResumeDataClass.createDefault())
-
-// We use from JSON so that if an older version of the resume style is loaded, it will be converted to the latest version
-const resumeStyle = ref(localStorage.getItem('resumeStyle') ? JSON.parse(localStorage.getItem('resumeStyle')) : ResumeStyleClass.createDefault())
+// A JSON Resume document; template, style and layout live in its meta
+const resume = ref(ResumeService.loadStored())
 
 // Active Tab State
 const activeTab = ref('info')
@@ -71,6 +67,7 @@ const alertMessage = ref({
     type: 'success'
 })
 
+let alertTimer = null
 const showAlert = (title, message, type = 'success') => {
     alertMessage.value = {
         show: true,
@@ -78,40 +75,49 @@ const showAlert = (title, message, type = 'success') => {
         message,
         type
     }
-    setTimeout(() => {
-        hideAlert()
-    }, 3000)
+    // A new alert restarts the timer, so it is not hidden by the previous one's
+    clearTimeout(alertTimer)
+    alertTimer = setTimeout(hideAlert, 3000)
 }
 
 const hideAlert = () => {
     alertMessage.value.show = false
 }
 
-onMounted(async () => {
-    setInterval(() => {
-        localStorage.setItem('resumeData', JSON.stringify(resumeData.value))
-        localStorage.setItem('resumeStyle', JSON.stringify(resumeStyle.value))
-    }, 1000)
+let autosaveTimer = null
+let storageWarned = false
+const autosave = () => {
+    try {
+        ResumeService.store(resume.value)
+    } catch (error) {
+        // Usually a full localStorage, e.g. because of a large photo. Warn once.
+        if (!storageWarned) {
+            storageWarned = true
+            console.error('Error saving resume:', error)
+            showAlert('Autosave Failed', 'Your browser storage is full. Export your resume as JSON to keep your changes.', 'error')
+        }
+    }
+}
+
+onUnmounted(() => {
+    clearInterval(autosaveTimer)
+    clearTimeout(alertTimer)
+})
+
+onMounted(() => {
+    autosaveTimer = setInterval(autosave, 1000)
 });
 
 const downloadPDF = async () => {
-    await ExporterService.exportToPDF(resumeData.value, resumeStyle.value)
+    await ExporterService.exportToPDF(resume.value)
 }
 
 const downloadHTML = async () => {
-    await ExporterService.exportToHTML(resumeData.value, resumeStyle.value)
+    await ExporterService.exportToHTML(resume.value)
 }
 
 const exportJSON = () => {
-    const blob = ResumeService.exportToJSON(resumeData.value, resumeStyle.value)
-    const url = window.URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = ExporterService.getFilename(resumeData.value, 'json')
-    document.body.appendChild(a)
-    a.click()
-    window.URL.revokeObjectURL(url)
-    document.body.removeChild(a)
+    ExporterService.download(ResumeService.exportToJSON(resume.value), ExporterService.getFilename(resume.value, 'json'))
 }
 
 const importJSON = () => {
@@ -122,9 +128,7 @@ const handleFileUpload = async (event) => {
     const file = event.target.files[0]
     if (file) {
         try {
-            const { resumeData: newResumeData, resumeStyle: newResumeStyle } = await ResumeService.loadFromFile(file)
-            resumeData.value = newResumeData
-            resumeStyle.value = newResumeStyle
+            resume.value = await ResumeService.loadFromFile(file)
             showAlert('Import Successful', 'Your resume has been imported successfully.', 'success')
         } catch (error) {
             console.error('Error importing file:', error)
@@ -244,7 +248,7 @@ const handleHome = () => {
 
 // TXT Export logic
 const downloadTXT = async () => {
-    await ExporterService.exportToTXT(resumeData.value)
+    await ExporterService.exportToTXT(resume.value)
 }
 
 const handleDownloadTXT = async () => {

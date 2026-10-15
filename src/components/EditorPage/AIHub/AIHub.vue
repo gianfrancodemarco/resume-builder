@@ -54,14 +54,14 @@
             <v-window v-model="activeTab">
                 <v-window-item value="ai-generation">
                     <div class="section-content">
-                        <AIGeneration :resume-info="props.resumeData" @update:resume-info="handleUpdateResumeData"
+                        <AIGeneration :resume-info="content" @update:resume-info="applyContent"
                             :generation-api-key="generationApiKey" :generation-model="generationModel"
                             :openai-api-key="openaiApiKey" :transcription-language="transcriptionLanguage" />
                     </div>
                 </v-window-item>
                 <v-window-item value="convert-cv">
                     <div class="section-content">
-                        <ConvertCV @update:resumeData="handleUpdateResumeData" :api-key="generationApiKey"
+                        <ConvertCV @update:resume-info="applyContent" :api-key="generationApiKey"
                             :model="generationModel" />
                     </div>
                 </v-window-item>
@@ -71,19 +71,24 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, computed } from 'vue'
+import { resumeContent, withContent } from '@/resume/resume'
 import ConvertCV from './ConvertCV.vue'
 import AIGeneration from './AIGeneration.vue'
 import { CVConversionService } from '@/services/CVConversionService'
 
 const props = defineProps({
-    resumeData: {
+    resume: {
         type: Object,
         required: true
     }
 })
 
-const emit = defineEmits(['update:resumeData'])
+const emit = defineEmits(['update:resume'])
+
+// The AI tools see and return only the JSON Resume content; settings and
+// photo are kept from the current resume
+const content = computed(() => resumeContent(props.resume))
 const activeTab = ref('ai-generation')
 const generationApiKey = ref('')
 const openaiApiKey = ref('')
@@ -178,8 +183,8 @@ watch(models, (newVal) => {
 }, { immediate: true })
 
 
-const handleUpdateResumeData = (newResumeData) => {
-    emit('update:resumeData', newResumeData)
+const applyContent = (newContent) => {
+    emit('update:resume', withContent(props.resume, newContent))
 }
 </script>
 

@@ -20,8 +20,8 @@
                                 :class="['template-item', { 'template-item-active': isActiveTemplate(template.key) }]"
                                 @click="confirmTemplateChange(template.key)">
                                 <div class="template-preview">
-                                    <ResumePreview v-if="templatesExpanded" :resume-data="props.resumeData"
-                                        :resume-style="template.instance" :max-pages="1" :debounce="600" />
+                                    <ResumePreview v-if="templatesExpanded" :resume="template.preview" :max-pages="1"
+                                        :debounce="600" />
                                 </div>
                                 <div class="template-name">
                                     {{ template.name }}
@@ -188,48 +188,29 @@
 </template>
 
 <script setup>
-import { ResumeStyleV1_1 } from '@/models/ResumeStyle/ResumeStyleV1_1'
-import { TemplateService } from '@/services/TemplateService'
+import { applyTemplate, settingsOf, withTemplate } from '@/resume/resume'
+import { TEMPLATES, hasSidebar } from '@/resume/templates'
+import { FONT_NAMES } from '@/typst/fonts'
 import ResumePreview from '../ResumePreview.vue'
 import { computed, ref } from 'vue'
 
 const props = defineProps({
-    resumeData: {
-        type: Object,
-        required: true
-    },
-    styleData: {
+    resume: {
         type: Object,
         required: true
     }
 })
 
-const emit = defineEmits(['update:style-data', 'change'])
+// Template, colors, typography and spacing live in the resume's meta
+const styleData = computed(() => settingsOf(props.resume))
 
-const fontOptions = ResumeStyleV1_1.FONT_OPTIONS
+const fontOptions = FONT_NAMES
 
-const templateOptions = computed(() => {
-    const templates = TemplateService.getAllTemplates()
-    return templates.map(template => ({
-        ...template,
-        instance: TemplateService.createTemplateInstance(template.key)
-    }))
-})
-
-const onTemplateSelect = (templateKey) => {
-    if (!templateKey) return
-
-    const templateInstance = TemplateService.createTemplateInstance(templateKey)
-    if (templateInstance) {
-        // Completely replace the style data instead of merging
-        Object.keys(props.styleData).forEach(key => {
-            delete props.styleData[key]
-        })
-        Object.assign(props.styleData, templateInstance)
-        props.styleData.templateName = templateInstance.templateName
-        emit('update:style-data', props.styleData)
-    }
-}
+const templateOptions = computed(() => Object.entries(TEMPLATES).map(([key, template]) => ({
+    key,
+    name: template.name,
+    preview: withTemplate(props.resume, key),
+})))
 
 const colorFields = {
     primary: { label: 'Primary Color' },
@@ -243,7 +224,7 @@ const colorFields = {
 }
 
 const validateHex = (key) => {
-    const value = props.styleData.colors[key]
+    const value = styleData.value.colors[key]
     // Remove any non-hex characters
     let cleanValue = value.replace(/[^0-9A-Fa-f]/g, '')
 
@@ -258,21 +239,14 @@ const validateHex = (key) => {
     }
 
     // Update the value
-    props.styleData.colors[key] = cleanValue
-    emit('change')
+    styleData.value.colors[key] = cleanValue
 }
 
-const isSidebarPresent = computed(() => {
-    return props.styleData.spacing.sidebarWidth > 0
-})
+const isSidebarPresent = computed(() => styleData.value.spacing.sidebarWidth > 0)
 
-const isOneColumnTemplate = computed(() => {
-    return props.styleData.templateName === 'OneColumnModern'
-})
+const isOneColumnTemplate = computed(() => !hasSidebar(styleData.value.template))
 
-const isActiveTemplate = (templateKey) => {
-    return props.styleData.templateName === templateKey
-}
+const isActiveTemplate = templateKey => styleData.value.template === templateKey
 
 const templatesExpanded = ref(false)
 const toggleTemplates = () => {
@@ -290,15 +264,7 @@ const confirmTemplateChange = (templateKey) => {
 const applyTemplateChange = () => {
     showTemplateDialog.value = false
     if (selectedTemplateKey.value) {
-        const templateKey = selectedTemplateKey.value
-        onTemplateSelect(templateKey)
-
-        // Show success toaster
-        const template = TemplateService.getTemplate(templateKey)
-        if (template) {
-            emit('change')
-        }
-
+        applyTemplate(props.resume, selectedTemplateKey.value)
         selectedTemplateKey.value = null
     }
 }

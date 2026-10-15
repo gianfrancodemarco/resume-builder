@@ -2,17 +2,15 @@
   <div class="editor-card">
     <v-window v-model="activeTab" class="editor-window">
       <v-window-item value="info">
-        <ResumeInfo v-model:resume-data="props.resumeData" :is-mobile="props.isMobile"
-          @update:resume-data="updateResumeData" @change="emit('change')" />
+        <ResumeInfo :resume="props.resume" :is-mobile="props.isMobile" />
       </v-window-item>
 
       <v-window-item value="style">
-        <ResumeStyle :style-data="props.style" :resume-data="props.resumeData" @update:style-data="updateStyle"
-          @change="emit('change')" />
+        <ResumeStyle :resume="props.resume" />
       </v-window-item>
 
       <v-window-item value="ai">
-        <AIHub :resume-data="props.resumeData" @update:resume-data="updateResumeData" />
+        <AIHub :resume="props.resume" @update:resume="emit('update:resume', $event)" />
       </v-window-item>
     </v-window>
   </div>
@@ -27,11 +25,7 @@ import ResumeStyle from './ResumeStyle/ResumeStyle.vue'
 import './SliderStyles.css'
 
 const props = defineProps({
-  resumeData: {
-    type: Object,
-    required: true
-  },
-  style: {
+  resume: {
     type: Object,
     required: true
   },
@@ -45,7 +39,7 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['update:resumeData', 'update:style', 'save', 'change', 'preview', 'update:activeTab'])
+const emit = defineEmits(['update:resume', 'update:activeTab'])
 
 const activeTab = ref(props.activeTab)
 
@@ -59,13 +53,4 @@ watch(activeTab, (newValue) => {
   emit('update:activeTab', newValue)
 })
 
-const updateStyle = (newStyle) => {
-  emit('update:style', newStyle)
-  emit('change')
-}
-
-const updateResumeData = (newData) => {
-  emit('update:resumeData', newData)
-  emit('change')
-}
 </script>

@@ -1,4 +1,5 @@
-import { ResumeDataV2 } from '@/models/ResumeData/ResumeDataV2'
+import { resumeContentSchema } from '@/resume/llmSchema'
+import { compact } from '@/resume/values'
 
 export class CVConversionService {
     static async convertCV(file, apiKey, model) {
@@ -6,8 +7,8 @@ export class CVConversionService {
             // Convert file to base64
             const base64File = await this.fileToBase64(file)
 
-            // Prepare the schema based on ResumeDataV2 structure
-            const schema = this.getResumeSchema()
+            // JSON Resume content (https://jsonresume.org/schema) as a strict schema
+            const schema = resumeContentSchema()
 
             // Prepare the messages for OpenRouter
             const fileType = file.type === 'application/pdf' ? 'pdf' : 'image'
@@ -32,17 +33,12 @@ export class CVConversionService {
                         {
                             type: 'text',
                             text: `
-                                Please analyze this CV and convert it into a structured format following the provided schema. 
-                                Extract all relevant information including personal details, work experience, education, and any other sections that could be added as custom sections. Format the content appropriately for a professional resume. 
-                                The content section is in HTML. Try to replicate original styles.
-
-                                Use <a> for links of websites, social media, etc.
-
-                                For lists, use <ul> and <li> tags. Add a tabs before each item. Do not add new lines between items.
-                                Do not use lists in work experience and education sections, but use <br> to separate paragraphs.
-
-                                If there are bars for skills, languages, etc. use the following format: (Skill)[BAR:Percentage] with no space, no list and not other text, for example: (Italian)[BAR:90]
-                                
+                                Please analyze this CV and convert it into the JSON Resume format (https://jsonresume.org/schema), following the provided schema.
+                                Extract all relevant information: personal details, contact details, profiles, work experience, education, skills, languages, projects and any other section the CV has.
+                                Put each piece of information in the most specific section of the schema. Leave a field as an empty string (or empty array) when the CV does not contain it; never invent data.
+                                Dates must be ISO 8601 (YYYY, YYYY-MM or YYYY-MM-DD). Leave the end date empty for current positions.
+                                Text fields may use Markdown (bold, italic, links). Put bullet points of a job or project in "highlights", one item per bullet, without the bullet character.
+                                For languages, put the level as written in the CV in "fluency" (e.g. "Native speaker", "C1", "Fluent").
                                 The CV is in the file attached.
                                 `
                         },
@@ -94,13 +90,8 @@ export class CVConversionService {
             const data = await response.json()
             const convertedData = JSON.parse(data.choices[0].message.content)
 
-            // Create new ResumeDataV2 instance with the converted data
-            const resumeData = ResumeDataV2.fromJSON(convertedData)
-            // For now, force all custom sections to be in the sidebar
-            for (const section of resumeData.customSections) {
-                section.position = 'sidebar'
-            }
-            return resumeData
+            // Strict mode returns every field; drop the empty ones
+            return compact(convertedData)
         } catch (error) {
             throw new Error(error.message)
         }
@@ -112,76 +103,6 @@ export class CVConversionService {
             reader.onload = (e) => resolve(e.target.result)
             reader.readAsDataURL(file)
         })
-    }
-
-    static getResumeSchema() {
-        return {
-            type: 'object',
-            properties: {
-                version: { type: 'number' },
-                personal: {
-                    type: 'object',
-                    properties: {
-                        name: { type: 'string' },
-                        title: { type: 'string' },
-                        visible: { type: 'boolean' }
-                    },
-                    additionalProperties: false,
-                    required: ['name', 'title', 'visible']
-                },
-                experiences: {
-                    type: 'array',
-                    items: {
-                        type: 'object',
-                        properties: {
-                            title: { type: 'string' },
-                            company: { type: 'string' },
-                            period: { type: 'string' },
-                            description: { type: 'string' },
-                            visible: { type: 'boolean' }
-                        },
-                        additionalProperties: false,
-                        required: ['title', 'company', 'period', 'description', 'visible']
-                    }
-                },
-                experiencesVisible: { type: 'boolean' },
-                experiencesSectionName: { type: 'string' },
-                education: {
-                    type: 'array',
-                    items: {
-                        type: 'object',
-                        properties: {
-                            degree: { type: 'string' },
-                            school: { type: 'string' },
-                            period: { type: 'string' },
-                            mark: { type: 'string' },
-                            thesis: { type: 'string' },
-                            visible: { type: 'boolean' }
-                        },
-                        additionalProperties: false,
-                        required: ['degree', 'school', 'period', 'mark', 'thesis', 'visible']
-                    }
-                },
-                educationVisible: { type: 'boolean' },
-                educationSectionName: { type: 'string' },
-                customSections: {
-                    type: 'array',
-                    items: {
-                        type: 'object',
-                        properties: {
-                            title: { type: 'string' },
-                            content: { type: 'string' },
-                            visible: { type: 'boolean' },
-                            position: { type: 'string', enum: ['main', 'sidebar'] }
-                        },
-                        additionalProperties: false,
-                        required: ['title', 'content', 'visible', 'position']
-                    }
-                }
-            },
-            additionalProperties: false,
-            required: ['version', 'personal', 'experiences', 'education', 'customSections', 'experiencesVisible', 'educationVisible', 'experiencesSectionName', 'educationSectionName']
-        }
     }
 
     static async fetchAvailableModels() {
