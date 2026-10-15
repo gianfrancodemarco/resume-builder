@@ -133,10 +133,15 @@ export function buildDocument(resume) {
     const pairing = FONT_PAIRINGS[design.fonts]
     const withSidebar = hasSidebar(design.layout)
 
+    const layout = LAYOUTS[design.layout]
     const main = []
     const sidebar = []
+    // Contact details and profiles shown in the header, for layouts that do that
+    const header = { contact: [], links: [] }
     for (const { column, ...section } of buildSections(resume)) {
-        ;(withSidebar && column === 'sidebar' ? sidebar : main).push(section)
+        if (layout.headerContact && section.kind === 'contact') header.contact = section.items
+        else if (layout.headerContact && section.kind === 'links') header.links = section.items
+        else (withSidebar && column === 'sidebar' ? sidebar : main).push(section)
     }
 
     // Each font is a list: Typst uses the next family for characters the first lacks.
@@ -148,7 +153,7 @@ export function buildDocument(resume) {
     const basics = resume.basics || {}
 
     const data = {
-        template: LAYOUTS[design.layout].typst,
+        template: layout.typst,
         title: [basics.name, basics.label].filter(Boolean).join(' - ') || 'Resume',
         personal: { name: basics.name || 'Your Name', title: basics.label || '' },
         image: basics.image ? { path: AVATAR_PATH, x: photo.x ?? 50, y: photo.y ?? 50, scale: photo.scale ?? 100 } : null,
@@ -162,6 +167,7 @@ export function buildDocument(resume) {
             sidebar: withSidebar ? SIDEBAR_WIDTH * PX_TO_PT : 0,
         },
         sidebarLeft: design.sidebarLeft,
+        header,
         main,
         sidebar,
     }

@@ -6,7 +6,7 @@
                 <div class="layouts">
                     <button v-for="(layout, key) in LAYOUTS" :key="key" type="button" class="layout-option"
                         :class="{ selected: design.layout === key }" :aria-pressed="design.layout === key"
-                        @click="design.layout = key">
+                        :title="layout.description" @click="design.layout = key">
                         <div class="layout-thumb">
                             <ResumePreview :resume="withDesign(resume, { layout: key })" :max-pages="1"
                                 :debounce="400" page-width="100%" />
@@ -109,8 +109,8 @@ const isCustomAccent = computed(() => !ACCENTS.some(a => sameColor(design.value.
 
 .layouts {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
 }
 
 .layout-option,
@@ -135,7 +135,7 @@ const isCustomAccent = computed(() => !ACCENTS.some(a => sameColor(design.value.
 }
 
 .layout-option {
-    padding: 8px;
+    padding: 6px;
 }
 
 .layout-thumb {
@@ -151,7 +151,8 @@ const isCustomAccent = computed(() => !ACCENTS.some(a => sameColor(design.value.
 
 .layout-name {
     display: block;
-    margin-top: 6px;
+    margin-top: 5px;
+    font-size: 0.85rem;
     font-weight: 500;
     text-align: center;
 }

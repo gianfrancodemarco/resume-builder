@@ -1,5 +1,5 @@
-// "1 Column Modern" template: framed page, section titles in a narrow left column.
-#import "lib.typ": look, section-body, rich, highlights, joined, maybe-link
+// "Classic" layout: one column, section titles in a narrow left column.
+#import "lib.typ": look, section-body, page-footer
 
 #let render(d) = {
   let colors = d.colors.pairs().map(((k, v)) => (k, rgb(v))).to-dict()
@@ -7,69 +7,52 @@
   let base = s.base * 1pt
   let section-gap = s.section * 1pt
   let content-gap = s.content * 1pt
-  let rule = 0.75pt + colors.text
+  let rule = 0.6pt + colors.text.transparentize(78%)
 
   set document(title: d.title, author: d.personal.name)
   set page(
     paper: "a4",
-    margin: 30pt,
+    margin: (x: 44pt, top: 40pt, bottom: 46pt),
     fill: colors.background,
-    background: rect(width: 100%, height: 100%, stroke: rule),
+    footer: page-footer(d.personal.name, colors.dates),
   )
   set text(font: d.fonts.body, size: base, fill: colors.text)
-  set par(leading: 0.65em, spacing: 0.65em)
+  set par(leading: 0.5em, spacing: 0.65em)
 
   let heading-text(body, ..args) = text(font: d.fonts.heading, weight: "bold", ..args, body)
   let lk = look(
     link: colors.link,
     muted: colors.dates,
-    bar-fill: colors.primary,
-    bar-track: colors.primary.transparentize(85%),
-    gap: 0.55em,
-    item-gap: content-gap,
+    accent: colors.primary,
+    rating-fill: colors.primary,
+    rating-track: colors.primary.transparentize(78%),
+    gap: 0.65em,
+    item-gap: content-gap * 1.4,
     strong-font: d.fonts.heading,
   )
-  let small(body) = {
-    set text(size: 0.9em)
-    set par(leading: 0.55em)
-    body
-  }
-
-  // Title and date on one line, organization below, content in smaller text
-  let entry(e, lk) = block(width: 100%, below: lk.item-gap, {
-    let title = joined(" | ", e.title, e.date)
-    if title != none { block(below: 0.5em, maybe-link(e.href, heading-text(title))) }
-    let org = joined(" - ", e.subtitle, e.location)
-    if org != none { block(below: 0.8em, org) }
-    small({
-      for detail in e.details { block(below: 0.6em, detail) }
-      rich(e.summary, lk)
-      highlights(e.highlights, lk)
-      if e.keywords.len() > 0 { block(above: lk.gap, text(fill: lk.muted, e.keywords.join(" · "))) }
-    })
-  })
 
   // Header: name on the left, title on the right
-  block(width: 100%, inset: (bottom: content-gap), stroke: (bottom: rule), below: section-gap, grid(
-    columns: (1fr, auto),
-    column-gutter: 12pt,
-    align: bottom,
-    heading-text(d.personal.name, size: s.heading * 1pt, fill: colors.primary),
-    heading-text(d.personal.title, size: s.heading * 0.75pt, fill: colors.subtitle),
-  ))
+  block(width: 100%, below: section-gap, {
+    grid(
+      columns: (1fr, auto),
+      column-gutter: 16pt,
+      align: bottom,
+      heading-text(d.personal.name, size: s.heading * 1.1pt, fill: colors.primary),
+      text(font: d.fonts.heading, size: s.heading * 0.62pt, fill: colors.subtitle, d.personal.title),
+    )
+    v(10pt, weak: true)
+    line(length: 100%, stroke: 1.2pt + colors.primary)
+  })
 
   for (i, section) in d.main.enumerate() {
-    let last = i == d.main.len() - 1
-    block(
-      width: 100%,
-      inset: (bottom: if last { 0pt } else { content-gap }),
-      stroke: (bottom: if last { none } else { rule }),
-      below: section-gap,
-      grid(
-        columns: (25%, 75%),
-        pad(right: 15pt, heading-text(upper(section.title), fill: colors.primary)),
-        section-body(section, lk, entry: entry),
-      ),
-    )
+    if i > 0 {
+      block(above: 0pt, below: section-gap * 0.75, line(length: 100%, stroke: rule))
+    }
+    block(width: 100%, below: section-gap * 0.75, grid(
+      columns: (24%, 76%),
+      block(sticky: true, inset: (right: 14pt),
+        heading-text(upper(section.title), size: 0.9em, fill: colors.primary, tracking: 0.8pt)),
+      section-body(section, lk),
+    ))
   }
 }

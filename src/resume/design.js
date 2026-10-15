@@ -2,9 +2,14 @@
 // knobs. Every combination is meant to look good; all colors are derived
 // from the accent (see typst/colors.js). Stored in resume.meta.resumeBuilder.design.
 
+// `headerContact`: contact details and profiles are shown in the header
+// instead of as sections
 export const LAYOUTS = {
     sidebar: { name: 'Sidebar', description: 'Colored sidebar next to the main column', typst: 'two-column', sidebar: true },
-    classic: { name: 'Classic', description: 'Single column, framed page', typst: 'one-column-modern', sidebar: false },
+    classic: { name: 'Classic', description: 'Section titles in a narrow left column', typst: 'one-column-modern', sidebar: false },
+    minimal: { name: 'Minimal', description: 'Centered header, one column, ATS friendly', typst: 'minimal', sidebar: false, headerContact: true },
+    banner: { name: 'Banner', description: 'Colored header band with photo', typst: 'banner', sidebar: false, headerContact: true },
+    timeline: { name: 'Timeline', description: 'Dates in a column along a timeline', typst: 'timeline', sidebar: false, headerContact: true },
 }
 
 export const ACCENTS = [

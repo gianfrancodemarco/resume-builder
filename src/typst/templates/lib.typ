@@ -5,12 +5,20 @@
 #let look(
   link: auto,           // link color, auto inherits the text color
   muted: luma(50%),     // dates, locations, secondary text
-  bar-fill: black,      // filled part of language bars
-  bar-track: luma(85%), // empty part of language bars
-  gap: 0.65em,          // space between paragraphs, normally the line spacing
+  rating-fill: black,      // filled dots of language ratings
+  rating-track: luma(80%), // empty dots of language ratings
+  gap: 0.65em,          // space between paragraphs, a bit more than the line spacing
   item-gap: 9pt,        // space between items of a section
   strong-font: auto,    // font of item titles, auto inherits
-) = (link: link, muted: muted, bar-fill: bar-fill, bar-track: bar-track, gap: gap, item-gap: item-gap, strong-font: strong-font)
+  accent: auto,         // organization line of entries, auto inherits
+  dates: "right",       // entry dates: "right" of the title, "below" it (narrow columns) or "none"
+  wide: true,           // full-width column: skills on one line each, languages side by side
+) = (
+  link: link, muted: muted, rating-fill: rating-fill, rating-track: rating-track, gap: gap, item-gap: item-gap,
+  strong-font: strong-font, accent: accent, dates: dates, wide: wide,
+)
+
+#let colored(fill, body) = if fill == auto { body } else { text(fill: fill, body) }
 
 #let strong-text(lk, body) = {
   let body = text(weight: "bold", body)
@@ -69,26 +77,45 @@
   })))
 }
 
-#let proficiency-bar(level, lk) = layout(size => box(
-  width: calc.min(size.width, 187.5pt),
-  height: 6pt,
-  radius: 3pt,
-  clip: true,
-  fill: lk.bar-track,
-  stroke: 0.75pt + lk.bar-fill,
-  place(top + left, box(width: level * 1%, height: 100%, fill: lk.bar-fill)),
-))
+// Five dots, filled according to a 0-100 level
+#let rating(level, lk) = {
+  let filled = calc.round(level / 20)
+  box(baseline: -0.1em, stack(dir: ltr, spacing: 2.5pt, ..range(5).map(i =>
+    circle(radius: 2.6pt, fill: if i < filled { lk.rating-fill } else { lk.rating-track }, stroke: none))))
+}
 
-// A job, degree, project, award…: title line, date/location line, then content
-#let entry(e, lk) = block(width: 100%, below: lk.item-gap, {
-  let title = joined(" - ", e.title, e.subtitle)
-  if title != none { block(below: 0.45em, maybe-link(e.href, strong-text(lk, title))) }
-  let meta = joined(" · ", e.date, e.location)
-  if meta != none { block(below: 0.45em, text(fill: lk.muted, meta)) }
-  for detail in e.details { block(below: 0.45em, detail) }
+// The title, organization and dates of an entry. Sticky, so it is never left
+// alone at the bottom of a page.
+#let entry-header(e, lk) = block(width: 100%, sticky: true, below: 0.45em, {
+  let org = joined(" · ", e.subtitle, e.location)
+  // Entries without a title (e.g. a reference) use the organization as title
+  let (title, org) = if e.title != "" { (e.title, org) } else { (org, none) }
+  let title = if title == none { none } else { maybe-link(e.href, strong-text(lk, title)) }
+  let date = if e.date == "" { none } else { text(fill: lk.muted, size: 0.92em, e.date) }
+
+  if lk.dates == "right" and date != none {
+    grid(columns: (1fr, auto), column-gutter: 12pt, title, date)
+  } else if title != none {
+    title
+  }
+  // Title, organization and date read as one unit: tight lines
+  if org != none { block(above: 0.38em, colored(lk.accent, org)) }
+  if lk.dates == "below" and date != none { block(above: 0.38em, date) }
+})
+
+// The content of an entry below its header. Its own block, so the paragraph
+// spacing inside does not add to the gap under the header.
+#let entry-content(e, lk) = block(width: 100%, above: 0.45em, {
+  for detail in e.details { block(below: 0.3em, detail) }
   rich(e.summary, lk)
   highlights(e.highlights, lk)
   if e.keywords.len() > 0 { block(above: lk.gap, text(fill: lk.muted, e.keywords.join(" · "))) }
+})
+
+// A job, degree, project, award…
+#let entry(e, lk) = block(width: 100%, below: lk.item-gap, {
+  entry-header(e, lk)
+  entry-content(e, lk)
 })
 
 // Renders a section's content by kind; templates can pass their own `entry`
@@ -96,33 +123,48 @@
   if section.kind == "text" {
     rich(section.content, lk)
   } else if section.kind == "contact" {
-    for item in section.items { block(below: lk.gap, maybe-link(item.href, item.text)) }
+    // One per line, as tight as the lines of a paragraph
+    for item in section.items { block(above: 0.4em, below: 0.4em, maybe-link(item.href, item.text)) }
   } else if section.kind == "links" {
     for item in section.items {
       let body = underline(item.text)
       let body = if lk.link == auto { body } else { text(fill: lk.link, body) }
-      block(below: lk.gap, {
+      block(above: 0.4em, below: 0.4em, {
         if item.label != "" { item.label + ": " }
         maybe-link(item.href, body)
       })
     }
   } else if section.kind == "tags" {
     for item in section.items {
-      block(below: lk.gap + 2pt, {
+      // One line per group in wide columns, so tight like lines of text
+      let gap = if lk.wide { 0.4em } else { lk.gap + 2pt }
+      block(above: gap, below: gap, {
         strong-text(lk, item.name)
         if item.level != "" { text(fill: lk.muted, " · " + item.level) }
-        if item.keywords.len() > 0 { linebreak(); item.keywords.join(", ") }
+        if item.keywords.len() > 0 {
+          // Wide columns keep each group on one line: "Frontend: Vue, TypeScript"
+          if lk.wide { if item.name != "" { ": " } } else { linebreak() }
+          item.keywords.join(", ")
+        }
       })
     }
   } else if section.kind == "languages" {
-    for item in section.items {
-      block(width: 100%, below: lk.gap + 3pt, {
-        block(below: 3pt, {
-          item.name
-          if item.fluency != "" { text(fill: lk.muted, " · " + item.fluency) }
-        })
-        if item.level != none { proficiency-bar(item.level, lk) }
-      })
+    // Name with a dot rating on the same line (aligned right in narrow
+    // columns, right after the name in wide ones), fluency in words below
+    let language(item) = block(width: 100%, above: 0.75em, below: 0.75em, breakable: false, {
+      if item.level == none {
+        item.name
+      } else if lk.wide {
+        item.name + h(8pt) + rating(item.level, lk)
+      } else {
+        grid(columns: (1fr, auto), column-gutter: 8pt, align: horizon, item.name, rating(item.level, lk))
+      }
+      if item.fluency != "" { block(above: 0.3em, text(size: 0.88em, fill: lk.muted, item.fluency)) }
+    })
+    if lk.wide {
+      grid(columns: (1fr, 1fr, 1fr), column-gutter: 18pt, ..section.items.map(language))
+    } else {
+      for item in section.items { language(item) }
     }
   } else if section.kind == "entries" {
     for e in section.items { entry(e, lk) }
@@ -138,4 +180,23 @@
   box(width: size, height: size, radius: size / 2, clip: true, fill: luma(93%),
     place(top + left, dx: (size - w) * img.x / 100, dy: (size - h) * img.y / 100,
       image(img.path, width: w)))
+}
+
+// Contact details and profiles on one wrapping line, for layouts that show
+// them in the header
+#let contact-line(header, link-fill: auto, sep: "  ·  ") = {
+  // Each item is a box, so lines wrap between items and never inside one
+  let items = header.contact.map(c => box(maybe-link(c.href, c.text)))
+  // Profiles show their address (github.com/jane) when they have one
+  let profile(l) = if l.href != "" { l.href.replace(regex("^https?://(www\.)?"), "") } else { joined(": ", l.label, l.text) }
+  let items = items + header.links.map(l => box(maybe-link(l.href, colored(link-fill, profile(l)))))
+  if items.len() > 0 { items.join(sep) }
+}
+
+// "Jane Doe · 2/3" at the bottom of pages, only for resumes longer than one page
+#let page-footer(name, fill, alignment: right) = context {
+  let total = counter(page).final().first()
+  if total > 1 {
+    align(alignment, text(size: 0.78em, fill: fill, [#name · #counter(page).display() / #total]))
+  }
 }
