@@ -103,8 +103,14 @@ Templates live in `src/typst/templates` as Typst files. `src/typst/document.js` 
 
 - [Vue 3](https://vuejs.org/) - Progressive JavaScript framework
 - [Vuetify 3](https://vuetifyjs.com/) - Material Design component framework
-- [TipTap](https://tiptap.dev/) - Rich text editor
+- [Typst](https://typst.app/) via [typst.ts](https://github.com/Myriad-Dreamin/typst.ts) - Typesetting compiled to WebAssembly, for the preview and the PDF
+- [JSON Resume](https://jsonresume.org/schema) - Open resume data format, validated with [jsonschema](https://github.com/tdegrunt/jsonschema)
+- [TipTap](https://tiptap.dev/) with [tiptap-markdown](https://github.com/aguingand/tiptap-markdown) - Rich text editor for the Markdown fields
+- [marked](https://marked.js.org/) - Markdown parsing for the Typst templates
+- [vue-draggable-plus](https://vue-draggable-plus.pages.dev/) - Drag and drop for sections and entries
+- [OpenRouter](https://openrouter.ai/) - LLM access for AI generation and CV import
 - [Phosphor Icons](https://phosphoricons.com/) - Icon library
+- [Vite](https://vite.dev/) and [Vitest](https://vitest.dev/) - Build tool and test runner
 - [Docker](https://www.docker.com/) - Containerization platform
 - [Docker Compose](https://docs.docker.com/compose/) - File watching and hot reload
 
