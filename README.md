@@ -1,29 +1,49 @@
 # Resume Builder
 
-A modern, single-page resume builder application built with Vue 3 and Vuetify. Create professional resumes with a beautiful UI and export them as HTML, PDF or JSON.
+**A free, private resume builder that typesets real PDFs in your browser.** No account, no paywall on the download, and your data never leaves your device.
 
-## Disclaimer
+[![Try it live](https://img.shields.io/badge/Try%20it%20live-%E2%86%92-08294D?style=for-the-badge)](https://resume-builder.gianfrancodemarco.dev/)
 
-*This project is a work in progress and is provided "as is" without any warranties or guarantees. The developers are not responsible for any issues or damages that may arise from using this software. This application is developed using AI for code generation, embracing a "vibe coding" approach to enhance speed and efficiency. Users are encouraged to contribute to the project and report any bugs or issues they encounter. Please use this application at your own risk.*
+[![GitHub stars](https://img.shields.io/github/stars/gianfrancodemarco/resume-builder?style=flat)](https://github.com/gianfrancodemarco/resume-builder/stargazers)
+[![Tests](https://github.com/gianfrancodemarco/resume-builder/actions/workflows/test.yml/badge.svg)](https://github.com/gianfrancodemarco/resume-builder/actions/workflows/test.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![JSON Resume](https://img.shields.io/badge/format-JSON%20Resume-orange)](https://jsonresume.org/schema)
+[![Typst](https://img.shields.io/badge/typeset%20with-Typst-239dad)](https://typst.app)
 
+![Editing a resume and switching layouts, colors and fonts with a live preview](docs/media/demo.gif)
+
+## Why this one?
+
+Most online resume builders let you write for free and then charge for the PDF, or keep your data on their servers. This one doesn't:
+
+- **Private by design**: everything runs and is saved in your browser. There is no backend and no account.
+- **Real typesetting**: resumes are compiled with [Typst](https://typst.app) running as WebAssembly, so the PDF has proper typography and embedded fonts, and looks the same on every device.
+- **No lock-in**: your resume is a standard [JSON Resume](https://jsonresume.org/schema) file. Import one from any JSON Resume tool, or export yours and take it elsewhere.
+- **Free and open source**: MIT licensed. Use the hosted version or self-host it with Docker.
+
+## Layouts
+
+Five layouts, each with any accent color and font pairing:
+
+![The five layouts: Sidebar, Classic, Minimal, Banner and Timeline](docs/media/layouts.png)
 
 ## Features
 
-![Resume Builder Screenshot](screenshot.png)
+- 🎨 **Five layouts**: Sidebar, Classic, Minimal (ATS friendly), Banner and Timeline
+- 🖌️ **Simple design choices**: an accent color (every other color is derived from it so text stays readable), five font pairings, text size and density
+- 📝 **Live preview**: the real pages update as you type, with zoom, fit-to-width and a page count
+- 🔄 **Flexible sections**: add, remove, reorder and hide any JSON Resume section, and place it in the main column or the sidebar
+- ✋ **Drag and drop**: reorder sections and entries, and edit entries inline
+- 💾 **Export**: PDF, JSON Resume or plain text (for pasting into application forms)
+- 🤖 **AI import**: turn an existing CV file into an editable resume with a model of your choice via [OpenRouter](https://openrouter.ai), using your own API key
+- 📱 **Works on mobile**: usable on desktop and phones
+- 📚 **CV writing guide**: built-in tips on writing a good resume
 
-- 🎨 **Modern UI**: Clean and intuitive interface built with Vuetify 3
-- 🔄 **Dynamic Sections**: Add, remove, reorder and hide any JSON Resume section, and place it in the main column or the sidebar
-- 🎯 **Customizable Details**: Flexible detail fields with link support
-- 🎨 **Simple Design Choices**: Two layouts, an accent color (all other colors are derived to stay readable), five font pairings, text size and density
-- 💾 **Export**: Download as PDF, JSON Resume or plain text
-- 📐 **Pixel-Perfect PDF**: Resumes are typeset with [Typst](https://typst.app) compiled to WebAssembly, right in the browser. The preview and the PDF come from the same compiled document, with embedded fonts, so the output is identical on every device
-- 🔒 **Privacy First**: Everything stays in your browser
-- 💾 **JSON Resume**: Resumes are stored in the open [JSON Resume](https://jsonresume.org/schema) format. Import a resume.json from any JSON Resume tool, and export one that other tools accept; the design and layout travel along in its `meta` field
-- 🤖 **AI CV Conversion**: Convert existing CVs using AI models
-- 📝 **Live Preview**: Real pages as you type, with zoom, fit-to-width and page count
-- 📱 **Mobile Responsive**: Works seamlessly on desktop and mobile devices
-- ✋ **Drag and Drop**: Reorder sections and entries, edit entries inline
-- 📚 **CV Writing Guide**: Access to comprehensive CV writing resources
+![The editor with the Design panel open](docs/media/editor.png)
+
+## Support the project
+
+If this saved you from a paywalled resume site, a ⭐ on GitHub helps other people find it. Bug reports, ideas and pull requests are welcome too: see [CONTRIBUTING.md](CONTRIBUTING.md) and the [open issues](https://github.com/gianfrancodemarco/resume-builder/issues).
 
 ## Getting Started
 
@@ -83,10 +103,20 @@ Templates live in `src/typst/templates` as Typst files. `src/typst/document.js` 
 
 - [Vue 3](https://vuejs.org/) - Progressive JavaScript framework
 - [Vuetify 3](https://vuetifyjs.com/) - Material Design component framework
-- [TipTap](https://tiptap.dev/) - Rich text editor
+- [Typst](https://typst.app/) via [typst.ts](https://github.com/Myriad-Dreamin/typst.ts) - Typesetting compiled to WebAssembly, for the preview and the PDF
+- [JSON Resume](https://jsonresume.org/schema) - Open resume data format, validated with [jsonschema](https://github.com/tdegrunt/jsonschema)
+- [TipTap](https://tiptap.dev/) with [tiptap-markdown](https://github.com/aguingand/tiptap-markdown) - Rich text editor for the Markdown fields
+- [marked](https://marked.js.org/) - Markdown parsing for the Typst templates
+- [vue-draggable-plus](https://vue-draggable-plus.pages.dev/) - Drag and drop for sections and entries
+- [OpenRouter](https://openrouter.ai/) - LLM access for AI generation and CV import
 - [Phosphor Icons](https://phosphoricons.com/) - Icon library
+- [Vite](https://vite.dev/) and [Vitest](https://vitest.dev/) - Build tool and test runner
 - [Docker](https://www.docker.com/) - Containerization platform
 - [Docker Compose](https://docs.docker.com/compose/) - File watching and hot reload
+
+## Disclaimer
+
+This project is a work in progress, provided "as is" without warranties. Much of the code was written with AI assistance. Please [report any bugs](https://github.com/gianfrancodemarco/resume-builder/issues) you find.
 
 ## License
 

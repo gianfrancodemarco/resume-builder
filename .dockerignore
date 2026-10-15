@@ -13,5 +13,5 @@ dist
 .idea
 *.pdf
 resume*.html
-screenshot.png 
+docs/
 .github
