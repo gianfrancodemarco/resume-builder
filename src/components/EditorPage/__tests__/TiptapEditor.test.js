@@ -210,9 +210,9 @@ describe('TiptapEditor', () => {
     describe('Font and Color Controls', () => {
         it('sets font family', async () => {
             const fontSelect = wrapper.find('select')
-            await fontSelect.setValue('Times New Roman')
-            expect(wrapper.vm.currentFont).toBe('Times New Roman')
-            expect(chainMock.setFontFamily).toHaveBeenCalledWith('Times New Roman')
+            await fontSelect.setValue('Tinos')
+            expect(wrapper.vm.currentFont).toBe('Tinos')
+            expect(chainMock.setFontFamily).toHaveBeenCalledWith('Tinos')
         })
 
         it('sets font size', async () => {
@@ -312,7 +312,7 @@ describe('TiptapEditor', () => {
     describe('Font Options', () => {
         it('has correct font options', () => {
             expect(wrapper.vm.fonts).toContain('Arial')
-            expect(wrapper.vm.fonts).toContain('Times New Roman')
+            expect(wrapper.vm.fonts).toContain('Tinos')
             expect(wrapper.vm.fonts).toContain('Courier New')
         })
 

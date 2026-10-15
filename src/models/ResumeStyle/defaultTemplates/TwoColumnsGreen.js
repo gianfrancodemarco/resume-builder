@@ -17,8 +17,8 @@ export class TwoColumnsGreen extends ResumeStyleV1_1 {
                 link: '#ffffff'
             },
             typography: {
-                headingFont: 'Helvetica',
-                bodyFont: 'Georgia',
+                headingFont: 'Arimo',
+                bodyFont: 'Gelasio',
                 baseSize: 14,
                 headingSize: 26
             },
@@ -31,8 +31,7 @@ export class TwoColumnsGreen extends ResumeStyleV1_1 {
             columns: {
                 left: ['personal', 'education'],
                 right: ['experiences', 'customSections']
-            },
-            customCSS: ''
+            }
         };
     }
 

@@ -7,11 +7,10 @@ describe('ResumeStyleV1_1', () => {
         it('creates a default style with sample data', () => {
             const style = ResumeStyleV1_1.createDefault()
             expect(style.colors.primary).toBe('#08294D')
-            expect(style.typography.headingFont).toBe('Helvetica')
+            expect(style.typography.headingFont).toBe('Arimo')
             expect(style.spacing.section).toBe(24)
             expect(style.columns.left).toEqual(['personal', 'education'])
             expect(style.columns.right).toEqual(['experiences', 'customSections'])
-            expect(style.customCSS).toBe('')
         })
     })
 
@@ -33,20 +32,6 @@ describe('ResumeStyleV1_1', () => {
             const errors = ResumeStyleV1_1.validateJSON(invalidStyle)
             expect(errors.length).toBeGreaterThan(0)
             expect(errors).toContain('Invalid primary color')
-        })
-
-        it('validates customCSS field', () => {
-            const style = ResumeStyleV1_1.createDefault()
-            style.customCSS = 'h1 { color: red; }'
-            const errors = ResumeStyleV1_1.validateJSON(style)
-            expect(errors).toEqual([])
-        })
-
-        it('returns error for invalid customCSS type', () => {
-            const style = ResumeStyleV1_1.createDefault()
-            style.customCSS = 123 // Should be string
-            const errors = ResumeStyleV1_1.validateJSON(style)
-            expect(errors).toContain('Invalid custom CSS')
         })
     })
 

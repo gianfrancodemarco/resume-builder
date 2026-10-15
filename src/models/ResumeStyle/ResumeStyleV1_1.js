@@ -1,22 +1,11 @@
+import { FONT_NAMES } from '@/typst/fonts';
+
 export class ResumeStyleV1_1 {
     static VERSION = 1.1;
     static TEMPLATE_NAME = '2 Columns';
 
-    static FONT_OPTIONS = [
-        "Arial",
-        "Verdana",
-        "Helvetica",
-        "Georgia",
-        "Times New Roman",
-        "Trebuchet MS",
-        "Tahoma",
-        "Courier New",
-        "Lucida Console",
-        "Palatino Linotype",
-        "Book Antiqua",
-        "Impact",
-        "Gill Sans"
-    ];
+    // Fonts bundled with the app; the Typst renderer cannot use system fonts
+    static FONT_OPTIONS = FONT_NAMES;
 
     static COLUMN_TYPES = {
         LEFT: 'left',
@@ -56,8 +45,8 @@ export class ResumeStyleV1_1 {
                 link: '#ffffff'
             },
             typography: {
-                headingFont: 'Helvetica',
-                bodyFont: 'Georgia',
+                headingFont: 'Arimo',
+                bodyFont: 'Gelasio',
                 baseSize: 16,
                 headingSize: 26
             },
@@ -70,8 +59,7 @@ export class ResumeStyleV1_1 {
             columns: {
                 left: ['personal', 'education'],
                 right: ['experiences', 'customSections']
-            },
-            customCSS: ''
+            }
         };
     }
 
@@ -138,11 +126,6 @@ export class ResumeStyleV1_1 {
         }
         if (!Array.isArray(json.columns?.right)) {
             errors.push('Invalid right column configuration');
-        }
-
-        // Validate customCSS
-        if (json.customCSS !== undefined && typeof json.customCSS !== 'string') {
-            errors.push('Invalid custom CSS');
         }
 
         return errors;
