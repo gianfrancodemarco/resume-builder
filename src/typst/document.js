@@ -9,10 +9,10 @@
 //   languages  { items: [{ name, fluency, level }] }
 // Sizes in the style are CSS px; Typst gets pt.
 import { degree, hasContent, itemsOf } from '@/resume/sections'
-import { settingsOf } from '@/resume/resume'
+import { resumeContent, settingsOf } from '@/resume/resume'
 import { TEMPLATES, hasSidebar } from '@/resume/templates'
 import { fluencyLevel, formatDate, formatLocation, formatRange } from '@/resume/format'
-import { resolveFont, typstFamily } from './fonts'
+import { FALLBACK_SCRIPTS, fallbackFont, resolveFont } from './fonts'
 import { cssColorToHex } from './colors'
 import { markdownToNodes } from './markdown'
 
@@ -137,9 +137,13 @@ export function buildDocument(resume) {
         ;(withSidebar && column === 'sidebar' ? sidebar : main).push(section)
     }
 
-    const headingFont = resolveFont(typography.headingFont)
-    const bodyFont = resolveFont(typography.bodyFont)
-    const fonts = new Set([headingFont, bodyFont])
+    // Each font is a list: Typst uses the next family for characters the first lacks.
+    // The fallback is only added (and downloaded) when the text needs it.
+    const needsFallback = FALLBACK_SCRIPTS.test(JSON.stringify(resumeContent(resume)))
+    const fontList = font => [font, ...(needsFallback && fallbackFont(font) !== font ? [fallbackFont(font)] : [])]
+    const headingFonts = fontList(resolveFont(typography.headingFont))
+    const bodyFonts = fontList(resolveFont(typography.bodyFont))
+    const fonts = new Set([...headingFonts, ...bodyFonts])
     if (usesCode([main, sidebar])) fonts.add('Cousine') // lib.typ sets code in Cousine
 
     const color = (value, fallback) => cssColorToHex(value) || cssColorToHex(fallback) || '#000000'
@@ -161,7 +165,7 @@ export function buildDocument(resume) {
             subtitle: color(colors.subtitleTextColor, primary),
             link: color(colors.link, primary),
         },
-        fonts: { heading: typstFamily(headingFont), body: typstFamily(bodyFont) },
+        fonts: { heading: headingFonts, body: bodyFonts },
         sizes: {
             base: (typography.baseSize || 14) * PX_TO_PT,
             heading: (typography.headingSize || 24) * PX_TO_PT,

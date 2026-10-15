@@ -9,10 +9,17 @@ import { FONT_FAMILIES } from '../src/typst/fonts.js'
 const OUT_DIR = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'public', 'fonts')
 const API = 'https://gwfh.mranftl.com/api/fonts'
 
+async function getMeta(id, subsets) {
+    const res = await fetch(`${API}/${id}${subsets ? `?subsets=${subsets.join(',')}` : ''}`)
+    if (!res.ok) throw new Error(`Font ${id} not found (${res.status})`)
+    return res.json()
+}
+
 for (const family of FONT_FAMILIES) {
-    const res = await fetch(`${API}/${family.id}?subsets=latin,latin-ext`)
-    if (!res.ok) throw new Error(`Font ${family.id} not found (${res.status})`)
-    const meta = await res.json()
+    // Ask for every script the family offers (Cyrillic, Greek, Vietnamese…);
+    // by default the files are subset to Latin only
+    const { subsets } = await getMeta(family.id)
+    const meta = await getMeta(family.id, subsets)
     const dir = path.join(OUT_DIR, family.id)
     await fs.mkdir(dir, { recursive: true })
 

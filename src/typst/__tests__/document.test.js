@@ -90,6 +90,19 @@ describe('buildDocument', () => {
         expect(buildDocument(resume).fonts).toEqual(['Arimo', 'Inter', 'Cousine'])
     })
 
+    it('adds a matching fallback font only when the text uses Greek, Cyrillic, Hebrew or Vietnamese', () => {
+        const resume = sampleResume()
+        expect(buildDocument(resume).data.fonts).toEqual({ heading: ['Arimo'], body: ['Gelasio'] })
+
+        resume.languages.push({ language: 'Русский', fluency: 'A2' })
+        const { data, fonts } = buildDocument(resume)
+        expect(data.fonts).toEqual({ heading: ['Arimo'], body: ['Gelasio', 'Tinos'] }) // Arimo needs no fallback
+        expect(fonts).toEqual(['Arimo', 'Gelasio', 'Tinos'])
+
+        settingsOf(resume).typography.bodyFont = 'Lato'
+        expect(buildDocument(resume).data.fonts.body).toEqual(['Lato', 'Arimo'])
+    })
+
     it('includes the photo with its crop settings', () => {
         const resume = sampleResume()
         expect(buildDocument(resume).data.image).toBeNull()
