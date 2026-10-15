@@ -13,11 +13,11 @@
                 <v-alert v-if="!configured" type="info" variant="tonal" density="compact" class="mb-3">
                     AI features use your own <a href="https://openrouter.ai/keys" target="_blank"
                         rel="noopener">OpenRouter API key</a>. It stays in this browser tab.
-                    <template v-slot:append>
+                    <div class="mt-2">
                         <v-btn size="small" variant="flat" color="primary" @click="settingsOpen = true">
                             Add key
                         </v-btn>
-                    </template>
+                    </div>
                 </v-alert>
                 <AIGeneration :resume-info="content" :generation-api-key="apiKey" :generation-model="model || ''"
                     :openai-api-key="openaiApiKey" :transcription-language="transcriptionLanguage"

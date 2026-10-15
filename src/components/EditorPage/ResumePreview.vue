@@ -12,6 +12,7 @@
 
         <div v-if="!pages.length && !error" class="resume-page resume-page-placeholder" :style="{ width: pageWidth }">
             <v-progress-circular indeterminate color="primary" />
+            <span v-if="loadingLabel" class="loading-label">{{ loadingLabel }}</span>
         </div>
 
         <v-alert v-if="error" type="error" variant="tonal" density="compact" class="preview-error">
@@ -37,6 +38,11 @@ const props = defineProps({
     debounce: {
         type: Number,
         default: 150
+    },
+    // Shown under the spinner until the first render (e.g. while the compiler downloads)
+    loadingLabel: {
+        type: String,
+        default: ''
     },
     // CSS width of each page, e.g. 100% for thumbnails
     pageWidth: {
@@ -130,8 +136,15 @@ onBeforeUnmount(() => {
 .resume-page-placeholder {
     aspect-ratio: 210 / 297;
     display: flex;
+    flex-direction: column;
+    gap: 16px;
     align-items: center;
     justify-content: center;
+}
+
+.loading-label {
+    font-size: 0.9rem;
+    color: #6B7280;
 }
 
 .updating .resume-page img {

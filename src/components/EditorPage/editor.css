@@ -79,10 +79,54 @@
 
 .field-label {
     display: block;
-    margin-bottom: 4px;
+    margin-bottom: 5px;
     font-size: 0.78rem;
     font-weight: 500;
+    letter-spacing: 0.01em;
     color: rgb(var(--v-theme-editor-text-secondary));
+}
+
+/* ---- Form fields (also in dialogs, which render outside the panels) ---- */
+
+.v-field {
+    font-size: 0.9rem;
+}
+
+.v-field--variant-outlined {
+    background: rgb(var(--v-theme-editor-field-bg));
+}
+
+.v-field--variant-outlined .v-field__outline {
+    --v-field-border-opacity: 1;
+    color: rgb(var(--v-theme-editor-border));
+    transition: color 0.15s;
+}
+
+.v-field--variant-outlined:hover .v-field__outline {
+    color: rgba(var(--v-theme-on-surface), 0.32);
+}
+
+.v-field--variant-outlined.v-field--focused .v-field__outline {
+    color: rgb(var(--v-theme-primary));
+}
+
+.v-field--variant-outlined.v-field--error .v-field__outline {
+    color: rgb(var(--v-theme-error));
+}
+
+.v-field--density-compact .v-field__input {
+    min-height: 38px;
+    padding-top: 7px;
+    padding-bottom: 7px;
+}
+
+.v-field .v-field__input::placeholder {
+    color: rgb(var(--v-theme-editor-text-muted));
+    opacity: 1;
+}
+
+.v-input__details {
+    padding-inline: 2px;
 }
 
 .form-grid {

@@ -69,7 +69,12 @@ const ACTIONS = [
     border: 1px solid rgb(var(--v-theme-editor-border));
     border-radius: 8px;
     overflow: hidden;
+    background: rgb(var(--v-theme-editor-field-bg));
     transition: border-color 0.15s;
+}
+
+.markdown-editor:hover:not(.focused) {
+    border-color: rgba(var(--v-theme-on-surface), 0.32);
 }
 
 .markdown-editor.focused {

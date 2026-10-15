@@ -2,7 +2,7 @@
     <div ref="pane" class="preview-pane">
         <div class="preview-scroll">
             <div class="preview-pages" :style="{ zoom: scale }">
-                <ResumePreview :resume="resume" @rendered="pages = $event.pages" />
+                <ResumePreview :resume="resume" loading-label="Preparing your resume…" @rendered="pages = $event.pages" />
             </div>
         </div>
 

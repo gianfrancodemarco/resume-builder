@@ -61,8 +61,9 @@ const RULES = {
     container-type: inline-size;
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    padding: 12px 12px 8px;
+    gap: 14px 12px;
+    padding: 14px 12px 8px;
+    border-top: 1px solid rgb(var(--v-theme-editor-border));
 }
 
 .full {

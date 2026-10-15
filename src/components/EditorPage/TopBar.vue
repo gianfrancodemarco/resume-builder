@@ -37,8 +37,8 @@
 </template>
 
 <script setup>
+import { useThemeToggle } from '@/composables/useThemeToggle'
 import { computed } from 'vue'
-import { useTheme } from 'vuetify'
 
 const props = defineProps({
     resume: { type: Object, required: true },
@@ -49,14 +49,7 @@ const props = defineProps({
 
 const emit = defineEmits(['home', 'download-pdf', 'import', 'export-json', 'export-txt'])
 
-const theme = useTheme()
-const isDark = computed(() => theme.global.current.value.dark)
-
-const toggleTheme = () => {
-    const next = isDark.value ? 'light' : 'dark'
-    theme.global.name.value = next
-    localStorage.setItem('theme', next)
-}
+const { isDark, toggleTheme } = useThemeToggle()
 
 const title = computed(() => {
     const { name, label } = props.resume.basics || {}

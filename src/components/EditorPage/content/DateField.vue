@@ -88,5 +88,6 @@ watch(model, value => {
 
 .present {
     flex: none;
+    margin-left: -6px;
 }
 </style>
