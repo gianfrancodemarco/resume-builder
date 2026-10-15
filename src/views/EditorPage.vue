@@ -15,30 +15,13 @@
 
                 <div class="editor-col" :style="isMobile ? { width: '100%' } : { width: '35%' }">
                     <ResumeEditor v-model:resume-data="resumeData" v-model:style="resumeStyle"
-                        v-model:active-tab="activeTab" @save="handleFormSave" @change="handleFormChange"
+                        v-model:active-tab="activeTab"
                         :is-mobile="isMobile" />
                 </div>
                 <div class="preview-col" :class="{ 'hidden': isMobile }" :style="!isMobile ? { width: '65%' } : {}">
-                    <div ref="previewContainer" class="preview-container"
+                    <div class="preview-container"
                         :style="{ transform: `scale(${zoomLevel / 100})`, transformOrigin: 'top center' }">
-                        <div v-for="(line, i) in lines" :key="i" :style="{
-                            position: 'absolute',
-                            top: `${(i + 1) * 296}mm`,
-                            left: 0,
-                            width: '100%',
-                            borderTop: '3px dashed rgba(0,0,0,0.5)', // thicker and semi-transparent
-                            display: 'flex',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            fontStyle: 'italic',
-                            color: 'rgba(0,0,0,0.5)',
-                            height: '20px', // ensures space for text
-                            zIndex: 1000
-                        }">
-                            <span style="position: absolute; top: -25px;">Page will be cut approximately here</span>
-                        </div>
-                        <TemplateFactory :resume-data="resumeData" :style="resumeStyle"
-                            :sidebar-position="resumeStyle.spacing.sidebarLeft ? 'left' : 'right'" />
+                        <ResumePreview :resume-data="resumeData" :resume-style="resumeStyle" />
                     </div>
                 </div>
             </div>
@@ -55,10 +38,10 @@
 <script setup>
 import LateralMenu from '@/components/EditorPage/LateralMenu.vue'
 import ResumeEditor from '@/components/EditorPage/ResumeEditor.vue'
-import TemplateFactory from '@/components/EditorPage/ResumeStyle/templates/TemplateFactory.vue'
+import ResumePreview from '@/components/EditorPage/ResumePreview.vue'
 import { ExporterService } from '@/services/ExporterService'
 import { ResumeDataClass, ResumeService, ResumeStyleClass } from '@/services/ResumeService'
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useDisplay } from 'vuetify'
 
@@ -88,20 +71,6 @@ const alertMessage = ref({
     type: 'success'
 })
 
-// PageBreak
-const previewContainer = ref(null);
-const lines = ref([]);
-let observer;
-
-const updateLines = () => {
-    if (!previewContainer.value) return;
-    const intervalMm = 292; //The page layout changes a bit on @, so 292 seems to give better results than 297
-    const heightPx = previewContainer.value.scrollHeight;
-    const heightMm = (heightPx * 25.4) / 96; // only to count lines
-    const count = Math.floor(heightMm / intervalMm);
-    lines.value = Array.from({ length: count });
-};
-
 const showAlert = (title, message, type = 'success') => {
     alertMessage.value = {
         show: true,
@@ -123,14 +92,6 @@ onMounted(async () => {
         localStorage.setItem('resumeData', JSON.stringify(resumeData.value))
         localStorage.setItem('resumeStyle', JSON.stringify(resumeStyle.value))
     }, 1000)
-
-    updateLines();
-    observer = new ResizeObserver(updateLines);
-    observer.observe(previewContainer.value);
-});
-
-onBeforeUnmount(async () => {
-    observer?.disconnect;
 });
 
 const downloadPDF = async () => {

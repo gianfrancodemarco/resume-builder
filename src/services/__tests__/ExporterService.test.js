@@ -1,6 +1,18 @@
 import { describe, expect, it } from 'vitest'
 import { ExporterService } from '@/services/ExporterService'
 import { ResumeDataV1 } from '@/models/ResumeData/ResumeDataV1'
+import { TypstService } from '@/typst/TypstService'
+
+vi.mock('@/typst/TypstService', () => ({
+    TypstService: {
+        renderPdf: vi.fn(async () => new Uint8Array([37, 80, 68, 70])),
+        renderSvg: vi.fn(async () => ({
+            svg: '<svg class="typst-doc"></svg>',
+            size: { width: 595, height: 1684 },
+            pages: [{ width: 595, height: 842 }, { width: 595, height: 842 }]
+        }))
+    }
+}))
 
 describe('ExporterService', () => {
     describe('getFilename', () => {
@@ -254,4 +266,42 @@ describe('ExporterService', () => {
             expect(result).toBe('Line 1\nLine 2')
         })
     })
-}) 
+
+    describe('exportToPDF and exportToHTML', () => {
+        const resumeData = { personal: { name: 'Jane <Doe>', title: 'Engineer' } }
+        const resumeStyle = { templateName: 'TwoColumnsBlue' }
+        let download
+
+        beforeEach(() => {
+            vi.restoreAllMocks() // earlier tests leave spies on ExporterService
+            global.Blob = class { constructor(parts, opts) { this.parts = parts; this.type = opts?.type } }
+            download = vi.spyOn(ExporterService, 'download').mockImplementation(() => { })
+        })
+
+        afterEach(() => {
+            download.mockRestore()
+        })
+
+        it('downloads the PDF compiled by Typst', async () => {
+            await ExporterService.exportToPDF(resumeData, resumeStyle)
+
+            expect(TypstService.renderPdf).toHaveBeenCalledWith(resumeData, resumeStyle)
+            const [blob, filename] = download.mock.calls[0]
+            expect(blob.type).toBe('application/pdf')
+            expect(filename).toBe('Jane <Doe>_Engineer.pdf')
+        })
+
+        it('downloads a standalone HTML page with the rendered pages', async () => {
+            await ExporterService.exportToHTML(resumeData, resumeStyle)
+
+            const [blob, filename] = download.mock.calls[0]
+            const html = blob.parts[0]
+            expect(blob.type).toBe('text/html')
+            expect(filename).toBe('Jane_<Doe>_Engineer.html')
+            expect(html).toContain('<svg class="typst-doc"></svg>')
+            expect(html).toContain('<title>Jane &lt;Doe&gt; - Engineer</title>')
+            expect(html).toContain('@page { size: 595pt 842pt; margin: 0; }')
+            expect(html).toContain('aspect-ratio: 595 / 1684')
+        })
+    })
+})
