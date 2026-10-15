@@ -29,6 +29,7 @@
     "marked": "^18.1.1",
     "tiptap-markdown": "^0.8.10",
     "vue": "^3.5.13",
+    "vue-draggable-plus": "^0.6.1",
     "vue-router": "^4.5.1",
     "vuetify": "^3.8.0-beta.0"
   },

@@ -1,0 +1,96 @@
+/* Building blocks shared by the editor panels (Content, Design, AI) */
+
+.panel-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.panel-card {
+    border: 1px solid rgb(var(--v-theme-editor-border));
+    border-radius: 12px;
+    background: rgb(var(--v-theme-surface));
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 52px;
+    padding: 4px 8px 4px 10px;
+    border-radius: 12px;
+}
+
+/* The part of a header that expands or collapses the card */
+.card-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    min-width: 0;
+    align-self: stretch;
+    padding: 0 6px;
+    border-radius: 8px;
+    color: inherit;
+    text-align: left;
+    user-select: none;
+}
+
+.card-toggle:hover {
+    background: rgb(var(--v-theme-editor-item-hover));
+}
+
+.card-toggle:focus-visible {
+    outline: 2px solid rgb(var(--v-theme-primary));
+}
+
+.card-icon {
+    opacity: 0.75;
+}
+
+.card-title {
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.card-body {
+    padding: 4px 14px 14px;
+}
+
+.panel-card > .card-body:first-child {
+    padding-top: 14px;
+}
+
+.drag-handle {
+    cursor: grab;
+    opacity: 0.4;
+    flex-shrink: 0;
+}
+
+.drag-handle:hover {
+    opacity: 0.9;
+}
+
+.sortable-ghost {
+    opacity: 0.4;
+}
+
+.field-label {
+    display: block;
+    margin-bottom: 4px;
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: rgb(var(--v-theme-editor-text-secondary));
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.form-grid .full {
+    grid-column: 1 / -1;
+}

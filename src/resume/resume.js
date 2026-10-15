@@ -1,10 +1,10 @@
 // The resume document: a JSON Resume (https://jsonresume.org/schema) whose
-// `meta.resumeBuilder` holds everything app-specific (template, style,
-// section layout, hidden items, photo crop). Other JSON Resume tools ignore it.
+// `meta.resumeBuilder` holds everything app-specific (design, section layout,
+// hidden items, photo crop). Other JSON Resume tools ignore it.
 import schema from '@jsonresume/schema/schema.json'
 import { Validator } from 'jsonschema'
 import { SECTIONS, SECTION_KEYS, hasContent, isListSection, itemsOf, sectionItems } from './sections'
-import { DEFAULT_TEMPLATE, TEMPLATES, hasSidebar, templateStyle } from './templates'
+import { hasSidebar, normalizeDesign } from './design'
 import { cloneJson } from './values'
 
 export const SCHEMA_URL = 'https://raw.githubusercontent.com/jsonresume/resume-schema/v1.0.0/schema.json'
@@ -22,8 +22,6 @@ export const settingsOf = resume => resume.meta.resumeBuilder
 
 function defaultSettings(resume) {
     return {
-        template: DEFAULT_TEMPLATE,
-        ...templateStyle(DEFAULT_TEMPLATE),
         sections: DEFAULT_ORDER.filter(key => hasContent(resume, key)).map(sectionLayout),
         hidden: {},
         photo: { x: 50, y: 50, scale: 100 },
@@ -46,7 +44,15 @@ export function prepareResume(json) {
     resume.basics ??= {}
     resume.basics.location ??= {}
     resume.meta ??= {}
-    resume.meta.resumeBuilder = { ...defaultSettings(resume), ...resume.meta.resumeBuilder }
+    // Only the settings the app knows are kept
+    const stored = resume.meta.resumeBuilder || {}
+    const defaults = defaultSettings(resume)
+    resume.meta.resumeBuilder = {
+        design: normalizeDesign(stored.design),
+        sections: Array.isArray(stored.sections) ? stored.sections : defaults.sections,
+        hidden: stored.hidden && typeof stored.hidden === 'object' ? stored.hidden : defaults.hidden,
+        photo: { ...defaults.photo, ...stored.photo },
+    }
     return resume
 }
 
@@ -95,7 +101,7 @@ export function availableSections(resume) {
 
 export function addSection(resume, key) {
     const layout = sectionLayout(key)
-    if (!hasSidebar(settingsOf(resume).template)) layout.column = 'main'
+    if (!hasSidebar(settingsOf(resume).design.layout)) layout.column = 'main'
     settingsOf(resume).sections.push(layout)
 }
 
@@ -107,10 +113,9 @@ export function removeSection(resume, key) {
     delete settings.hidden[key]
 }
 
-export function moveSection(resume, key, direction) {
-    const sections = settingsOf(resume).sections
-    const from = sections.findIndex(s => s.key === key)
-    swap(sections, from, from + (direction === 'up' ? -1 : 1))
+/** Moves the section at index `from` to index `to` (e.g. after a drag). */
+export function moveSection(resume, from, to) {
+    move(settingsOf(resume).sections, from, to)
 }
 
 // ---- Items ----------------------------------------------------------------
@@ -135,12 +140,21 @@ export function removeItem(resume, key, index) {
     setHidden(resume, key, hidden)
 }
 
-export function moveItem(resume, key, index, direction) {
-    const target = index + (direction === 'up' ? -1 : 1)
-    if (!swap(sectionItems(resume, key), index, target)) return
-    const hidden = [...(settingsOf(resume).hidden[key] || [])]
-        .map(i => (i === index ? target : i === target ? index : i))
-    setHidden(resume, key, hidden)
+/** Moves the item at index `from` to index `to`; hidden items stay hidden. */
+export function moveItem(resume, key, from, to) {
+    if (!move(sectionItems(resume, key), from, to)) return
+    moveHidden(resume, key, from, to)
+}
+
+/**
+ * Updates hidden indices after an item moved from `from` to `to`, for when the
+ * items were already reordered elsewhere (e.g. by drag and drop).
+ */
+export function moveHidden(resume, key, from, to) {
+    const count = sectionItems(resume, key).length
+    const flags = Array.from({ length: count }, (_, i) => isItemHidden(resume, key, i))
+    if (!move(flags, from, to)) return
+    setHidden(resume, key, flags.flatMap((hidden, i) => (hidden ? [i] : [])))
 }
 
 function setHidden(resume, key, indices) {
@@ -149,26 +163,18 @@ function setHidden(resume, key, indices) {
     else delete settingsOf(resume).hidden[key]
 }
 
-function swap(array, a, b) {
-    if (a < 0 || b < 0 || a >= array.length || b >= array.length) return false
-    ;[array[a], array[b]] = [array[b], array[a]]
+function move(array, from, to) {
+    if (from === to || from < 0 || to < 0 || from >= array.length || to >= array.length) return false
+    array.splice(to, 0, ...array.splice(from, 1))
     return true
 }
 
-// ---- Templates ------------------------------------------------------------
+// ---- Design ---------------------------------------------------------------
 
-/** Switches template, resetting colors, typography and spacing to its defaults. */
-export function applyTemplate(resume, templateKey) {
+/** A copy of the resume with some design values changed (for previews). */
+export function withDesign(resume, changes) {
     const settings = settingsOf(resume)
-    Object.assign(settings, { template: templateKey }, templateStyle(templateKey))
-}
-
-/** A copy of the resume rendered with another template (for previews). */
-export function withTemplate(resume, templateKey) {
-    return {
-        ...resume,
-        meta: { ...resume.meta, resumeBuilder: { ...settingsOf(resume), template: templateKey, ...TEMPLATES[templateKey].style } },
-    }
+    return { ...resume, meta: { ...resume.meta, resumeBuilder: { ...settings, design: { ...settings.design, ...changes } } } }
 }
 
 // ---- Sample ---------------------------------------------------------------

@@ -94,7 +94,7 @@ describe('LandingPage', () => {
         it('renders the hero description', () => {
             const heroDescription = wrapper.find('.hero-description')
             expect(heroDescription.exists()).toBe(true)
-            expect(heroDescription.text()).toContain('Build professional resumes')
+            expect(heroDescription.text()).toContain('download a PDF that looks')
         })
 
         it('renders the CTA button', () => {
@@ -120,84 +120,27 @@ describe('LandingPage', () => {
     })
 
     describe('Feature Cards', () => {
-        it('renders Free & Open Source feature card', () => {
-            const featureCards = wrapper.findAll('.feature-card')
-            const freeCard = featureCards[0]
-
-            expect(freeCard.find('.feature-title').text()).toContain('Free & Open Source')
-            expect(freeCard.find('.feature-icon').text()).toBe('🚀')
-            expect(freeCard.find('.feature-description').text()).toContain('Completely free to use')
+        it.each([
+            [0, '📐', 'Pixel-perfect PDF', 'exactly what you download'],
+            [1, '🔓', 'Open format, private by design', 'JSON Resume file'],
+            [2, '🚀', 'Free & Open Source', 'No sign-up'],
+            [3, '📚', 'CV Writing Guide', 'Learn how to write'],
+        ])('renders feature card %i: %s %s', (index, icon, title, description) => {
+            const card = wrapper.findAll('.feature-card')[index]
+            expect(card.find('.feature-icon').text()).toBe(icon)
+            expect(card.find('.feature-title').text()).toContain(title)
+            expect(card.find('.feature-description').text()).toContain(description)
         })
 
-        it('renders Multiple Export Formats feature card', () => {
-            const featureCards = wrapper.findAll('.feature-card')
-            const exportCard = featureCards[1]
-
-            expect(exportCard.find('.feature-title').text()).toContain('Multiple Export Formats')
-            expect(exportCard.find('.feature-icon').text()).toBe('📄')
-            expect(exportCard.find('.feature-description').text()).toContain('Export to PDF, HTML')
-        })
-
-        it('renders Professional Templates feature card', () => {
-            const featureCards = wrapper.findAll('.feature-card')
-            const templatesCard = featureCards[2]
-
-            expect(templatesCard.find('.feature-title').text()).toContain('Professional Templates')
-            expect(templatesCard.find('.feature-icon').text()).toBe('🎨')
-            expect(templatesCard.find('.feature-description').text()).toContain('Choose from multiple templates')
-        })
-
-        it('renders CV Writing Guide feature card', () => {
-            const featureCards = wrapper.findAll('.feature-card')
-            const guideCard = featureCards[3]
-
-            expect(guideCard.find('.feature-title').text()).toContain('CV Writing Guide')
-            expect(guideCard.find('.feature-icon').text()).toBe('📚')
-            expect(guideCard.find('.feature-description').text()).toContain('Learn how to write')
-            expect(guideCard.find('.guide-link').exists()).toBe(true)
+        it('links to the CV writing guide', () => {
+            expect(wrapper.findAll('.feature-card')[3].find('.guide-link').exists()).toBe(true)
         })
     })
 
     describe('Hero Visual', () => {
-        it('renders the hero visual section', () => {
-            const heroVisual = wrapper.find('.hero-visual')
-            expect(heroVisual.exists()).toBe(true)
-        })
-
-        it('renders the mockup container', () => {
-            const mockupContainer = wrapper.find('.mockup-container')
-            expect(mockupContainer.exists()).toBe(true)
-        })
-
-        it('renders the mockup screen', () => {
-            const mockupScreen = wrapper.find('.mockup-screen')
-            expect(mockupScreen.exists()).toBe(true)
-        })
-
-        it('renders the mockup header with dots', () => {
-            const mockupHeader = wrapper.find('.mockup-header')
-            expect(mockupHeader.exists()).toBe(true)
-
-            const dots = wrapper.findAll('.dot')
-            expect(dots).toHaveLength(3)
-        })
-
-        it('renders the mockup content with columns', () => {
-            const mockupContent = wrapper.find('.mockup-content')
-            expect(mockupContent.exists()).toBe(true)
-
-            const leftColumn = wrapper.find('.mockup-left-column')
-            const rightColumn = wrapper.find('.mockup-right-column')
-            expect(leftColumn.exists()).toBe(true)
-            expect(rightColumn.exists()).toBe(true)
-        })
-
-        it('renders mockup sections with lines', () => {
-            const mockupSections = wrapper.findAll('.mockup-section')
-            expect(mockupSections.length).toBeGreaterThan(0)
-
-            const mockupLines = wrapper.findAll('.mockup-line')
-            expect(mockupLines.length).toBeGreaterThan(0)
+        it('shows the two rendered resume layouts', () => {
+            const shots = wrapper.findAll('.hero-visual .resume-shot')
+            expect(shots.map(img => img.attributes('src'))).toEqual(['/landing/classic.png', '/landing/sidebar.png'])
         })
     })
 
@@ -340,17 +283,6 @@ describe('LandingPage', () => {
             expect(shape2.classes()).toContain('shape-2')
         })
 
-        it('has mockup animation classes', () => {
-            const mockupContainer = wrapper.find('.mockup-container')
-            expect(mockupContainer.classes()).toContain('mockup-container')
-        })
-
-        it('has pulse animation classes', () => {
-            const mockupLines = wrapper.findAll('.mockup-line')
-            mockupLines.forEach(line => {
-                expect(line.classes()).toContain('mockup-line')
-            })
-        })
     })
 
     describe('Content Validation', () => {
@@ -373,11 +305,6 @@ describe('LandingPage', () => {
         it('has correct number of feature cards', () => {
             const featureCards = wrapper.findAll('.feature-card')
             expect(featureCards).toHaveLength(4)
-        })
-
-        it('has correct number of mockup sections', () => {
-            const mockupSections = wrapper.findAll('.mockup-section')
-            expect(mockupSections.length).toBeGreaterThan(0)
         })
     })
 
@@ -408,12 +335,6 @@ describe('LandingPage', () => {
                 expect(card.find('.feature-title').exists()).toBe(true)
                 expect(card.find('.feature-description').exists()).toBe(true)
             })
-        })
-
-        it('has proper mockup structure', () => {
-            const mockupScreen = wrapper.find('.mockup-screen')
-            expect(mockupScreen.find('.mockup-header').exists()).toBe(true)
-            expect(mockupScreen.find('.mockup-content').exists()).toBe(true)
         })
     })
 

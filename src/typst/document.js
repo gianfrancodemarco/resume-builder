@@ -7,13 +7,13 @@
 //   entries    { items: [{ title, subtitle, date, location, href, details, summary, highlights, keywords }] }
 //   tags       { items: [{ name, level, keywords }] }
 //   languages  { items: [{ name, fluency, level }] }
-// Sizes in the style are CSS px; Typst gets pt.
+// Sizes in the design are CSS px; Typst gets pt.
 import { degree, hasContent, itemsOf } from '@/resume/sections'
 import { resumeContent, settingsOf } from '@/resume/resume'
-import { TEMPLATES, hasSidebar } from '@/resume/templates'
+import { DENSITIES, FONT_PAIRINGS, LAYOUTS, SIDEBAR_WIDTH, SIZES, hasSidebar } from '@/resume/design'
 import { fluencyLevel, formatDate, formatLocation, formatRange } from '@/resume/format'
-import { FALLBACK_SCRIPTS, fallbackFont, resolveFont } from './fonts'
-import { cssColorToHex } from './colors'
+import { FALLBACK_SCRIPTS, fallbackFonts } from './fonts'
+import { deriveColors } from './colors'
 import { markdownToNodes } from './markdown'
 
 const PX_TO_PT = 0.75
@@ -127,9 +127,11 @@ export function buildSections(resume) {
  */
 export function buildDocument(resume) {
     const settings = settingsOf(resume)
-    const { colors = {}, typography = {}, spacing = {}, photo = {} } = settings
-    const template = TEMPLATES[settings.template] || TEMPLATES.TwoColumnsBlue
-    const withSidebar = hasSidebar(settings.template) && spacing.sidebarWidth > 0
+    const { design, photo = {} } = settings
+    const size = SIZES[design.size]
+    const density = DENSITIES[design.density]
+    const pairing = FONT_PAIRINGS[design.fonts]
+    const withSidebar = hasSidebar(design.layout)
 
     const main = []
     const sidebar = []
@@ -138,53 +140,33 @@ export function buildDocument(resume) {
     }
 
     // Each font is a list: Typst uses the next family for characters the first lacks.
-    // The fallback is only added (and downloaded) when the text needs it.
+    // The fallbacks are only added (and downloaded) when the text needs them.
     const needsFallback = FALLBACK_SCRIPTS.test(JSON.stringify(resumeContent(resume)))
-    const fontList = font => [font, ...(needsFallback && fallbackFont(font) !== font ? [fallbackFont(font)] : [])]
-    const headingFonts = fontList(resolveFont(typography.headingFont))
-    const bodyFonts = fontList(resolveFont(typography.bodyFont))
-    const fonts = new Set([...headingFonts, ...bodyFonts])
-    if (usesCode([main, sidebar])) fonts.add('Cousine') // lib.typ sets code in Cousine
-
-    const color = (value, fallback) => cssColorToHex(value) || cssColorToHex(fallback) || '#000000'
-    const primary = color(colors.primary, '#000000')
+    const fontList = font => [font, ...(needsFallback ? fallbackFonts(font) : [])]
+    const headingFonts = fontList(pairing.heading)
+    const bodyFonts = fontList(pairing.body)
     const basics = resume.basics || {}
 
     const data = {
-        template: template.layout,
+        template: LAYOUTS[design.layout].typst,
         title: [basics.name, basics.label].filter(Boolean).join(' - ') || 'Resume',
         personal: { name: basics.name || 'Your Name', title: basics.label || '' },
         image: basics.image ? { path: AVATAR_PATH, x: photo.x ?? 50, y: photo.y ?? 50, scale: photo.scale ?? 100 } : null,
-        colors: {
-            primary,
-            text: color(colors.text, primary),
-            background: color(colors.background, '#ffffff'),
-            sidebarBackground: color(colors.sidebarBackground, primary),
-            sidebarText: color(colors.sidebarText, primary),
-            dates: color(colors.datesTextColor, primary),
-            subtitle: color(colors.subtitleTextColor, primary),
-            link: color(colors.link, primary),
-        },
+        colors: deriveColors(design.accent),
         fonts: { heading: headingFonts, body: bodyFonts },
         sizes: {
-            base: (typography.baseSize || 14) * PX_TO_PT,
-            heading: (typography.headingSize || 24) * PX_TO_PT,
-            section: (spacing.section ?? 24) * PX_TO_PT,
-            content: (spacing.content ?? 12) * PX_TO_PT,
-            sidebar: withSidebar ? spacing.sidebarWidth * PX_TO_PT : 0,
+            base: size.base * PX_TO_PT,
+            heading: size.heading * PX_TO_PT,
+            section: density.section * PX_TO_PT,
+            content: density.content * PX_TO_PT,
+            sidebar: withSidebar ? SIDEBAR_WIDTH * PX_TO_PT : 0,
         },
-        sidebarLeft: Boolean(spacing.sidebarLeft),
+        sidebarLeft: design.sidebarLeft,
         main,
         sidebar,
     }
 
-    return { data, fonts: [...fonts] }
-}
-
-function usesCode(value) {
-    if (Array.isArray(value)) return value.some(usesCode)
-    if (value && typeof value === 'object') return value.t === 'code' || Object.values(value).some(usesCode)
-    return false
+    return { data, fonts: [...new Set([...headingFonts, ...bodyFonts])] }
 }
 
 const TYPST_IMAGE_TYPES = ['image/png', 'image/jpeg', 'image/gif', 'image/svg+xml']

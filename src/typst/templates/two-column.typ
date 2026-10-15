@@ -32,7 +32,7 @@
     set text(fill: colors.sidebarText)
     set par(leading: 0.6em)
     let lk = look(
-      link: colors.link,
+      link: colors.sidebarText,
       muted: colors.sidebarText.transparentize(30%),
       bar-fill: colors.sidebarText,
       bar-track: colors.sidebarText.transparentize(80%),

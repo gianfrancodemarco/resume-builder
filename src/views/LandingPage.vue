@@ -19,8 +19,8 @@
                         in Minutes
                     </h1>
 
-                    <p class="hero-description">Build professional resumes with our modern, intuitive editor.
-                        Export to PDF, customize styles, and stand out from the crowd.
+                    <p class="hero-description">Write it once, pick a design, and download a PDF that looks
+                        exactly like the preview. No account, nothing leaves your browser.
                     </p>
 
                     <div class="typing-container">
@@ -37,31 +37,28 @@
 
                     <div class="features-grid">
                         <div class="feature-card">
+                            <div class="feature-icon">📐</div>
+                            <div class="feature-content">
+                                <h3 class="feature-title">Pixel-perfect PDF</h3>
+                                <p class="feature-description">What you see is exactly what you download, on every
+                                    device and browser</p>
+                            </div>
+                        </div>
+
+                        <div class="feature-card">
+                            <div class="feature-icon">🔓</div>
+                            <div class="feature-content">
+                                <h3 class="feature-title">Open format, private by design</h3>
+                                <p class="feature-description">Your resume is a JSON Resume file that stays in your
+                                    browser. Import it, export it, take it anywhere</p>
+                            </div>
+                        </div>
+
+                        <div class="feature-card">
                             <div class="feature-icon">🚀</div>
                             <div class="feature-content">
                                 <h3 class="feature-title">Free & Open Source</h3>
-                                <p class="feature-description">Completely free to use with full source code available on
-                                    GitHub</p>
-                            </div>
-                        </div>
-
-                        <div class="feature-card">
-                            <div class="feature-icon">📄</div>
-                            <div class="feature-content">
-                                <h3 class="feature-title">Multiple Export Formats</h3>
-                                <p class="feature-description">Export to PDF, HTML, or JSON for later editing and
-                                    sharing</p>
-                            </div>
-                        </div>
-
-                        <div class="feature-card">
-                            <div class="feature-icon">🎨</div>
-                            <div class="feature-content">
-                                <h3 class="feature-title">
-                                    Professional Templates
-                                </h3>
-                                <p class="feature-description">Choose from multiple templates designed for different
-                                    industries</p>
+                                <p class="feature-description">No sign-up. The full source code is on GitHub</p>
                             </div>
                         </div>
 
@@ -80,56 +77,10 @@
                     </div>
                 </div>
 
-                <div class="hero-visual">
-                    <div class="mockup-container">
-                        <div class="mockup-screen">
-                            <div class="mockup-header">
-                                <div class="mockup-dots">
-                                    <div class="dot"></div>
-                                    <div class="dot"></div>
-                                    <div class="dot"></div>
-                                </div>
-                            </div>
-                            <div class="mockup-content">
-                                <!-- Left Column -->
-                                <div class="mockup-left-column">
-                                    <div class="mockup-section">
-                                        <div class="mockup-section-title"></div>
-                                        <div class="mockup-line"></div>
-                                        <div class="mockup-line short"></div>
-                                        <div class="mockup-line"></div>
-                                    </div>
-                                    <div class="mockup-section">
-                                        <div class="mockup-section-title short"></div>
-                                        <div class="mockup-line"></div>
-                                        <div class="mockup-line short"></div>
-                                    </div>
-                                    <div class="mockup-section">
-                                        <div class="mockup-section-title short"></div>
-                                        <div class="mockup-line"></div>
-                                        <div class="mockup-line"></div>
-                                    </div>
-                                </div>
-
-                                <!-- Right Column -->
-                                <div class="mockup-right-column">
-                                    <div class="mockup-section">
-                                        <div class="mockup-section-title"></div>
-                                        <div class="mockup-line"></div>
-                                        <div class="mockup-line short"></div>
-                                        <div class="mockup-line"></div>
-                                        <div class="mockup-line short"></div>
-                                    </div>
-                                    <div class="mockup-section">
-                                        <div class="mockup-section-title short"></div>
-                                        <div class="mockup-line"></div>
-                                        <div class="mockup-line"></div>
-                                        <div class="mockup-line short"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <div class="hero-visual" aria-hidden="true">
+                    <!-- Rendered by the app itself (sample resume), see public/landing -->
+                    <img src="/landing/classic.png" alt="" class="resume-shot back" />
+                    <img src="/landing/sidebar.png" alt="" class="resume-shot front" />
                 </div>
             </main>
 
@@ -159,14 +110,12 @@
 import { onMounted } from 'vue'
 
 const sentences = [
-    "Professional templates for every industry",
-    "Real-time preview as you type",
-    "Export to PDF with perfect formatting",
-    "Customizable colors and layouts",
-    "Mobile-friendly responsive design",
+    "Live preview of the real PDF as you type",
+    "Clean layouts that look right with any color",
+    "Import your old CV with AI",
+    "Works on your phone too",
     "No registration required",
     "Open source and completely free",
-    "Built with modern web technologies"
 ]
 
 onMounted(() => {
@@ -472,145 +421,36 @@ onMounted(() => {
 
 /* Hero Visual */
 .hero-visual {
+    position: relative;
     display: flex;
     justify-content: center;
     align-items: center;
+    min-height: 560px;
 }
 
-.mockup-container {
-    position: relative;
-    perspective: 1200px;
+.resume-shot {
+    position: absolute;
+    width: min(360px, 38vw);
+    border-radius: 6px;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+    transition: transform 0.4s ease;
 }
 
-.mockup-screen {
-    width: 320px;
-    height: 420px;
-    background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
-    border-radius: 12px;
-    padding: 1.5rem;
-    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
-    transform: rotateY(-20deg) rotateX(8deg);
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+.resume-shot.back {
+    transform: translate(70px, 20px) rotate(6deg);
+    opacity: 0.85;
 }
 
-.mockup-screen:hover {
-    transform: rotateY(-15deg) rotateX(5deg) translateY(-10px);
-    box-shadow: 0 35px 70px rgba(0, 0, 0, 0.4);
+.resume-shot.front {
+    transform: translate(-40px, -10px) rotate(-3deg);
 }
 
-.mockup-header {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 1.5rem;
+.hero-visual:hover .resume-shot.back {
+    transform: translate(110px, 24px) rotate(8deg);
 }
 
-.mockup-dots {
-    display: flex;
-    gap: 0.5rem;
-}
-
-.dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.3);
-}
-
-.mockup-content {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1.5rem;
-    height: calc(100% - 3rem);
-}
-
-.mockup-left-column {
-    display: flex;
-    flex-direction: column;
-    gap: 1.2rem;
-}
-
-.mockup-right-column {
-    display: flex;
-    flex-direction: column;
-    gap: 1.2rem;
-}
-
-.mockup-section {
-    display: flex;
-    flex-direction: column;
-    gap: 0.6rem;
-}
-
-.mockup-section-title {
-    height: 14px;
-    background: rgba(255, 255, 255, 0.15);
-    border-radius: 3px;
-    width: 80%;
-}
-
-.mockup-section-title.short {
-    width: 60%;
-}
-
-.mockup-line {
-    height: 6px;
-    background: rgba(255, 255, 255, 0.08);
-    border-radius: 3px;
-    animation: pulse 2s ease-in-out infinite;
-}
-
-.mockup-line:nth-child(2) {
-    animation-delay: 0.2s;
-}
-
-.mockup-line:nth-child(3) {
-    animation-delay: 0.4s;
-}
-
-.mockup-line:nth-child(4) {
-    animation-delay: 0.6s;
-}
-
-.mockup-line:nth-child(5) {
-    animation-delay: 0.8s;
-}
-
-.mockup-line.short {
-    width: 70%;
-}
-
-@keyframes pulse {
-
-    0%,
-    100% {
-        opacity: 0.6;
-    }
-
-    50% {
-        opacity: 1;
-    }
-}
-
-/* Add floating animation to the entire mockup */
-.mockup-container {
-    animation: float-mockup 6s ease-in-out infinite;
-}
-
-@keyframes float-mockup {
-
-    0%,
-    100% {
-        transform: translateY(0px) rotateY(-20deg) rotateX(8deg);
-    }
-
-    50% {
-        transform: translateY(-15px) rotateY(-18deg) rotateX(6deg);
-    }
-}
-
-.mockup-container:hover {
-    animation-play-state: paused;
+.hero-visual:hover .resume-shot.front {
+    transform: translate(-70px, -14px) rotate(-4deg);
 }
 
 /* Footer */

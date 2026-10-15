@@ -1,269 +1,253 @@
 <template>
-    <v-app>
-        <v-main>
-            <div class="editor-content" :class="{ 'mobile-view': isMobile }">
-                <!-- Lateral Menu -->
+    <div class="editor-page" :class="{ mobile: isMobile }">
+        <TopBar :resume="resume" :saved="saved" :downloading="downloading" :compact="isMobile" @home="router.push('/')"
+            @download-pdf="handleDownloadPDF" @import="handleImportJSON" @export-json="handleExportJSON"
+            @export-txt="handleDownloadTXT" />
 
-                <LateralMenu v-model:active-tab="activeTab" :sections="settingsOf(resume).sections"
-                    :handleShowAll="handleShowAllTooltips" :handleShowTooltipsStart="handleShowTooltipsStart"
-                    :handleShowTooltipsEnd="handleShowTooltipsEnd" :handleZoomIn="handleZoomIn"
-                    :handleZoomOut="handleZoomOut" :handleExportJSON="handleExportJSON"
-                    :handleImportJSON="handleImportJSON" :handleDownloadPDF="handleDownloadPDF"
-                    :handleDownloadHTML="handleDownloadHTML" :handleDownloadTXT="handleDownloadTXT"
-                    :handleHome="handleHome" @scroll-to-section="handleScrollToSection"
-                    @update:active-tab="activeTab = $event" />
+        <div class="editor-body">
+            <aside v-show="!isMobile || view !== 'preview'" class="editor-panel">
+                <v-tabs v-if="!isMobile" v-model="panel" grow color="primary" density="comfortable" class="panel-tabs">
+                    <v-tab v-for="tab in TABS" :key="tab.value" :value="tab.value" :prepend-icon="tab.icon">
+                        {{ tab.title }}
+                    </v-tab>
+                </v-tabs>
+                <div class="panel-scroll">
+                    <ContentPanel v-show="panel === 'content'" :resume="resume" />
+                    <DesignPanel v-if="panel === 'design'" :resume="resume" />
+                    <!-- Mounted on first visit, then kept so the chat and API keys survive tab switches -->
+                    <AIPanel v-if="aiOpened" v-show="panel === 'ai'" :resume="resume"
+                        @update:resume="resume = $event" />
+                </div>
+            </aside>
 
-                <div class="editor-col" :style="isMobile ? { width: '100%' } : { width: '35%' }">
-                    <ResumeEditor v-model:resume="resume" v-model:active-tab="activeTab"
-                        :is-mobile="isMobile" />
-                </div>
-                <div class="preview-col" :class="{ 'hidden': isMobile }" :style="!isMobile ? { width: '65%' } : {}">
-                    <div class="preview-container"
-                        :style="{ transform: `scale(${zoomLevel / 100})`, transformOrigin: 'top center' }">
-                        <ResumePreview :resume="resume" />
-                    </div>
-                </div>
-            </div>
-        </v-main>
+            <PreviewPane v-show="!isMobile || view === 'preview'" :resume="resume" class="editor-preview" />
+        </div>
+
+        <nav v-if="isMobile" class="bottom-nav" aria-label="Editor views">
+            <button v-for="tab in [...TABS, PREVIEW_TAB]" :key="tab.value" type="button"
+                :class="{ active: view === tab.value }" @click="view = tab.value">
+                <v-icon :icon="tab.icon" size="20" />
+                <span>{{ tab.title }}</span>
+            </button>
+        </nav>
 
         <!-- Hidden file input for JSON import -->
-        <input type="file" ref="fileInput" style="display: none" accept=".json" @change="handleFileUpload" />
+        <input ref="fileInput" type="file" class="d-none" accept=".json,application/json" @change="handleFileUpload" />
 
-        <v-alert v-model="alertMessage.show" :type="alertMessage.type" :title="alertMessage.title"
-            :text="alertMessage.message" closable @click:close="hideAlert" class="alert-message" timeout="3000" />
-    </v-app>
+        <v-snackbar v-model="toast.show" :color="toast.type" :timeout="3000" location="bottom right">
+            <strong>{{ toast.title }}</strong>
+            <div>{{ toast.message }}</div>
+        </v-snackbar>
+    </div>
 </template>
 
 <script setup>
-import LateralMenu from '@/components/EditorPage/LateralMenu.vue'
-import ResumeEditor from '@/components/EditorPage/ResumeEditor.vue'
-import ResumePreview from '@/components/EditorPage/ResumePreview.vue'
+import AIPanel from '@/components/EditorPage/ai/AIPanel.vue'
+import ContentPanel from '@/components/EditorPage/content/ContentPanel.vue'
+import DesignPanel from '@/components/EditorPage/design/DesignPanel.vue'
+import PreviewPane from '@/components/EditorPage/PreviewPane.vue'
+import TopBar from '@/components/EditorPage/TopBar.vue'
+import '@/components/EditorPage/editor.css'
 import { ExporterService } from '@/services/ExporterService'
-import { settingsOf } from '@/resume/resume'
 import { ResumeService } from '@/services/ResumeService'
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useDisplay } from 'vuetify'
 
+const TABS = [
+    { value: 'content', title: 'Content', icon: 'ph-note-pencil' },
+    { value: 'design', title: 'Design', icon: 'ph-paint-brush' },
+    { value: 'ai', title: 'AI', icon: 'ph-sparkle' },
+]
+const PREVIEW_TAB = { value: 'preview', title: 'Preview', icon: 'ph-eye' }
+
 const { mobile } = useDisplay()
 const router = useRouter()
+const isMobile = computed(() => mobile.value)
 
-// A JSON Resume document; template, style and layout live in its meta
+// A JSON Resume document; design and layout live in its meta
 const resume = ref(ResumeService.loadStored())
 
-// Active Tab State
-const activeTab = ref('info')
-
-// Zoom and tooltip state
-const zoomLevel = ref(100)
+// What is shown: a panel tab, or (on mobile) the preview
+const view = ref('content')
+const lastPanel = ref('content')
+const panel = computed({
+    get: () => (view.value === 'preview' ? lastPanel.value : view.value),
+    set: value => { view.value = value },
+})
+watch(view, value => {
+    if (value !== 'preview') lastPanel.value = value
+})
+const aiOpened = ref(false)
+watch(panel, value => {
+    if (value === 'ai') aiOpened.value = true
+}, { immediate: true })
 
 const fileInput = ref(null)
+const downloading = ref(false)
+const saved = ref(true)
 
-const isMobile = computed(() => mobile.value)
-const alertMessage = ref({
-    show: false,
-    title: '',
-    message: '',
-    type: 'success'
-})
-
-let alertTimer = null
-const showAlert = (title, message, type = 'success') => {
-    alertMessage.value = {
-        show: true,
-        title,
-        message,
-        type
-    }
-    // A new alert restarts the timer, so it is not hidden by the previous one's
-    clearTimeout(alertTimer)
-    alertTimer = setTimeout(hideAlert, 3000)
+const toast = ref({ show: false, title: '', message: '', type: 'success' })
+const notify = (title, message, type = 'success') => {
+    toast.value = { show: true, title, message, type }
 }
 
-const hideAlert = () => {
-    alertMessage.value.show = false
-}
+const track = event => window.sa_event?.(event)
+
+// ---- Autosave ----
 
 let autosaveTimer = null
-let storageWarned = false
 const autosave = () => {
     try {
         ResumeService.store(resume.value)
+        saved.value = true
     } catch (error) {
         // Usually a full localStorage, e.g. because of a large photo. Warn once.
-        if (!storageWarned) {
-            storageWarned = true
+        if (saved.value) {
             console.error('Error saving resume:', error)
-            showAlert('Autosave Failed', 'Your browser storage is full. Export your resume as JSON to keep your changes.', 'error')
+            notify('Autosave failed', 'Your browser storage is full. Export your resume as JSON to keep your changes.', 'error')
         }
+        saved.value = false
     }
 }
 
-onUnmounted(() => {
-    clearInterval(autosaveTimer)
-    clearTimeout(alertTimer)
-})
-
 onMounted(() => {
     autosaveTimer = setInterval(autosave, 1000)
-});
+    // Save the last edits when the tab is closed or reloaded
+    window.addEventListener('beforeunload', autosave)
+})
 
-const downloadPDF = async () => {
-    await ExporterService.exportToPDF(resume.value)
+onUnmounted(() => {
+    clearInterval(autosaveTimer)
+    window.removeEventListener('beforeunload', autosave)
+    // ...or when leaving the editor (e.g. to the home page)
+    autosave()
+})
+
+// ---- Actions ----
+
+const handleDownloadPDF = async () => {
+    track('download_pdf')
+    downloading.value = true
+    try {
+        await ExporterService.exportToPDF(resume.value)
+    } catch (error) {
+        console.error('Error generating PDF:', error)
+        notify('PDF generation failed', 'Please try again.', 'error')
+    } finally {
+        downloading.value = false
+    }
 }
 
-const downloadHTML = async () => {
-    await ExporterService.exportToHTML(resume.value)
+const handleExportJSON = () => {
+    track('export_json')
+    try {
+        ExporterService.download(ResumeService.exportToJSON(resume.value), ExporterService.getFilename(resume.value, 'json'))
+    } catch (error) {
+        console.error('Error exporting JSON:', error)
+        notify('Export failed', 'Failed to export the resume as JSON.', 'error')
+    }
 }
 
-const exportJSON = () => {
-    ExporterService.download(ResumeService.exportToJSON(resume.value), ExporterService.getFilename(resume.value, 'json'))
+const handleDownloadTXT = async () => {
+    track('download_txt')
+    try {
+        await ExporterService.exportToTXT(resume.value)
+    } catch (error) {
+        console.error('Error generating TXT:', error)
+        notify('Export failed', 'Failed to export the resume as text.', 'error')
+    }
 }
 
-const importJSON = () => {
+const handleImportJSON = () => {
+    track('import_json')
     fileInput.value.click()
 }
 
-const handleFileUpload = async (event) => {
+const handleFileUpload = async event => {
     const file = event.target.files[0]
     if (file) {
         try {
             resume.value = await ResumeService.loadFromFile(file)
-            showAlert('Import Successful', 'Your resume has been imported successfully.', 'success')
+            notify('Resume imported', file.name)
         } catch (error) {
             console.error('Error importing file:', error)
-            showAlert('Import Failed', error.message || 'Failed to import resume.', 'error')
+            notify('Import failed', error.message || 'Failed to import resume.', 'error')
         }
     }
     // Reset the input so the same file can be selected again
     event.target.value = ''
 }
-
-const handleExportJSON = () => {
-    if (window.sa_event) {
-        window.sa_event('export_json')
-    }
-    try {
-        exportJSON()
-        showAlert('Export Successful', 'Your resume has been exported as JSON.', 'success')
-    } catch (error) {
-        console.error('Error exporting JSON:', error)
-        showAlert('Export Failed', 'Failed to export resume as JSON.', 'error')
-    }
-}
-
-const handleImportJSON = () => {
-    if (window.sa_event) {
-        window.sa_event('import_json')
-    }
-    importJSON()
-}
-
-const handleDownloadPDF = async () => {
-    if (window.sa_event) {
-        window.sa_event('download_pdf')
-    }
-    try {
-        await downloadPDF()
-        showAlert('PDF Generated', 'Your resume has been generated as PDF.', 'success')
-    } catch (error) {
-        console.error('Error generating PDF:', error)
-        showAlert('PDF Generation Failed', 'Failed to generate PDF. Please try again.', 'error')
-    }
-}
-
-const handleDownloadHTML = async () => {
-    if (window.sa_event) {
-        window.sa_event('download_html')
-    }
-    try {
-        await downloadHTML()
-        showAlert('HTML Generated', 'Your resume has been generated as HTML.', 'success')
-    } catch (error) {
-        console.error('Error generating HTML:', error)
-        showAlert('HTML Generation Failed', 'Failed to generate HTML. Please try again.', 'error')
-    }
-}
-
-const handleScrollToSection = (section) => {
-    // Find the editor content area
-    const editorContent = document.querySelector('.editor-window')
-    if (!editorContent) return
-
-    // Find the target section element using data-section attribute
-    const targetElement = editorContent.querySelector(`[data-section="${section}"]`)
-
-    if (targetElement) {
-        targetElement.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start'
-        })
-    }
-}
-
-const handleShowAllTooltips = () => {
-    // This will be handled by mouse events in the template
-}
-
-const handleShowTooltipsStart = () => {
-    // Force show all tooltips in the lateral menu
-    const tooltipButtons = document.querySelectorAll('.lateral-menu .v-btn')
-    tooltipButtons.forEach(btn => {
-        const tooltip = btn.closest('.v-tooltip')
-        if (tooltip) {
-            // Trigger hover event to show tooltip
-            btn.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }))
-        }
-    })
-}
-
-const handleShowTooltipsEnd = () => {
-    // Force hide all tooltips in the lateral menu
-    const tooltipButtons = document.querySelectorAll('.lateral-menu .v-btn')
-    tooltipButtons.forEach(btn => {
-        const tooltip = btn.closest('.v-tooltip')
-        if (tooltip) {
-            // Trigger mouse leave event to hide tooltip
-            btn.dispatchEvent(new MouseEvent('mouseleave', { bubbles: true }))
-        }
-    })
-}
-
-const handleZoomIn = () => {
-    if (zoomLevel.value < 200) {
-        zoomLevel.value += 25
-    }
-}
-
-const handleZoomOut = () => {
-    if (zoomLevel.value > 50) {
-        zoomLevel.value -= 25
-    }
-}
-
-const handleHome = () => {
-    // Navigate to home page
-    router.push('/')
-}
-
-// TXT Export logic
-const downloadTXT = async () => {
-    await ExporterService.exportToTXT(resume.value)
-}
-
-const handleDownloadTXT = async () => {
-    if (window.sa_event) {
-        window.sa_event('download_txt');
-    }
-    try {
-        // Call the downloadTXT function to generate and download the TXT file
-        await downloadTXT();
-        showAlert('TXT Generated', 'Your resume has been generated as TXT.', 'success');
-    } catch (error) {
-        console.error('Error generating TXT:', error);
-        showAlert('TXT Generation Failed', 'Failed to generate TXT. Please try again.', 'error');
-    }
-}
 </script>
 
-<style scoped src="@/views/EditorPage.css"></style>
+<style scoped>
+.editor-page {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    height: 100dvh;
+    background: rgb(var(--v-theme-background));
+}
+
+.editor-body {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+}
+
+.editor-panel {
+    display: flex;
+    flex-direction: column;
+    width: clamp(380px, 36%, 560px);
+    flex-shrink: 0;
+    border-right: 1px solid rgb(var(--v-theme-editor-border));
+    background: rgb(var(--v-theme-background));
+}
+
+.panel-tabs {
+    flex: none;
+    border-bottom: 1px solid rgb(var(--v-theme-editor-border));
+}
+
+.panel-scroll {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+}
+
+.editor-preview {
+    flex: 1;
+}
+
+.mobile .editor-panel {
+    width: 100%;
+    border-right: none;
+}
+
+.mobile .panel-scroll {
+    padding: 12px;
+}
+
+.bottom-nav {
+    display: flex;
+    flex-shrink: 0;
+    border-top: 1px solid rgb(var(--v-theme-editor-border));
+    background: rgb(var(--v-theme-surface));
+    padding-bottom: env(safe-area-inset-bottom);
+}
+
+.bottom-nav button {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 8px 0;
+    font-size: 0.72rem;
+    color: rgb(var(--v-theme-editor-text-muted));
+}
+
+.bottom-nav button.active {
+    color: rgb(var(--v-theme-primary));
+}
+</style>
