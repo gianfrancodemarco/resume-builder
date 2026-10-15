@@ -7,7 +7,7 @@ describe('ResumeStyleV1_1', () => {
         it('creates a default style with sample data', () => {
             const style = ResumeStyleV1_1.createDefault()
             expect(style.colors.primary).toBe('#08294D')
-            expect(style.typography.headingFont).toBe('Helvetica')
+            expect(style.typography.headingFont).toBe('Arimo')
             expect(style.spacing.section).toBe(24)
             expect(style.columns.left).toEqual(['personal', 'education'])
             expect(style.columns.right).toEqual(['experiences', 'customSections'])

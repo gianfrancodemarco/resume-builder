@@ -17,6 +17,7 @@ A modern, single-page resume builder application built with Vue 3 and Vuetify. C
 - 🎯 **Customizable Details**: Flexible detail fields with link support
 - 🎭 **Style Customization**: Customize colors, typography, and layout
 - 💾 **Multiple Export Formats**: Download as HTML, PDF, JSON or TXT (plain text)
+- 📐 **Pixel-Perfect PDF**: Resumes are typeset with [Typst](https://typst.app) compiled to WebAssembly, right in the browser. The preview and the PDF come from the same compiled document, with embedded fonts, so the output is identical on every device
 - 🔒 **Privacy First**: Everything stays in your browser
 - 💾 **Save/Load**: Import and export your resume data as JSON
 - 🤖 **AI CV Conversion**: Convert existing CVs using AI models
@@ -26,6 +27,10 @@ A modern, single-page resume builder application built with Vue 3 and Vuetify. C
 - 📚 **CV Writing Guide**: Access to comprehensive CV writing resources
 
 ## Getting Started
+
+### How rendering works
+
+Templates live in `src/typst/templates` as Typst files. `src/typst/document.js` turns the resume data and style into JSON that the templates read, and `src/typst/TypstService.js` runs the compiler in the browser to produce the SVG preview and the PDF. Fonts are bundled as TTF files in `public/fonts` (Typst cannot use system fonts in the browser); to change the set, edit `src/typst/fonts.js` and run `node scripts/fetch-fonts.mjs`.
 
 ### Prerequisites
 

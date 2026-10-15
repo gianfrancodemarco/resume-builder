@@ -15,8 +15,8 @@ export class TwoColumnsBlue extends ResumeStyleV1_1 {
                 link: '#ffffff'
             },
             typography: {
-                headingFont: 'Helvetica',
-                bodyFont: 'Georgia',
+                headingFont: 'Arimo',
+                bodyFont: 'Gelasio',
                 baseSize: 14,
                 headingSize: 26
             },

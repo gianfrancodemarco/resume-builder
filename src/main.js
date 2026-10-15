@@ -1,6 +1,7 @@
 import { createApp, h } from 'vue'
 import App from './App.vue'
 import router from './router'
+import { registerFontFaces } from './typst/fonts'
 
 // Vuetify imports
 import 'vuetify/styles'
@@ -189,6 +190,8 @@ const vuetify = createVuetify({
         }
     },
 })
+
+registerFontFaces()
 
 const app = createApp(App)
 app.use(vuetify)
