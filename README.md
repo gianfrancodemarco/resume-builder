@@ -30,7 +30,7 @@ Five layouts, each with any accent color and font pairing:
 ## Features
 
 - 🎨 **Five layouts**: Sidebar, Classic, Minimal (ATS friendly), Banner and Timeline
-- 🖌️ **Simple design choices**: an accent color (every other color is derived from it so text stays readable), five font pairings, text size and density
+- 🖌️ **Simple design choices**: an accent color (every other color is derived from it so text stays readable), six font pairings, text size and density
 - 📝 **Live preview**: the real pages update as you type, with zoom, fit-to-width and a page count
 - 🔄 **Flexible sections**: add, remove, reorder and hide any JSON Resume section, and place it in the main column or the sidebar
 - ✋ **Drag and drop**: reorder sections and entries, and edit entries inline
