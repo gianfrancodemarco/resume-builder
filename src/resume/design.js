@@ -19,6 +19,9 @@ export const ACCENTS = [
     { name: 'Forest', value: '#1F6B45' },
     { name: 'Burgundy', value: '#7A1F3D' },
     { name: 'Plum', value: '#4C2A6B' },
+    { name: 'Charcoal', value: '#36454F' },
+    { name: 'Brown', value: '#795548' },
+    { name: 'Indigo', value: '#4B0082' },
 ]
 
 // Heading and body families; all bundled (see typst/fonts.js)
