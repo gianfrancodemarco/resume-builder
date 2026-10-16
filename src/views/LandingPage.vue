@@ -11,8 +11,20 @@
 
         <!-- Main content -->
         <div class="content-wrapper">
-            <v-btn class="theme-toggle" :icon="isDark ? 'ph-sun' : 'ph-moon'" variant="text"
-                :aria-label="isDark ? 'Light theme' : 'Dark theme'" @click="toggleTheme" />
+            <nav class="landing-nav">
+                <a href="https://gianfrancodemarco.dev" target="_blank" rel="noopener" class="nav-link">
+                    gianfrancodemarco.dev
+                </a>
+                <v-btn href="https://github.com/gianfrancodemarco/resume-builder" target="_blank" rel="noopener"
+                    variant="text" class="star-btn" aria-label="Star this project on GitHub"
+                    title="Star this project on GitHub">
+                    <v-icon icon="ph-github-logo" />
+                    <span class="ml-2">Star</span>
+                    <v-icon icon="ph-star" size="14" class="ml-1 star-icon" />
+                </v-btn>
+                <v-btn class="theme-toggle" :icon="isDark ? 'ph-sun' : 'ph-moon'" variant="text"
+                    :aria-label="isDark ? 'Light theme' : 'Dark theme'" @click="toggleTheme" />
+            </nav>
             <main class="hero-section">
                 <div class="hero-content">
                     <h1 class="hero-title">
@@ -86,24 +98,6 @@
                 </div>
             </main>
 
-            <footer class="footer">
-                <div class="footer-content">
-                    <div class="footer-links">
-                        <a href="https://gianfrancodemarco.dev" target="_blank" class="footer-link">
-                            gianfrancodemarco.dev
-                        </a>
-                        <span class="footer-separator">•</span>
-                        <a href="https://github.com/gianfrancodemarco/resume-builder" target="_blank"
-                            class="footer-link">
-                            <span class="github-icon">⭐</span>
-                            Star on GitHub
-                        </a>
-                    </div>
-                    <div class="footer-tagline">
-                        Built with ❤️ and Vue.js
-                    </div>
-                </div>
-            </footer>
         </div>
     </div>
 </template>
@@ -187,7 +181,7 @@ onMounted(() => {
     width: 100%;
     height: 100%;
     background: linear-gradient(135deg, rgb(var(--v-theme-primary)) 0%, rgb(var(--v-theme-secondary)) 100%);
-    opacity: 0.08;
+    opacity: var(--wash-opacity, 0.08);
 }
 
 .floating-shapes {
@@ -202,7 +196,7 @@ onMounted(() => {
     position: absolute;
     border-radius: 50%;
     background: linear-gradient(45deg, rgb(var(--v-theme-primary)), rgb(var(--v-theme-secondary)));
-    opacity: 0.08;
+    opacity: var(--shape-opacity, 0.08);
     animation: float 8s ease-in-out infinite;
 }
 
@@ -253,7 +247,7 @@ onMounted(() => {
     grid-template-columns: 1fr 1fr;
     gap: 3rem;
     align-items: center;
-    padding: 2rem 4rem;
+    padding: 0 4rem 2rem;
     max-width: 1400px;
     margin: 0 auto;
     width: 100%;
@@ -348,8 +342,9 @@ onMounted(() => {
 }
 
 .feature-card {
-    background: rgba(var(--v-theme-surface), 0.6);
-    border: 1px solid rgba(var(--v-theme-on-background), 0.1);
+    background: rgba(var(--v-theme-surface), var(--card-opacity, 0.6));
+    border: 1px solid rgba(var(--v-theme-on-background), var(--card-border, 0.1));
+    box-shadow: var(--card-shadow, none);
     border-radius: 16px;
     padding: 1rem;
     backdrop-filter: blur(10px);
@@ -361,10 +356,10 @@ onMounted(() => {
 }
 
 .feature-card:hover {
-    background: rgba(var(--v-theme-on-background), 0.08);
-    border-color: rgba(var(--v-theme-on-background), 0.2);
+    background: var(--card-hover-bg, rgba(var(--v-theme-on-background), 0.08));
+    border-color: var(--card-hover-border, rgba(var(--v-theme-on-background), 0.2));
     transform: translateY(-4px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, var(--card-hover-shadow, 0.2));
 }
 
 .feature-icon {
@@ -424,16 +419,50 @@ onMounted(() => {
     flex: 1;
 }
 
-/* Softer shadows on a light background */
-:global(.v-theme--light) .landing-container {
+/* Light theme: a cleaner background, solid cards and softer shadows */
+:global(.v-theme--light .landing-container) {
     --shot-shadow: 0.18;
+    --wash-opacity: 0.04;
+    --shape-opacity: 0;
+    --card-opacity: 1;
+    --card-border: 0.08;
+    --card-shadow: 0 1px 3px rgba(16, 24, 40, 0.06);
+    --card-hover-bg: rgb(var(--v-theme-surface));
+    --card-hover-border: rgba(var(--v-theme-primary), 0.35);
+    --card-hover-shadow: 0.08;
 }
 
-.theme-toggle {
-    position: absolute;
-    top: 16px;
-    right: 16px;
-    z-index: 3;
+:global(.v-theme--light .landing-container .guide-card) {
+    background: linear-gradient(135deg, rgba(var(--v-theme-primary), 0.06), rgba(var(--v-theme-secondary), 0.06)), rgb(var(--v-theme-surface));
+}
+
+.landing-nav {
+    display: flex;
+    justify-content: flex-end;
+    padding: 12px 16px 0;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.nav-link {
+    color: rgba(var(--v-theme-on-background), 0.7);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.9rem;
+    margin-right: 0.5rem;
+    transition: color 0.3s ease;
+}
+
+.nav-link:hover {
+    color: rgb(var(--v-theme-on-background));
+}
+
+.star-btn {
+    text-transform: none !important;
+}
+
+.star-icon {
+    color: rgb(var(--v-theme-editor-star));
 }
 
 /* Hero Visual */
@@ -470,51 +499,6 @@ onMounted(() => {
     transform: translate(-70px, -14px) rotate(-4deg);
 }
 
-/* Footer */
-.footer {
-    padding: 2rem 4rem;
-    backdrop-filter: blur(10px);
-    background: rgba(var(--v-theme-on-background), 0.03);
-    border-top: 1px solid rgba(var(--v-theme-on-background), 0.08);
-}
-
-.footer-content {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    max-width: 1400px;
-    margin: 0 auto;
-}
-
-.footer-links {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-}
-
-.footer-link {
-    color: rgba(var(--v-theme-on-background), 0.7);
-    text-decoration: none;
-    font-weight: 500;
-    transition: color 0.3s ease;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.footer-link:hover {
-    color: rgb(var(--v-theme-on-background));
-}
-
-.footer-separator {
-    color: rgba(var(--v-theme-on-background), 0.4);
-}
-
-.footer-tagline {
-    color: rgba(var(--v-theme-on-background), 0.6);
-    font-size: 0.9rem;
-}
-
 .guide-icon {
     font-size: 0.9rem;
 }
@@ -525,7 +509,7 @@ onMounted(() => {
         grid-template-columns: 1fr;
         text-align: center;
         gap: 2rem;
-        padding: 2rem;
+        padding: 0.5rem 2rem 2rem;
         margin-bottom: 1rem;
     }
 
@@ -598,24 +582,11 @@ onMounted(() => {
     .hero-visual {
         display: none;
     }
-
-    .footer {
-        padding: 1rem 2rem;
-        position: relative;
-        bottom: 0;
-        width: 100%;
-    }
-
-    .footer-content {
-        flex-direction: column;
-        gap: 0.8rem;
-        text-align: center;
-    }
 }
 
 @media (max-width: 480px) {
     .hero-section {
-        padding: 1.5rem 1rem;
+        padding: 0.5rem 1rem 1.5rem;
         margin-bottom: 0.5rem;
     }
 
@@ -675,21 +646,6 @@ onMounted(() => {
         text-align: center;
     }
 
-    .footer {
-        padding: 0.8rem 1rem;
-        position: relative;
-        bottom: 0;
-        width: 100%;
-    }
-
-    .footer-links {
-        flex-direction: column;
-        gap: 0.4rem;
-    }
-
-    .footer-separator {
-        display: none;
-    }
 }
 
 .guide-card {
