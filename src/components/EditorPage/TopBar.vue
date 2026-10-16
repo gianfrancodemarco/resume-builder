@@ -26,12 +26,16 @@
 
         <!-- Split button: PDF, plus the other formats in the menu -->
         <div class="download" :class="{ done: downloaded }">
-            <v-btn color="primary" variant="flat" class="download-main" :aria-busy="downloading"
-                :prepend-icon="downloading ? undefined : downloaded ? 'ph-check' : 'ph-download-simple'"
-                @click="!downloading && emit('download-pdf')">
-                <v-progress-circular v-if="downloading" indeterminate size="16" width="2" class="mr-2" />
-                {{ downloadLabel }}
-            </v-btn>
+            <v-tooltip text="Download PDF (Ctrl+P / ⌘P)" location="bottom">
+                <template v-slot:activator="{ props: tooltipProps }">
+                    <v-btn v-bind="tooltipProps" color="primary" variant="flat" class="download-main" :aria-busy="downloading"
+                        :prepend-icon="downloading ? undefined : downloaded ? 'ph-check' : 'ph-download-simple'"
+                        @click="!downloading && emit('download-pdf')">
+                        <v-progress-circular v-if="downloading" indeterminate size="16" width="2" class="mr-2" />
+                        {{ downloadLabel }}
+                    </v-btn>
+                </template>
+            </v-tooltip>
             <v-menu location="bottom end">
                 <template v-slot:activator="{ props: menuProps }">
                     <v-btn v-bind="menuProps" color="primary" variant="flat" class="download-more"
