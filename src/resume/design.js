@@ -31,6 +31,7 @@ export const FONT_PAIRINGS = {
     elegant: { name: 'Elegant', heading: 'EB Garamond', body: 'EB Garamond' },
     editorial: { name: 'Editorial', heading: 'Source Sans 3', body: 'Source Serif 4' },
     clean: { name: 'Clean', heading: 'Source Sans 3', body: 'Source Sans 3' },
+    contemporary: { name: 'Contemporary', heading: 'Inter', body: 'Gelasio' },
 }
 
 // Sizes in CSS px, converted to pt for Typst
