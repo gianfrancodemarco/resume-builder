@@ -42,7 +42,7 @@ const { stub } = vi.hoisted(() => ({
 }))
 
 vi.mock('@/components/EditorPage/TopBar.vue', stub('TopBar', 'top-bar-stub', {
-    props: ['resume', 'saved', 'downloading', 'compact'],
+    props: ['resume', 'saved', 'downloading', 'downloaded', 'compact'],
     emits: ['home', 'download-pdf', 'import', 'export-json', 'export-txt'],
 }))
 vi.mock('@/components/EditorPage/PreviewPane.vue', stub('PreviewPane', 'preview-pane-stub'))
@@ -235,6 +235,90 @@ describe('EditorPage', () => {
             expect(topBar().props('downloading')).toBe(false)
             // No toast on success
             expect(wrapper.vm.toast.show).toBe(false)
+        })
+
+        it('downloads the PDF on Ctrl+P or Cmd+P keyboard shortcut and prevents default', async () => {
+            let finish
+            ExporterService.exportToPDF.mockImplementation(() => new Promise(resolve => { finish = resolve }))
+
+            const event = new KeyboardEvent('keydown', {
+                key: 'p',
+                ctrlKey: true,
+                bubbles: true,
+                cancelable: true,
+            })
+            const preventDefaultSpy = vi.spyOn(event, 'preventDefault')
+
+            window.dispatchEvent(event)
+            await nextTick()
+
+            expect(preventDefaultSpy).toHaveBeenCalled()
+            expect(ExporterService.exportToPDF).toHaveBeenCalledWith(wrapper.vm.resume)
+            expect(topBar().props('downloading')).toBe(true)
+
+            finish()
+            await flushPromises()
+            expect(topBar().props('downloading')).toBe(false)
+        })
+
+        it('downloads the PDF on Cmd+P on macOS', async () => {
+            const event = new KeyboardEvent('keydown', {
+                key: 'p',
+                metaKey: true,
+                bubbles: true,
+                cancelable: true,
+            })
+            const preventDefaultSpy = vi.spyOn(event, 'preventDefault')
+
+            window.dispatchEvent(event)
+            await flushPromises()
+
+            expect(preventDefaultSpy).toHaveBeenCalled()
+            expect(ExporterService.exportToPDF).toHaveBeenCalledWith(wrapper.vm.resume)
+        })
+
+        it('does not trigger another download if already downloading when Ctrl+P is pressed', async () => {
+            let finish
+            ExporterService.exportToPDF.mockImplementation(() => new Promise(resolve => { finish = resolve }))
+
+            topBar().vm.$emit('download-pdf')
+            await nextTick()
+            expect(ExporterService.exportToPDF).toHaveBeenCalledTimes(1)
+
+            const event = new KeyboardEvent('keydown', {
+                key: 'p',
+                ctrlKey: true,
+                bubbles: true,
+                cancelable: true,
+            })
+            const preventDefaultSpy = vi.spyOn(event, 'preventDefault')
+
+            window.dispatchEvent(event)
+            await nextTick()
+
+            expect(preventDefaultSpy).toHaveBeenCalled()
+            expect(ExporterService.exportToPDF).toHaveBeenCalledTimes(1)
+
+            finish()
+            await flushPromises()
+        })
+
+        it('stops listening to keyboard shortcut after unmount', () => {
+            wrapper.unmount()
+            wrapper = null
+
+            const event = new KeyboardEvent('keydown', {
+                key: 'p',
+                ctrlKey: true,
+                bubbles: true,
+                cancelable: true,
+            })
+            const preventDefaultSpy = vi.spyOn(event, 'preventDefault')
+
+            window.dispatchEvent(event)
+
+            expect(preventDefaultSpy).not.toHaveBeenCalled()
+            expect(ExporterService.exportToPDF).not.toHaveBeenCalled()
         })
 
         it('shows an error toast when the PDF fails', async () => {
