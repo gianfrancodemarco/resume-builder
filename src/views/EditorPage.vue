@@ -116,7 +116,7 @@ const autosave = () => {
 }
 
 const handleKeyDown = event => {
-    if ((event.ctrlKey || event.metaKey) && (event.key === 'p' || event.key === 'P')) {
+    if ((event.ctrlKey || event.metaKey) && !event.shiftKey && !event.altKey && (event.key === 'p' || event.key === 'P')) {
         event.preventDefault()
         if (!downloading.value) {
             handleDownloadPDF()

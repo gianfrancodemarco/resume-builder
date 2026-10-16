@@ -303,6 +303,32 @@ describe('EditorPage', () => {
             await flushPromises()
         })
 
+        it('does not intercept shortcuts with extra modifiers like Ctrl+Shift+P or Ctrl+Alt+P', () => {
+            const shiftEvent = new KeyboardEvent('keydown', {
+                key: 'p',
+                ctrlKey: true,
+                shiftKey: true,
+                bubbles: true,
+                cancelable: true,
+            })
+            const shiftPreventDefaultSpy = vi.spyOn(shiftEvent, 'preventDefault')
+            window.dispatchEvent(shiftEvent)
+
+            const altEvent = new KeyboardEvent('keydown', {
+                key: 'p',
+                ctrlKey: true,
+                altKey: true,
+                bubbles: true,
+                cancelable: true,
+            })
+            const altPreventDefaultSpy = vi.spyOn(altEvent, 'preventDefault')
+            window.dispatchEvent(altEvent)
+
+            expect(shiftPreventDefaultSpy).not.toHaveBeenCalled()
+            expect(altPreventDefaultSpy).not.toHaveBeenCalled()
+            expect(ExporterService.exportToPDF).not.toHaveBeenCalled()
+        })
+
         it('stops listening to keyboard shortcut after unmount', () => {
             wrapper.unmount()
             wrapper = null
