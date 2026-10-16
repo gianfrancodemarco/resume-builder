@@ -130,7 +130,7 @@ describe('EditorPage', () => {
             mountPage()
             const resume = wrapper.vm.resume
 
-            expect(topBar().props()).toEqual({ resume, saved: true, downloading: false, compact: false })
+            expect(topBar().props()).toEqual({ resume, saved: true, downloading: false, downloaded: false, compact: false })
             expect(wrapper.findComponent({ name: 'PreviewPane' }).props('resume')).toStrictEqual(resume)
             expect(wrapper.findComponent({ name: 'ContentPanel' }).props('resume')).toStrictEqual(resume)
         })
