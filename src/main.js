@@ -129,7 +129,7 @@ const PHOSPHOR_ICONS = {
 }
 
 // Editor tokens on top of Vuetify's: borders, field and item backgrounds,
-// secondary text, and the backdrop behind the resume preview
+// secondary text, the backdrop behind the resume preview, and the GitHub star
 const THEMES = {
     dark: {
         dark: true,
@@ -150,6 +150,7 @@ const THEMES = {
             'editor-text-secondary': '#B1BAC4',
             'editor-text-muted': '#7D8590',
             'editor-preview-bg': '#0A0D12',
+            'editor-star': '#E3B341',
         },
     },
     light: {
@@ -159,6 +160,7 @@ const THEMES = {
             secondary: '#7B5BD6',
             success: '#1A7F37',
             'on-success': '#FFFFFF',
+            info: '#4C5BD4',
             background: '#F4F5F8',
             surface: '#FFFFFF',
             'on-background': '#1F2328',
@@ -169,7 +171,8 @@ const THEMES = {
             'editor-item-hover': '#EEF0F4',
             'editor-text-secondary': '#4B5563',
             'editor-text-muted': '#6B7280',
-            'editor-preview-bg': '#E6E9EF',
+            'editor-preview-bg': '#D5DAE1',
+            'editor-star': '#6B7280',
         },
     },
 }

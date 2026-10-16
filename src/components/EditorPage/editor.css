@@ -138,3 +138,12 @@
 .form-grid .full {
     grid-column: 1 / -1;
 }
+
+/* Light theme keeps to one accent: a dashed outline instead of a tinted fill */
+.v-theme--light .add-section {
+    border: 1px dashed rgb(var(--v-theme-editor-border));
+}
+
+.v-theme--light .add-section .v-btn__underlay {
+    opacity: 0;
+}

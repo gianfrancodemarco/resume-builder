@@ -135,7 +135,7 @@ const title = computed(() => {
 }
 
 .star-icon {
-    color: #E3B341;
+    color: rgb(var(--v-theme-editor-star));
 }
 
 .download {
