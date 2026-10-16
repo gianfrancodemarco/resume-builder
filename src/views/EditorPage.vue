@@ -128,7 +128,7 @@ onMounted(() => {
     autosaveTimer = setInterval(autosave, 1000)
     // Save the last edits when the tab is closed or reloaded
     window.addEventListener('beforeunload', autosave)
-    window.addEventListener('keydown', handleKeyDown) 
+    window.addEventListener('keydown', handleKeyDown)
 })
 
 onUnmounted(() => {
