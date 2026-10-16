@@ -113,9 +113,8 @@ describe('LandingPage', () => {
             expect(featureCards).toHaveLength(4)
         })
 
-        it('renders the footer', () => {
-            const footer = wrapper.find('.footer')
-            expect(footer.exists()).toBe(true)
+        it('does not render a footer', () => {
+            expect(wrapper.find('footer').exists()).toBe(false)
         })
     })
 
@@ -189,40 +188,22 @@ describe('LandingPage', () => {
         })
     })
 
-    describe('Footer', () => {
-        it('renders the footer content', () => {
-            const footerContent = wrapper.find('.footer-content')
-            expect(footerContent.exists()).toBe(true)
-        })
-
-        it('renders the footer links', () => {
-            const footerLinks = wrapper.find('.footer-links')
-            expect(footerLinks.exists()).toBe(true)
-        })
-
+    describe('Navigation', () => {
         it('renders the gianfrancodemarco.dev link', () => {
-            const devLink = wrapper.find('a[href="https://gianfrancodemarco.dev"]')
+            const devLink = wrapper.find('.landing-nav a[href="https://gianfrancodemarco.dev"]')
             expect(devLink.exists()).toBe(true)
             expect(devLink.text()).toContain('gianfrancodemarco.dev')
+            expect(devLink.attributes('target')).toBe('_blank')
         })
 
-        it('renders the GitHub link', () => {
-            const githubLink = wrapper.find('a[href="https://github.com/gianfrancodemarco/resume-builder"]')
-            expect(githubLink.exists()).toBe(true)
-            expect(githubLink.text()).toContain('Star on GitHub')
-            expect(githubLink.find('.github-icon').text()).toBe('⭐')
+        it('renders the star on GitHub button', () => {
+            const starButton = wrapper.find('.landing-nav .star-btn')
+            expect(starButton.exists()).toBe(true)
+            expect(starButton.text()).toContain('Star')
         })
 
-        it('renders the footer tagline', () => {
-            const footerTagline = wrapper.find('.footer-tagline')
-            expect(footerTagline.exists()).toBe(true)
-            expect(footerTagline.text()).toContain('Built with ❤️ and Vue.js')
-        })
-
-        it('renders the footer separator', () => {
-            const footerSeparator = wrapper.find('.footer-separator')
-            expect(footerSeparator.exists()).toBe(true)
-            expect(footerSeparator.text()).toBe('•')
+        it('renders the theme toggle', () => {
+            expect(wrapper.find('.landing-nav .theme-toggle').exists()).toBe(true)
         })
     })
 
@@ -293,7 +274,7 @@ describe('LandingPage', () => {
                 '.typing-container',
                 '.cta-buttons',
                 '.features-grid',
-                '.footer'
+                '.landing-nav'
             ]
 
             requiredSections.forEach(selector => {
@@ -318,7 +299,7 @@ describe('LandingPage', () => {
                 'hero-content',
                 'hero-visual',
                 'features-grid',
-                'footer'
+                'landing-nav'
             ]
 
             mainClasses.forEach(className => {
