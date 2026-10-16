@@ -43,7 +43,7 @@ const { stub } = vi.hoisted(() => ({
 
 vi.mock('@/components/EditorPage/TopBar.vue', stub('TopBar', 'top-bar-stub', {
     props: ['resume', 'saved', 'downloading', 'compact'],
-    emits: ['home', 'download-pdf', 'import', 'export-json', 'export-txt'],
+    emits: ['home', 'download-pdf', 'import', 'new-blank-resume', 'export-json', 'export-txt'],
 }))
 vi.mock('@/components/EditorPage/PreviewPane.vue', stub('PreviewPane', 'preview-pane-stub'))
 vi.mock('@/components/EditorPage/content/ContentPanel.vue', stub('ContentPanel', 'content-panel-stub'))
@@ -298,8 +298,35 @@ describe('EditorPage', () => {
             expect(clickSpy).toHaveBeenCalled()
             expect(window.sa_event).toHaveBeenCalledWith('import_json')
         })
-    })
+        it('opens the confirmation dialog for a new blank resume', async () => {
+        const before = wrapper.vm.resume
 
+        topBar().vm.$emit('new-blank-resume')
+        await nextTick()
+
+        expect(wrapper.vm.showNewResumeDialog).toBe(true)
+        expect(wrapper.vm.resume).toStrictEqual(before)
+        })
+
+        it('creates a blank resume while preserving design settings', async () => {
+        const current = wrapper.vm.resume
+        settingsOf(current).design.layout = 'classic'
+        settingsOf(current).design.accent = '#123456'
+        const previousDesign = { ...settingsOf(current).design }
+
+        topBar().vm.$emit('new-blank-resume')
+        await nextTick()
+
+        wrapper.vm.createBlankResume()
+        await nextTick()
+
+        expect(wrapper.vm.resume.basics.name).toBeUndefined()
+        expect(wrapper.vm.resume.work).toBeUndefined()
+        expect(settingsOf(wrapper.vm.resume).design).toStrictEqual(previousDesign)
+        expect(wrapper.vm.showNewResumeDialog).toBe(false)
+        expect(wrapper.vm.toast.title).toBe('New resume created')
+    })
+    })
     describe('importing a file', () => {
         beforeEach(() => mountPage())
 

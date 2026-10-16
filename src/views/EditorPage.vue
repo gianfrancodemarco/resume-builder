@@ -2,7 +2,8 @@
     <div class="editor-page" :class="{ mobile: isMobile }">
         <TopBar :resume="resume" :saved="saved" :downloading="downloading" :downloaded="downloaded"
             :compact="isMobile" @home="router.push('/')"
-            @download-pdf="handleDownloadPDF" @import="handleImportJSON" @export-json="handleExportJSON"
+            @download-pdf="handleDownloadPDF" @import="handleImportJSON"
+            @new-blank-resume="handleNewBlankResume" @export-json="handleExportJSON"
             @export-txt="handleDownloadTXT" />
 
         <div class="editor-body">
@@ -34,6 +35,23 @@
 
         <!-- Hidden file input for JSON import -->
         <input ref="fileInput" type="file" class="d-none" accept=".json,application/json" @change="handleFileUpload" />
+        <v-dialog v-model="showNewResumeDialog" max-width="400">
+           <v-card>
+              <v-card-title>Start a new blank resume?</v-card-title>
+                <v-card-text>
+                This will replace your current resume with a blank one. Your current content will be lost.
+                </v-card-text>
+                <v-card-actions>
+                 <v-spacer />
+                   <v-btn variant="text" @click="showNewResumeDialog = false">
+                    Cancel
+                   </v-btn>
+                   <v-btn color="primary" @click="createBlankResume">
+                   Create blank resume
+                   </v-btn>
+                 </v-card-actions>
+            </v-card>
+        </v-dialog>
 
         <v-snackbar v-model="toast.show" :color="toast.type" :timeout="3000" location="bottom right">
             <strong>{{ toast.title }}</strong>
@@ -54,6 +72,7 @@ import { ResumeService } from '@/services/ResumeService'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useDisplay } from 'vuetify'
+import { prepareResume } from '@/resume/resume'
 
 const TABS = [
     { value: 'content', title: 'Content', icon: 'ph-note-pencil' },
@@ -85,6 +104,7 @@ watch(panel, value => {
 }, { immediate: true })
 
 const fileInput = ref(null)
+const showNewResumeDialog = ref(false)
 const downloading = ref(false)
 // Shown on the download button for a moment after a successful download
 const downloaded = ref(false)
@@ -171,6 +191,29 @@ const handleDownloadTXT = async () => {
 const handleImportJSON = () => {
     track('import_json')
     fileInput.value.click()
+}
+
+const handleNewBlankResume = () => {
+    showNewResumeDialog.value = true
+}
+
+const createBlankResume = () => {
+    const currentSettings = resume.value.meta.resumeBuilder
+    const blankResume = prepareResume({
+        meta: {
+            resumeBuilder: {
+                ...currentSettings,
+                sections: currentSettings.sections.map(section => ({ ...section })),
+                hidden: { ...currentSettings.hidden },
+                photo: { ...currentSettings.photo },
+                design: { ...currentSettings.design },
+            },
+        },
+    })
+
+    resume.value = blankResume
+    showNewResumeDialog.value = false
+    notify('New resume created', 'Your blank resume is ready.')
 }
 
 const handleFileUpload = async event => {
