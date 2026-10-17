@@ -83,4 +83,16 @@ describe('PreviewPane zoom preferences', () => {
         await wrapper.get('[aria-label="Zoom in"]').trigger('click')
         expect(wrapper.find('.zoom-value').text()).toBe('110%')
     })
+
+    it('still zooms when obtaining localStorage throws', async () => {
+        vi.spyOn(window, 'localStorage', 'get').mockImplementation(() => {
+            throw new DOMException('Storage blocked', 'SecurityError')
+        })
+        vi.spyOn(console, 'error').mockImplementation(() => {})
+        wrapper = mountPreview()
+        expect(wrapper.vm.fit).toBe(true)
+        await wrapper.get('[aria-label="Zoom in"]').trigger('click')
+        expect(wrapper.vm.fit).toBe(false)
+        expect(wrapper.find('.zoom-value').text()).toBe('110%')
+    })
 })
