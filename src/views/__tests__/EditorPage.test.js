@@ -299,33 +299,49 @@ describe('EditorPage', () => {
             expect(window.sa_event).toHaveBeenCalledWith('import_json')
         })
         it('opens the confirmation dialog for a new blank resume', async () => {
-        const before = wrapper.vm.resume
+            const before = JSON.parse(JSON.stringify(wrapper.vm.resume))
 
-        topBar().vm.$emit('new-blank-resume')
-        await nextTick()
+            topBar().vm.$emit('new-blank-resume')
+            await nextTick()
 
-        expect(wrapper.vm.showNewResumeDialog).toBe(true)
-        expect(wrapper.vm.resume).toStrictEqual(before)
+            expect(wrapper.vm.showNewResumeDialog).toBe(true)
+            expect(wrapper.vm.resume).toStrictEqual(before)
         })
 
         it('creates a blank resume while preserving design settings', async () => {
-        const current = wrapper.vm.resume
-        settingsOf(current).design.layout = 'classic'
-        settingsOf(current).design.accent = '#123456'
-        const previousDesign = { ...settingsOf(current).design }
+            const current = wrapper.vm.resume
+            const currentSettings = settingsOf(current)
 
-        topBar().vm.$emit('new-blank-resume')
-        await nextTick()
+            currentSettings.design.layout = 'classic'
+            currentSettings.design.accent = '#123456'
+            currentSettings.hidden = { ...currentSettings.hidden, work: true }
+            currentSettings.photo = { ...currentSettings.photo }
+            currentSettings.sections = currentSettings.sections.map(section => ({ ...section }))
 
-        wrapper.vm.createBlankResume()
-        await nextTick()
+            const previousDesign = { ...currentSettings.design }
+            const previousPhoto = { ...currentSettings.photo }
+            const previousSections = currentSettings.sections.map(section => ({ ...section }))
+            const previousImage = current.basics.image
 
-        expect(wrapper.vm.resume.basics.name).toBeUndefined()
-        expect(wrapper.vm.resume.work).toBeUndefined()
-        expect(settingsOf(wrapper.vm.resume).design).toStrictEqual(previousDesign)
-        expect(wrapper.vm.showNewResumeDialog).toBe(false)
-        expect(wrapper.vm.toast.title).toBe('New resume created')
-    })
+            topBar().vm.$emit('new-blank-resume')
+            await nextTick()
+
+            const createButton = wrapper.findAllComponents({ name: 'VBtn' })
+                .find(button => button.text() === 'Create blank resume')
+            expect(createButton).toBeDefined()
+            await createButton.trigger('click')
+            await nextTick()
+
+            expect(wrapper.vm.resume.basics.image).toBe(previousImage)
+            expect(settingsOf(wrapper.vm.resume).design).toStrictEqual(previousDesign)
+            expect(settingsOf(wrapper.vm.resume).photo).toStrictEqual(previousPhoto)
+            expect(settingsOf(wrapper.vm.resume).sections).toStrictEqual(previousSections)
+            expect(settingsOf(wrapper.vm.resume).hidden).toStrictEqual({})
+            expect(wrapper.vm.resume.basics.name).toBeUndefined()
+            expect(wrapper.vm.resume.work).toBeUndefined()
+            expect(wrapper.vm.showNewResumeDialog).toBe(false)
+            expect(wrapper.vm.toast.title).toBe('New resume created')
+        })
     })
     describe('importing a file', () => {
         beforeEach(() => mountPage())

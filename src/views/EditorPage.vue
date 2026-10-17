@@ -199,12 +199,16 @@ const handleNewBlankResume = () => {
 
 const createBlankResume = () => {
     const currentSettings = resume.value.meta.resumeBuilder
+
     const blankResume = prepareResume({
+        basics: {
+            image: resume.value.basics?.image,
+        },
         meta: {
             resumeBuilder: {
                 ...currentSettings,
                 sections: currentSettings.sections.map(section => ({ ...section })),
-                hidden: { ...currentSettings.hidden },
+                hidden: {},
                 photo: { ...currentSettings.photo },
                 design: { ...currentSettings.design },
             },
