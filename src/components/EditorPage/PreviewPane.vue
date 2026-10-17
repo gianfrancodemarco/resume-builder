@@ -22,7 +22,7 @@
 </template>
 
 <script setup>
-import { useResizeObserver } from '@vueuse/core'
+import { useLocalStorage, useResizeObserver } from '@vueuse/core'
 import { computed, ref } from 'vue'
 import ResumePreview from './ResumePreview.vue'
 
@@ -41,8 +41,14 @@ const ZOOM_STEP = 0.1
 
 const pane = ref(null)
 const paneWidth = ref(PAGE_WIDTH + GUTTER)
-const fit = ref(true)
-const manualZoom = ref(1)
+const fit = useLocalStorage('resume-preview-fit', true)
+const storedZoom = useLocalStorage('resume-preview-zoom', 1)
+const manualZoom = computed({
+    get: () => Number.isFinite(storedZoom.value)
+        ? Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, storedZoom.value))
+        : 1,
+    set: value => { storedZoom.value = value }
+})
 const pages = ref(0)
 
 useResizeObserver(pane, ([entry]) => {
