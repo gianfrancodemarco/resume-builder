@@ -12,11 +12,18 @@ const router = createRouter({
     routes
 })
 
-// Track route changes with Simple Analytics
-router.afterEach((to) => {
-    if (window.sa_pageview) {
-        window.sa_pageview(to.name || to.path)
+// Track route changes with GoatCounter (the script loads async, so the first view may wait for it)
+function trackPageview(path) {
+    const count = () => window.goatcounter.count({ path })
+    if (window.goatcounter?.count) {
+        count()
+    } else {
+        document.querySelector('script[data-goatcounter]')?.addEventListener('load', count, { once: true })
     }
+}
+
+router.afterEach((to) => {
+    trackPageview(to.path)
 })
 
 export default router
