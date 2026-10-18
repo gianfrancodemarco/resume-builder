@@ -3,6 +3,22 @@
 All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.0] - 2026-10-18
+
+### Added
+
+- Three more accent colours: Charcoal, Brown and Indigo ([#94](https://github.com/gianfrancodemarco/resume-builder/pull/94)).
+
+### Changed
+
+- **Landing page:** the footer is gone. The personal site link and the GitHub star button are in a nav row at the top, next to the theme toggle ([#96](https://github.com/gianfrancodemarco/resume-builder/pull/96)).
+- **Calmer light theme** ([#96](https://github.com/gianfrancodemarco/resume-builder/pull/96)): on the landing page, a fainter background, no floating shapes and solid white cards. In the editor, a darker backdrop behind the preview, an indigo AI notice, a grey GitHub star and a dashed "Add section" button. Dark mode is unchanged.
+- Visit statistics moved from Simple Analytics, whose free plan keeps only 30 days, to [GoatCounter](https://www.goatcounter.com), which keeps them with no time limit. Neither uses cookies.
+
+### Fixed
+
+- Light-theme styles from the landing page leaked into the rest of the app ([#96](https://github.com/gianfrancodemarco/resume-builder/pull/96)).
+
 ## [2.0.0] - 2026-10-16
 
 A rebuild of the rendering, the data model and the editor. Resumes are now typeset with Typst and stored as standard JSON Resume files.
@@ -159,6 +175,7 @@ First stable release.
 
 - Freezes on mobile caused by a recursive update ([#9](https://github.com/gianfrancodemarco/resume-builder/pull/9)).
 
+[2.1.0]: https://github.com/gianfrancodemarco/resume-builder/compare/v2.0.0...v2.1.0
 [2.0.0]: https://github.com/gianfrancodemarco/resume-builder/compare/v1.8.0...v2.0.0
 [1.8.0]: https://github.com/gianfrancodemarco/resume-builder/compare/v1.7.0...v1.8.0
 [1.7.0]: https://github.com/gianfrancodemarco/resume-builder/compare/v1.6.1...v1.7.0
