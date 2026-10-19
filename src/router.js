@@ -1,6 +1,7 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
 import LandingPage from './views/LandingPage.vue'
 import EditorPage from './views/EditorPage.vue'
+import { trackPageview } from './analytics'
 
 const routes = [
     { path: '/', component: LandingPage, name: 'landing' },
@@ -12,16 +13,7 @@ const router = createRouter({
     routes
 })
 
-// Track route changes with GoatCounter (the script loads async, so the first view may wait for it)
-function trackPageview(path) {
-    const count = () => window.goatcounter.count({ path })
-    if (window.goatcounter?.count) {
-        count()
-    } else {
-        document.querySelector('script[data-goatcounter]')?.addEventListener('load', count, { once: true })
-    }
-}
-
+// Track route changes with GoatCounter
 router.afterEach((to) => {
     trackPageview(to.path)
 })

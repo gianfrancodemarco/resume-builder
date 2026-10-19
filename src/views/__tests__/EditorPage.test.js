@@ -84,7 +84,7 @@ describe('EditorPage', () => {
 
         mocks.push = vi.fn()
         mocks.display.mobile = ref(false)
-        window.sa_event = vi.fn()
+        window.goatcounter = { count: vi.fn() }
 
         vuetify = createVuetify({ components, directives })
 
@@ -103,7 +103,7 @@ describe('EditorPage', () => {
         wrapper?.unmount()
         wrapper = null
         localStorage.clear()
-        delete window.sa_event
+        delete window.goatcounter
         vi.useRealTimers()
         vi.restoreAllMocks()
         vi.unstubAllGlobals()
@@ -226,7 +226,7 @@ describe('EditorPage', () => {
             await nextTick()
 
             expect(ExporterService.exportToPDF).toHaveBeenCalledWith(wrapper.vm.resume)
-            expect(window.sa_event).toHaveBeenCalledWith('download_pdf')
+            expect(window.goatcounter.count).toHaveBeenCalledWith({ path: 'download_pdf', event: true })
             expect(topBar().props('downloading')).toBe(true)
 
             finish()
@@ -255,7 +255,7 @@ describe('EditorPage', () => {
             expect(ResumeService.exportToJSON).toHaveBeenCalledWith(wrapper.vm.resume)
             expect(ExporterService.getFilename).toHaveBeenCalledWith(wrapper.vm.resume, 'json')
             expect(ExporterService.download).toHaveBeenCalledWith(expect.any(Blob), 'test.json')
-            expect(window.sa_event).toHaveBeenCalledWith('export_json')
+            expect(window.goatcounter.count).toHaveBeenCalledWith({ path: 'export_json', event: true })
             expect(wrapper.vm.toast.show).toBe(false)
         })
 
@@ -275,7 +275,7 @@ describe('EditorPage', () => {
             await flushPromises()
 
             expect(ExporterService.exportToTXT).toHaveBeenCalledWith(wrapper.vm.resume)
-            expect(window.sa_event).toHaveBeenCalledWith('download_txt')
+            expect(window.goatcounter.count).toHaveBeenCalledWith({ path: 'download_txt', event: true })
             expect(wrapper.vm.toast.show).toBe(false)
         })
 
@@ -296,7 +296,7 @@ describe('EditorPage', () => {
             topBar().vm.$emit('import')
 
             expect(clickSpy).toHaveBeenCalled()
-            expect(window.sa_event).toHaveBeenCalledWith('import_json')
+            expect(window.goatcounter.count).toHaveBeenCalledWith({ path: 'import_json', event: true })
         })
     })
 

@@ -57,6 +57,7 @@
 <script setup>
 import { computed, onBeforeUnmount, ref } from 'vue'
 import { CVConversionService } from '@/services/CVConversionService'
+import { trackEvent } from '@/analytics'
 
 const props = defineProps({
     apiKey: {
@@ -147,9 +148,7 @@ const cancel = () => {
 }
 
 const handleConvert = async ({ file, apiKey, model }) => {
-    if (window.sa_event) {
-        window.sa_event('convert_cv')
-    }
+    trackEvent('convert_cv')
     controller = new AbortController()
     loading.value = true
     startProgress()

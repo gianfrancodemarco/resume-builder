@@ -49,6 +49,7 @@ import DesignPanel from '@/components/EditorPage/design/DesignPanel.vue'
 import PreviewPane from '@/components/EditorPage/PreviewPane.vue'
 import TopBar from '@/components/EditorPage/TopBar.vue'
 import '@/components/EditorPage/editor.css'
+import { trackEvent as track } from '@/analytics'
 import { ExporterService } from '@/services/ExporterService'
 import { ResumeService } from '@/services/ResumeService'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
@@ -95,8 +96,6 @@ const toast = ref({ show: false, title: '', message: '', type: 'success' })
 const notify = (title, message, type = 'success') => {
     toast.value = { show: true, title, message, type }
 }
-
-const track = event => window.sa_event?.(event)
 
 // ---- Autosave ----
 

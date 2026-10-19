@@ -71,6 +71,7 @@
 <script>
 import AIGenerationService from "../../../services/AIGenerationService";
 import TranscriptionService from "../../../services/TranscriptionService";
+import { trackEvent } from "../../../analytics";
 
 const PROMPT_EDIT = `
 You are an experienced HR and career consultant helping a user improve an existing resume.
@@ -244,9 +245,7 @@ export default {
         async sendMessage() {
             if (!this.userInput.trim() || this.isLoading || !this.activePrompt) return;
 
-            if (window.sa_event) {
-                window.sa_event("ai_send_message");
-            }
+            trackEvent("ai_send_message");
 
             const userMessage = { sender: "user", text: this.userInput };
             this.history.push(userMessage);
@@ -319,18 +318,14 @@ export default {
         },
         startFromScratch() {
             if (!this.hasSettings()) return;
-            if (window.sa_event) {
-                window.sa_event("ai_start_from_scratch");
-            }
+            trackEvent("ai_start_from_scratch");
             const newResume = { basics: {} };
             this.$emit("update:resumeInfo", newResume);
             this.startConversation(PROMPT_SCRATCH, newResume);
         },
         editExistingResume() {
             if (!this.hasSettings()) return;
-            if (window.sa_event) {
-                window.sa_event("ai_edit_existing_resume");
-            }
+            trackEvent("ai_edit_existing_resume");
             this.startConversation(PROMPT_EDIT, this.resumeInfo);
         },
         handleEnter(event) {
