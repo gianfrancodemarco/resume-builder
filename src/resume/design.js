@@ -32,6 +32,9 @@ export const FONT_PAIRINGS = {
     editorial: { name: 'Editorial', heading: 'Source Sans 3', body: 'Source Serif 4' },
     clean: { name: 'Clean', heading: 'Source Sans 3', body: 'Source Sans 3' },
     contemporary: { name: 'Contemporary', heading: 'Inter', body: 'Gelasio' },
+    refined: { name: 'Refined', heading: 'EB Garamond', body: 'Inter' },
+    journal: { name: 'Journal', heading: 'Gelasio', body: 'Source Serif 4' },
+    metro: { name: 'Metro', heading: 'Arimo', body: 'Inter' },
 }
 
 // Sizes in CSS px, converted to pt for Typst
