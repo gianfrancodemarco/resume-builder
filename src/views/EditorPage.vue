@@ -135,16 +135,27 @@ const autosave = () => {
     }
 }
 
+const handleKeyDown = event => {
+    if ((event.ctrlKey || event.metaKey) && !event.shiftKey && !event.altKey && (event.key === 'p' || event.key === 'P')) {
+        event.preventDefault()
+        if (!downloading.value) {
+            handleDownloadPDF()
+        }
+    }
+}
+
 onMounted(() => {
     autosaveTimer = setInterval(autosave, 1000)
     // Save the last edits when the tab is closed or reloaded
     window.addEventListener('beforeunload', autosave)
+    window.addEventListener('keydown', handleKeyDown)
 })
 
 onUnmounted(() => {
     clearInterval(autosaveTimer)
     clearTimeout(downloadedTimer)
     window.removeEventListener('beforeunload', autosave)
+    window.removeEventListener('keydown', handleKeyDown)
     // ...or when leaving the editor (e.g. to the home page)
     autosave()
 })

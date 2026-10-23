@@ -22,6 +22,8 @@ export const ACCENTS = [
     { name: 'Charcoal', value: '#36454F' },
     { name: 'Brown', value: '#795548' },
     { name: 'Indigo', value: '#4B0082' },
+    { name: 'Ochre', value: '#6F4E12' },
+    { name: 'Pine', value: '#1B4332' },
 ]
 
 // Heading and body families; all bundled (see typst/fonts.js)
@@ -31,6 +33,10 @@ export const FONT_PAIRINGS = {
     elegant: { name: 'Elegant', heading: 'EB Garamond', body: 'EB Garamond' },
     editorial: { name: 'Editorial', heading: 'Source Sans 3', body: 'Source Serif 4' },
     clean: { name: 'Clean', heading: 'Source Sans 3', body: 'Source Sans 3' },
+    contemporary: { name: 'Contemporary', heading: 'Inter', body: 'Gelasio' },
+    refined: { name: 'Refined', heading: 'EB Garamond', body: 'Inter' },
+    journal: { name: 'Journal', heading: 'Gelasio', body: 'Source Serif 4' },
+    metro: { name: 'Metro', heading: 'Arimo', body: 'Inter' },
 }
 
 // Sizes in CSS px, converted to pt for Typst
