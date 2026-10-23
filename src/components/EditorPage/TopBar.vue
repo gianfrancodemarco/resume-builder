@@ -60,7 +60,16 @@
                 <v-btn v-bind="menuProps" icon="ph-dots-three-vertical" variant="text" aria-label="More actions" />
             </template>
             <v-list density="compact" min-width="220">
-                <v-list-item prepend-icon="ph-upload-simple" title="Import JSON Resume" @click="emit('import')" />
+            <v-list-item
+               prepend-icon="ph-upload-simple"
+               title="Import JSON Resume"
+               @click="emit('import')"
+            />
+            <v-list-item
+               prepend-icon="ph-file-plus"
+               title="New blank resume"
+               @click="emit('new-blank-resume')"
+            />
                 <v-divider class="my-1" />
                 <v-list-item :prepend-icon="isDark ? 'ph-sun' : 'ph-moon'"
                     :title="isDark ? 'Light theme' : 'Dark theme'" @click="toggleTheme" />
@@ -82,7 +91,14 @@ const props = defineProps({
     compact: { type: Boolean, default: false },
 })
 
-const emit = defineEmits(['home', 'download-pdf', 'import', 'export-json', 'export-txt'])
+const emit = defineEmits([
+    'home',
+    'download-pdf',
+    'import',
+    'new-blank-resume',
+    'export-json',
+    'export-txt',
+])
 
 const REPOSITORY_URL = 'https://github.com/gianfrancodemarco/resume-builder'
 
